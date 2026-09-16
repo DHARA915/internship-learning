@@ -1,0 +1,67 @@
+<!-- /*
+In JavaScript, an event is an occurrence or action that takes place in the browser or within the Document Object Model (DOM) that can be detected and responded to by your code.*/ -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>event</title>
+</head>
+
+<body>
+
+    <h1>Onclick event</h1>
+    <button onclick="cliked()">
+        click me
+    </button>
+
+    <br><br>
+    <h1>Onmouseover onclick onmouseout</h1>
+    <button onmouseover="hover()" onclick="color()" onmouseout="color2()" id="hovermany">hover me</button>
+    <p id="hover"></p>
+    <br><br>
+
+    <h1>Onkeydown Onkeyup </h1>
+    <input type="text" id="keyInput" onkeydown="down()" onkeyup="up()" placeholder="Type something here">
+    <button id="key">some text</button>
+
+    <script>
+        function cliked() {
+            alert('button cliked');
+        }
+
+        function hover() {
+            let x = 'After hovered';
+            document.getElementById('hover').textContent = x;
+        }
+
+        getElementById('hovermany'), addEventListener('mouseover', hover)
+
+        function color() {
+            document.getElementById('hovermany').style.backgroundColor = 'black';
+            document.getElementById('hovermany').style.color = 'white';
+
+        }
+        function color2() {
+            document.getElementById('hovermany').style.backgroundColor = 'pink';
+            document.getElementById('hovermany').style.color = 'blue';
+
+        }
+
+        function up() {
+            document.getElementById('key').style.backgroundColor = 'lightblue';
+            document.getElementById('key').style.color = 'black';
+        }
+        function down() {
+            // document.getElementById('key').style.backgroundColor='yellow';
+            document.getElementById("key").style.backgroundColor = 'black';
+            document.getElementById("key").style.color = 'white';
+        }
+        document.addEventListener('keydown', down);
+        document.addEventListener('keyup', up);
+
+    </script>
+</body>
+
+</html>

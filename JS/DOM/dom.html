@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <h1 id="inn">Heading</h1>
+    <img class="image" src="./i1.png" alt="">
+    <p id="first">Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate ullam ipsam dignissimos ratione
+        quo minus magnam illo, odio mollitia atque repudiandae necessitatibus hic?</p>
+    <div class="container">
+        <div class="box">
+            <div class="box1" id="b1">
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Qui, ipsa.
+            </div>
+            <div class="box1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere, officiis quis?
+            </div>
+            <div class="box1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas veniam impedit quidem expedita?
+            </div>
+        </div>
+
+        <div class="second">
+            <p id="demo"></p>
+        </div>
+
+    </div>
+    <h2>JavaScript HTML DOM</h2>
+
+    <p>Finding HTML Elements by Query Selector</p>
+    <p class="intro">Hello World!.</p>
+    <p class="intro">This example demonstrates the <b>querySelectorAll</b> method.</p>
+
+    <p id="demo"></p>
+
+    <script>
+        const x = document.querySelectorAll("p.intro");
+        document.getElementById("demo").innerHTML =
+            'The first paragraph (index 0) with class="intro" is: ' + x[0].innerHTML;
+    </script>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callback</title>
+</head>
+<body>
+    <script>
+        function loadscript(src,callback){
+            var script=document.createElement("script")
+            script.src=src;
+            script.onload=function(){
+                console.log("Script loaded",src)
+                callback(null,src)
+            }
+
+            script.onerror=function(){
+                console.log("Error in loading script")
+                callback(new Error("Src:",src))
+            }
+           document.body.appendChild(script)
+        }
+
+        function hello(error,src){
+            if(error){
+                console.log("Error")
+                return
+            }
+            alert("hello"+src)
+        }
+        loadscript("https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",hello)
+    </script>
+</body>
+</html>

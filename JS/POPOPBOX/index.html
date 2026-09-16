@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Alert, Confirm, Prompt Example</title>
+</head>
+<body>
+
+<h2>JavaScript Popup Demo</h2>
+<button onclick="login()">Click to Login</button>
+
+<script>
+  function login() {
+    alert("Welcome to our website!"); // 1️⃣ Alert message
+
+    let confirmLogin = confirm("Do you want to log in?"); // 2️⃣ Confirm
+
+    if (confirmLogin) {
+      let username = prompt("Enter your username:"); // 3️⃣ Prompt for input
+
+      if (username) {
+        alert("Hello, " + username + "! You are logged in."); // Success message
+      } else {
+        alert("No username entered. Login cancelled.");
+      }
+    } else {
+      alert("Login cancelled.");
+    }
+  }
+</script>
+
+</body>
+</html>

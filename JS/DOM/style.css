@@ -1,0 +1,17 @@
+h1{
+    color: rgb(250, 121, 34);
+}
+.box{
+    display: flex;
+
+}
+.box1{
+    width:30%;
+    height: 40vh;
+    background-color: aqua;
+    padding: 5px;
+    margin: 0px 12px;
+}
+.container{
+    margin-left:3%;
+}
