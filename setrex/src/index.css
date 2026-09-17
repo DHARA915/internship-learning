@@ -1,8 +1,46 @@
 @import "tailwindcss";
 
 @theme {
+
+  /* For color */
+
   --color-primary:#ffffff;
-  --color-secondary:#bef264
+  --color-secondary:#CFFE25;
+  --color-tertiary:#d2d2d2cc;
+  --color-transparent-bg: rgba(13, 13, 16, 0);
+  --color-bgprimary:#000000;
+
+  /* For Big Texts */
+
+  --text-bigtext:62px;
+  --text-bigtext--line-height:70px;
+  --font-weight-bigtext:500;
+  --tracking-bigtext: -0.06em;
+
+  /* for Small Texts */
+   --text-smalltext: 16px;
+  --text-smalltext--line-height: 24px;
+  --font-weight-smalltext: 400;
+  --tracking-smalltext: -0.01em;
+
+  /* border radius */
+   --radius-common: 7px;
+}
+
+@utility big-text{
+  font-size:var(--text-bigtext);
+  line-height:var( --text-bigtext--line-height);
+  font-weight:var(--font-weight-bigtext);
+  letter-spacing:var(--tracking-bigtext);
+  color:var(--color-primary);
+}
+
+@utility small-text{
+  font-size: var(--text-smalltext);
+  line-height: var(--text-smalltext--line-height);
+  font-weight: var(--font-weight-smalltext);
+  letter-spacing: var(--tracking-smalltext);
+  color:var(--color-tertiary);
 }
 
 /* 
