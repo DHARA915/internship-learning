@@ -54,7 +54,7 @@ const Hero = () => {
                     <Button
                       color="bg-secondary"
                       hover_color="hover:bg-primary"
-                      text="Get Start Now"
+                      text="Get Started Now"
                       icon={
                         <svg
                           width="22"
@@ -96,3 +96,4 @@ const Hero = () => {
 }
 
 export default Hero
+
