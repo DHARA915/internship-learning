@@ -23,9 +23,33 @@
   --font-weight-smalltext: 400;
   --tracking-smalltext: -0.01em;
 
+  /* fontType */
+   --font-bdo: "BDO Grotesk", sans-serif;
+
+
   /* border radius */
    --radius-common: 7px;
+
+    /* =========================
+     Marquee Animation
+  ========================= */
+
+  --animate-marquee: marquee 6s linear infinite;
+
+
 }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+
 
 @utility big-text{
   font-size:var(--text-bigtext);
@@ -41,6 +65,10 @@
   font-weight: var(--font-weight-smalltext);
   letter-spacing: var(--tracking-smalltext);
   color:var(--color-tertiary);
+}
+
+body {
+  font-family: var(--font-bdo);
 }
 
 /* 

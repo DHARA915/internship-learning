@@ -1,12 +1,16 @@
 import React from 'react'
-import Navbar from '../Component/Navbar'
-import Hero from '../Component/Hero'
+import Navbar from '../Components/Navbar'
+import Hero from '../Sections/Hero'
+import Parterslide from '../Sections/Parterslide'
+import SupportCard from '../Sections/SupportCard'
 
 const Homepage = () => {
   return (
     <>
     <Navbar/>
     <Hero/>
+    <Parterslide/>
+    <SupportCard/>
     </>
     
   )

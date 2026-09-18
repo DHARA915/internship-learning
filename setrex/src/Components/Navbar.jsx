@@ -1,6 +1,7 @@
 import { ChevronDown, Menu, X } from "lucide-react";
 import Button from "./Button";
 import { useState } from "react";
+import Logo from "./logo";
 
 function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -25,14 +26,7 @@ function Navbar() {
                     <nav id="navbar" className="  bg-gradient-to-r from-slate-950 to black  flex px-[20px] justify-between items-center gap-[20px]">
 
                         {/* Logo */}
-                        <div className="flex w-1/3 justify-start items-center gap-[30px]">
-
-                            <img className="h-10 w-auto"
-                                src="https://cdn.prod.website-files.com/68b6ff99deb8a7b82b41a88b/68bf22b84f1d6c96a46932fc_832071e89378345f11dbea20b8e9d9aa_Logo.svg"
-                                alt="SetreX Logo"
-
-                            />
-                        </div>
+                        <Logo/>
 
                         {/* NavbarLink */}
 

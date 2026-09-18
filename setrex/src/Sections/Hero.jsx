@@ -1,5 +1,5 @@
 import React from 'react'
-import Button from "./Button";
+import Button from "../Components/Button";
 import { ArrowRight } from "lucide-react";
 
 const Hero = () => {
@@ -7,7 +7,7 @@ const Hero = () => {
     <section id="hero" className="bg-bgprimary">
 
       <div id="hero_container" className="h-full relative z-2 w-full max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-[20px]">
-        <div id="main" className="flex w-full h-full max-w-[603px] mx-auto py-[100px] sm:py-[100px] lg:py-[100px] flex-col justify-center items-center">
+        <div id="main" className="flex w-full h-full max-w-[603px] mx-auto py-[150px] flex-col justify-center items-center">
 
           <div id="content" className="w-full">
 
