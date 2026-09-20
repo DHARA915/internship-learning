@@ -36,6 +36,13 @@
 
   --animate-marquee: marquee 6s linear infinite;
 
+  /* For mobile Device */
+  --text-mbsm:17px;
+  --text-mbsm--line-height: 28px;
+
+  /* for feature-section */
+
+  
 
 }
 
@@ -50,6 +57,11 @@
   }
 
 
+@utility mbsm {
+  font-size: 16px;
+  line-height: 28px;
+  font-weight: 500;
+}
 
 @utility big-text{
   font-size:var(--text-bigtext);
@@ -70,6 +82,32 @@
 body {
   font-family: var(--font-bdo);
 }
+
+/* for Investor marquee */
+
+  @keyframes marquee-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-50% - 0.5rem));
+    }
+  }
+  @keyframes marquee-y {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-50% - 0.5rem));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track-x,
+    .marquee-track-y {
+      animation-duration: 1ms;
+      animation-iteration-count: 1;
+    }
+  }
 
 /* 
 :root {

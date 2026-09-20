@@ -10,10 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@kitlangton/rolling-number": "^0.4.1",
     "@tailwindcss/vite": "^4.3.3",
+    "framer-motion": "^13.4.0",
     "lucide-react": "^1.46.0",
     "react": "^19.2.8",
+    "react-countup": "^6.5.3",
     "react-dom": "^19.2.8",
+    "react-intersection-observer": "^11.0.1",
+    "react-slot-counter": "^3.3.3",
     "swiper": "^14.2.0",
     "tailwindcss": "^4.3.3"
   },

@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Label = ({label}) => {
+const Label = ({label,bgcolor}) => {
   return (
-    <div className="inline-flex text-sm w-fit items-center py-[4px] px-[15px] text-black rounded-sm bg-[#f3ff9b]">
+    <div style={{backgroundColor:bgcolor}} className={`inline-flex text-sm w-fit items-center py-[3px] px-[12px]  lg:py-[4px] lg:px-[15px] text-black rounded-sm`}>
   {label}
 </div>
   )

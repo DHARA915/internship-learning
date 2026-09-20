@@ -1,7 +1,10 @@
 import { ChevronDown, Menu, X } from "lucide-react";
 import Button from "./Button";
 import { useState } from "react";
-import Logo from "./logo";
+import Logo from "./Logo";
+import { motion } from "framer-motion";
+
+
 
 function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,14 +19,26 @@ function Navbar() {
     ];
 
     return (
-        <section className="bg-black relative z-9999 w-full ">
+        <section className="bg-bgprimary relative z-9999 w-full ">
 
             {/* Header */}
 
-            <div className="relative z-2 w-full max-w-[1320px] mx-auto">
+            <motion.div
+  initial={{
+    opacity: 0,
+    y: -80,
+  }}
+  animate={{
+    opacity: 1,
+    y: 0,
+  }}
+  transition={{
+    duration: 1.5,
+    ease: [0.16, 1, 0.3, 1],
+  }} className="relative z-2 w-full max-w-[1320px] mx-auto">
                 <div className="relative z-10 py-[20px]">
 
-                    <nav id="navbar" className="  bg-gradient-to-r from-slate-950 to black  flex px-[20px] justify-between items-center gap-[20px]">
+                    <nav id="navbar" className="   flex px-[20px] justify-between items-center gap-[20px]">
 
                         {/* Logo */}
                         <Logo/>
@@ -84,12 +99,24 @@ function Navbar() {
                         </button>
                     </nav>
                 </div>
-            </div>
+            </motion.div>
 
 
             {/* Mobile Navbar */}
 
-            <div id="mobile-navbar"
+            <motion.div
+  initial={{
+    opacity: 0,
+    y: -80,
+  }}
+  animate={{
+    opacity: 1,
+    y: 0,
+  }}
+  transition={{
+    duration: 1.5,
+    ease: [0.16, 1, 0.3, 1],
+  }} id="mobile-navbar"
                 className={` bg-black overflow-hidden border-t absolute top-full left-0 w-full z-50 border-gray-800 px-6 transition-all duration-500 ease-in-out lg:hidden ${isOpen
                     ? "h-screen translate-y-0 opacity-100 pb-6 pt-6"
                     : "h-0  opacity-0 pb-0 pt-0"
@@ -129,7 +156,7 @@ function Navbar() {
                     </li>
                 </ul>
 
-            </div>
+            </motion.div>
 
 
 

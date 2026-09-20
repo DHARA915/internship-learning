@@ -1,6 +1,8 @@
 import React from 'react'
 import Button from "../Components/Button";
 import { ArrowRight } from "lucide-react";
+import SectionReveal from '../Components/SectionReveal'
+
 
 const Hero = () => {
   return (
@@ -10,6 +12,9 @@ const Hero = () => {
         <div id="main" className="flex w-full h-full max-w-[603px] mx-auto py-[150px] flex-col justify-center items-center">
 
           <div id="content" className="w-full">
+
+
+            <SectionReveal>
 
             <div id="header_wrap" className="flex flex-col">
 
@@ -86,6 +91,7 @@ const Hero = () => {
               </div>
 
             </div>
+            </SectionReveal>
           </div>
 
         </div>
