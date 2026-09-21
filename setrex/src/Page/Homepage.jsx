@@ -10,6 +10,7 @@ import Investore from '../Sections/Investore'
 import Capability from '../Sections/Capability'
 import Integration from '../Sections/Integration'
 import Testimonial from '../Sections/Testimonial'
+import Pricing from '../Sections/Pricing'
 
 const Homepage = () => {
   return (
@@ -23,6 +24,7 @@ const Homepage = () => {
     <Capability/>
     <Integration/>
     <Testimonial/>
+    <Pricing/>
     </>
     
   )
