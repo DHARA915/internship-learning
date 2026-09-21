@@ -8,7 +8,7 @@ const Hero = () => {
   return (
     <section id="hero" className="bg-bgprimary">
 
-      <div id="hero_container" className="h-full relative z-2 w-full max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-[20px]">
+      <div id="hero_container" className="h-full relative z-2 w-full max-w-[1320px] mx-auto  px-[20px]">
         <div id="main" className="flex w-full h-full max-w-[603px] mx-auto py-[150px] flex-col justify-center items-center">
 
           <div id="content" className="w-full">
@@ -39,11 +39,11 @@ const Hero = () => {
               </div>
 
               {/* For Text */}
-              <div id="hero-text-wrap" className="flex flex-col items-center justify-start gap-[16px] sm:gap-[20px] text-center px-2">
-                <div id='heading_wrapper' className="items-center">
-                  <div className="big-text text-3xl sm:text-4xl md:text-5xl leading-tight">
+              <div id="hero-text-wrap" className="flex flex-col items-center max-w-full justify-start gap-[16px] sm:gap-[20px] text-center px-2">
+                <div id='heading_wrapper' className="items-center lg:max-w-[80%] ">
+                  <h1 className="big-text text-3xl sm:text-4xl md:text-5xl leading-tight">
                     Turn your big idea into a stunning Website
-                  </div>
+                  </h1>
                 </div>
                 <div className="hro-subtitle-wrap">
                   <div className="hero-subtitle text-primary">
@@ -52,10 +52,10 @@ const Hero = () => {
                     </div>
                   </div>
                 </div>
-
+bg-[#1f1f23] lg:p-[60px] px-[20px] py-[24px] text-[24px]  h-full rounded-3xl w-full max-w-full lg:max-w-[90%]
                 {/* Buttons */}
-                <div id="Buttons" className="flex flex-row sm:flex-row w-full sm:w-auto gap-4 sm:gap-6 items-center justify-center mt-2">
-                  <div className="flex w-full sm:w-auto">
+                <div id="Buttons" className="flex  flex-col lg:flex-row w-full sm:w-auto gap-4 sm:gap-6 items-center justify-center mt-2">
+                  <div className="flex justify-center w-full sm:w-auto">
                     <Button
                       color="bg-secondary"
                       hover_color="hover:bg-primary"
@@ -80,7 +80,7 @@ const Hero = () => {
                     />
                   </div>
 
-                  <div className="flex w-full sm:w-auto">
+                  <div className="flex justify-center w-full sm:w-auto">
                     <Button
                       color="bg-primary"
                       hover_color="hover:bg-secondary"
@@ -89,6 +89,8 @@ const Hero = () => {
                   </div>
                 </div>
               </div>
+
+              
 
             </div>
             </SectionReveal>

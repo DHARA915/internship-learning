@@ -50,7 +50,7 @@ const Capability = () => {
 
           <div id="content" className="w-full">
 
-            <div id="header_wrap" className="flex mx-auto max-w-full lg:max-w-[52%] flex-col">
+            <div id="header_wrap" className="flex mx-auto max-w-full lg:max-w-[55%] flex-col">
 
 
               {/* For Text */}

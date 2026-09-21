@@ -79,7 +79,7 @@ const Integration = () => {
                         <div className="lg:mt-[40px] mt-6">
 
                             <Button text="See All Integration" color="bg-primary"
-                                hover_color="hover:bg-secondary" />
+                                hover_color="hover:bg-secondary" className="px-[42px] py-[15px]" />
                         </div>
                     </SectionReveal>
 

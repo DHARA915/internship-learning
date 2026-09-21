@@ -27,17 +27,32 @@ const rowTwo = [
   { name: 'James Patel', role: 'UX Designer', src: img('photo-1679412330254-90cb240038c5') },
 ]
 
+// const Card = ({ item }) => (
+//   <figure className="shrink-0 flex items-center gap-3 sm:gap-4 lg:gap-5 rounded-2xl sm:rounded-3xl lg:rounded-[28px] border border-white/10 bg-[#0a0a0a] py-3 pl-3 pr-6 sm:py-4 sm:pl-4 sm:pr-8 lg:pr-10">
+//     <img
+//       className="shrink-0 size-12 sm:size-16 md:size-20 lg:size-24 rounded-full object-cover"
+//       src={item.src}
+//       alt={item.name}
+//       loading="lazy"
+//     />
+//     <div className="whitespace-nowrap">
+//       <p className="text-base sm:text-lg md:text-xl lg:text-2xl !font-500 text-white">{item.name}</p>
+//       <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm md:text-base lg:text-lg text-[#D2D2D2CC] ">{item.role}</p>
+//     </div>
+//   </figure>
+// )
+
 const Card = ({ item }) => (
-  <figure className="shrink-0 flex items-center gap-3 sm:gap-4 lg:gap-5 rounded-2xl sm:rounded-3xl lg:rounded-[28px] border border-white/10 bg-[#0a0a0a] py-3 pl-3 pr-6 sm:py-4 sm:pl-4 sm:pr-8 lg:pr-10">
+  <figure className="shrink-0 flex items-center gap-4 rounded-2xl sm:rounded-3xl lg:rounded-[28px]  bg-[#050508] p-[25px]">
     <img
-      className="shrink-0 size-12 sm:size-16 md:size-20 lg:size-24 rounded-full object-cover"
+      className="shrink-0 w-[78px] h-[78px] rounded-full object-cover"
       src={item.src}
       alt={item.name}
       loading="lazy"
     />
     <div className="whitespace-nowrap">
       <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-white">{item.name}</p>
-      <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm md:text-base lg:text-lg text-neutral-400">{item.role}</p>
+      <p className="text-xs sm:text-sm md:text-base lg:text-lg text-neutral-400">{item.role}</p>
     </div>
   </figure>
 )
@@ -155,12 +170,12 @@ const Investore = () => {
 
    
 
-      <div id="main" className="flex flex-col w-full mx-auto max-w-[92%] lg:max-w-[85%] lg:p-[20px] px-[16px]">
+      <div id="main" className="flex flex-col w-full mx-auto max-w-[92%] lg:max-w-[85%] lg:px-[20px] px-[16px]">
         <SectionReveal>
 
         <div id="heading_wrapper" className="flex items-center justify-start">
-          <h2 className="big-text text-2xl sm:text-4xl md:text-5xl leading-tight text-white max-w-full sm:max-w-[75%] md:max-w-[100%] lg:max-w-[45%]">
-            Supported by many companies around the world
+          <h2 className="big-text lg:text-[32px] text-[20px] md:text-5xl leading-tight text-white max-w-full sm:max-w-[75%] md:max-w-[100%] lg:max-w-[35%]">
+            Supported by leading AI and future-of-work investors.
           </h2>
         </div>
         </SectionReveal>

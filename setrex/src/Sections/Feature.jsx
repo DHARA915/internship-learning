@@ -8,7 +8,7 @@ const Feature = () => {
   return (
     <section
       id="featuresection"
-      className="flex justify-center bg-bgprimary px-4 pt-[72px] lg:pt-[160px]"
+      className="flex justify-center bg-bgprimary px-[16px] pt-[72px] lg:pt-[160px]"
     >
       <div
         id="main"
@@ -92,13 +92,12 @@ const Feature = () => {
           {/* Lower Content */}
           <SectionReveal>
 
-          <div id="lower-content" className="  gap-5 flex-col lg:flex-row  flex lg:gap-[22px]" >
+          <div id="lower-content" className="  gap-5 flex-col lg:grid lg:lg:grid-cols-2 flex lg:gap-[22px]" >
             <div id="left" className="  rounded-2xl flex flex-col  justify-between lg:gap-[32px]">
 
               <div id="upper-left">
-                <img src="https://cdn.prod.website-files.com/68b6ff99deb8a7b82b41a88b/68bf3f4f3746318550a6b91f_99e0c53ce72663410403ef302e227598_Features%20Card%2003.avif" />
+                <img src="/test.svg" />
               </div>
-
               <div id="lower-left" className=" flex gap-[12px] flex-col lg:gap-[20px] pb-[24px] px-[20px] lg:px-[60px] lg:pb-[60px] ">
 
                 <h4 id="heading" className="text-primary text-[20px] md:text-[32px]">
@@ -146,11 +145,12 @@ const Feature = () => {
                     icon={<Bot className="h-5 w-5 sm:h-6 sm:w-6" />}
                     slide={false}
                     shadow={true}
+                    className="lg:!h-[75px] lg:!w-[236px] lg:!p-0 !text-[25px]"
                   />
                 </div>
               </div>
 
-              <div id="lower-left" className=" px-[20px] flex gap-[12px] flex-col lg:gap-[20px]  lg:px-[20px] lg:px-[60px] lg:pb-[60px] ">
+              <div id="lower-left" className=" px-[20px] lg:px-0 px-[16px] flex gap-[12px] flex-col lg:gap-[20px]  lg:px-[20px] lg:px-[60px] lg:pb-[60px] ">
 
                 <h4 id="heading" className="text-primary text-[20px] md:text-[32px]">
                   Trusted Support Team                </h4>

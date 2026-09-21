@@ -59,7 +59,7 @@ const Parterslide = () => {
 
       <div
         id="brand-main"
-        className="gap-[30px] mx-[50px] lg:mx-[291px] lg:px-[20px] flex flex-col"
+        className="gap-[30px] max-w-[70%] mx-auto lg:px-[20px] lg:pt-[60px] flex flex-col"
       >
         <SectionReveal>
 

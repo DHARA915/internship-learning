@@ -41,19 +41,21 @@ function Navbar() {
                     <nav id="navbar" className="   flex px-[20px] justify-between items-center gap-[20px]">
 
                         {/* Logo */}
+                        <div className="w-1/3 items-center">
                         <Logo/>
+                    </div>
 
                         {/* NavbarLink */}
 
-                        <div className="flex w-1/3 items-center justify-center">
+                        <div className="flex w-1/3 items-center justify-center ">
 
                             <div className="relative flex justify-start items-center gap-[38px]">
 
-                                <ul className="hidden items-center gap-8 text-sm  md:hidden sm:hidden  text-primary lg:flex">
+                                <ul className="hidden items-center text-[16px] gap-8 text-sm  md:hidden sm:hidden  text-primary lg:flex">
                                     {navLinks.map((link) => (
                                         <li
                                             key={link.name}
-                                            className="flex cursor-pointer items-center gap-1 text-lg hover:text-secondary"
+                                            className="flex cursor-pointer items-center gap-1 hover:text-secondary"
                                         >
                                             <a href={link.href}>{link.name}</a>
                                             {
@@ -74,21 +76,21 @@ function Navbar() {
 
                                 <a
                                     href="/pages"
-                                    className="flex items-center gap-1 text-lg font-medium text-primary hover:text-lime-500"
+                                    className="flex items-center gap-1 text-[16px] font-medium text-primary hover:text-lime-500"
                                 >
                                     Pages
                                     <ChevronDown className="h-6 w-6" />
                                 </a>
                             </div>
 
-                            <Button color="bg-primary" hover_color="hover:bg-secondary" text="Contact Us" />
+                            <Button color="bg-primary" hover_color="hover:bg-secondary" text="Contact Us" className="!text-[16px]"  />
                         </div>
 
 
 
                         {/* Mobile menu button */}
                         <button
-                            className="text-primary lg:hidden relative z-[60]"
+                            className="text-primary lg:hidden text-[16px] relative z-[60]"
                             onClick={() => setIsOpen(!isOpen)}
                         >
                             {isOpen ? (
@@ -118,7 +120,7 @@ function Navbar() {
     ease: [0.16, 1, 0.3, 1],
   }} id="mobile-navbar"
                 className={` bg-black overflow-hidden border-t absolute top-full left-0 w-full z-50 border-gray-800 px-6 transition-all duration-500 ease-in-out lg:hidden ${isOpen
-                    ? "h-screen translate-y-0 opacity-100 pb-6 pt-6"
+                    ? "h-screen translate-y-0 opacity-100 pb-6 pt-6  "
                     : "h-0  opacity-0 pb-0 pt-0"
                     }`}
             >
