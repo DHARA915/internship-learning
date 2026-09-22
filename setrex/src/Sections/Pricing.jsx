@@ -2,51 +2,53 @@ import React from 'react'
 import { useState } from 'react';
 import { Rocket, Zap } from 'lucide-react'
 import Pricingcard from '../Components/Pricingcard';
+import SectionReveal from '../Components/SectionReveal';
+import { motion, AnimatePresence } from "framer-motion";
 
 const Pricing = () => {
 
     const [yearly, setYearly] = useState(false);
 
     const plans = [
-  {
-    icon: <Rocket size={20} />,
-    title: "Starter Plan",
-    description: "Perfect for small businesses and startups looking to establish their digital presence.",
-    price: "$149",
-    period: "/monthly",
-    features: ["Basic strategy consultation", "Social media setup", "Monthly performance reports", "Dedicated Support Team"],
-  },
-  {
-    icon: <Zap size={20} />,
-    title: "Enterprise Plan",
-    description: "Solutions tailored for large businesses to optimize performance and drive innovation.",
-    price: "$599",
-    period: "/monthly",
-    badge: "Most Popular",
-    highlighted: true,
-    features: ["For large businesses with complex needs", "Full-service marketing strategy and execution", "Advanced analytics and custom reporting", "24/7 priority support"],
-  },
-  {
-    icon: <Rocket size={20} />,
-    title: "Starter Plan",
-    description: "Perfect for small businesses and startups looking to establish their digital presence.",
-    price: "$149",
-    period: "/yearly",
-    features: ["Basic strategy consultation", "Social media setup", "Monthly performance reports", "Dedicated Support Team"],
-  },
-  {
-    icon: <Zap size={20} />,
-    title: "Enterprise Plan",
-    description: "Solutions tailored for large businesses to optimize performance and drive innovation.",
-    price: "$599",
-    period: "/yearly",
-    badge: "Most Popular",
-    highlighted: true,
-    features: ["For large businesses with complex needs", "Full-service marketing strategy and execution", "Advanced analytics and custom reporting", "24/7 priority support"],
-  },
-]
+        {
+            icon: <Rocket size={20} />,
+            title: "Starter Plan",
+            description: "Perfect for small businesses and startups looking to establish their digital presence.",
+            price: "$149",
+            period: "/monthly",
+            features: ["Basic strategy consultation", "Social media setup", "Monthly performance reports", "Dedicated Support Team"],
+        },
+        {
+            icon: <Zap size={20} />,
+            title: "Enterprise Plan",
+            description: "Solutions tailored for large businesses to optimize performance and drive innovation.",
+            price: "$599",
+            period: "/monthly",
+            badge: "Most Popular",
+            highlighted: true,
+            features: ["For large businesses with complex needs", "Full-service marketing strategy and execution", "Advanced analytics and custom reporting", "24/7 priority support"],
+        },
+        {
+            icon: <Rocket size={20} />,
+            title: "Starter Plan",
+            description: "Perfect for small businesses and startups looking to establish their digital presence.",
+            price: "$149",
+            period: "/yearly",
+            features: ["Basic strategy consultation", "Social media setup", "Monthly performance reports", "Dedicated Support Team"],
+        },
+        {
+            icon: <Zap size={20} />,
+            title: "Enterprise Plan",
+            description: "Solutions tailored for large businesses to optimize performance and drive innovation.",
+            price: "$599",
+            period: "/yearly",
+            badge: "Most Popular",
+            highlighted: true,
+            features: ["For large businesses with complex needs", "Full-service marketing strategy and execution", "Advanced analytics and custom reporting", "24/7 priority support"],
+        },
+    ]
 
-const billing = yearly ? "/yearly" : "/monthly";
+    const billing = yearly ? "/yearly" : "/monthly";
 
 
     return (
@@ -95,15 +97,32 @@ const billing = yearly ? "/yearly" : "/monthly";
                         </span>
                     </div>
 
-                    <div id="pricingcards" className="lg:px-[20px] lg:pb-[20px] lg:mt-[60px] rounded-2xl ">
 
+                    {/* <div id="pricingcards" className="lg:px-[20px] lg:pb-[20px] lg:mt-[60px] rounded-2xl ">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {plans
+                                .filter((plan) => plan.period === billing)
+                                .map((plan) => <Pricingcard key={plan.title + plan.period} {...plan} />)}
+                        </div>
+                    </div> */}
 
-
-                    <div className="grid lg:grid-cols-2 grid-col-1 gap-6">
-  {plans.map((plan) => <Pricingcard key={plan.title} {...plan} />)}
-</div>
-                    </div>
-
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={billing}
+                            initial={{ opacity: 0, y: 80 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                            <div id="pricingcards" className="lg:px-[20px] lg:pb-[20px] lg:mt-[60px] rounded-2xl">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {plans
+                                        .filter((plan) => plan.period === billing)
+                                        .map((plan) => <Pricingcard key={plan.title + plan.period} {...plan} />)}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
 
 
                 </div>
