@@ -1,6 +1,7 @@
 import { needsOptions, needsLengthValidation, needsRangeValidation } from "../utils/fieldTypes";
 import { OptionsEditor } from "./Optionseditor ";
 import { Button } from "../components/Button";
+import Input from "../components/Input";
 
 // props:
 //   field           — the currently selected field object, or null
@@ -33,7 +34,7 @@ export function FieldSettingsPanel({ field, onUpdateField, onDeleteField, onDupl
 
       <label className="block">
         <span className="mb-1 block text-xs font-medium text-gray-500">Label</span>
-        <input
+        <Input
           type="text"
           value={field.label}
           onChange={(e) => onUpdateField({ label: e.target.value })}
@@ -43,7 +44,7 @@ export function FieldSettingsPanel({ field, onUpdateField, onDeleteField, onDupl
 
       <label className="block">
         <span className="mb-1 block text-xs font-medium text-gray-500">Placeholder</span>
-        <input
+        <Input
           type="text"
           value={field.placeholder}
           onChange={(e) => onUpdateField({ placeholder: e.target.value })}
@@ -52,7 +53,7 @@ export function FieldSettingsPanel({ field, onUpdateField, onDeleteField, onDupl
       </label>
 
       <label className="flex items-center gap-2">
-        <input
+        <Input
           type="checkbox"
           checked={field.required}
           onChange={(e) => onUpdateField({ required: e.target.checked })}
@@ -65,7 +66,7 @@ export function FieldSettingsPanel({ field, onUpdateField, onDeleteField, onDupl
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="mb-1 block text-xs font-medium text-gray-500">Min length</span>
-            <input
+            <Input
               type="number"
               min="0"
               value={field.minLength ?? ""}
@@ -77,7 +78,7 @@ export function FieldSettingsPanel({ field, onUpdateField, onDeleteField, onDupl
           </label>
           <label className="block">
             <span className="mb-1 block text-xs font-medium text-gray-500">Max length</span>
-            <input
+            <Input
               type="number"
               min="0"
               value={field.maxLength ?? ""}

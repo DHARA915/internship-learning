@@ -79,7 +79,7 @@ function FieldInput({ field, value, onChange }) {
               value={option}
               checked={value === option}
               onChange={(e) => onChange(e.target.value)}
-              className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+            
             />
             {option}
           </label>
@@ -101,11 +101,11 @@ function FieldInput({ field, value, onChange }) {
       <div className="flex flex-col gap-1.5" onClick={stop}>
         {field.options.map((option) => (
           <label key={option} className="flex items-center gap-2 text-sm text-gray-700">
-            <input
+            <Input
               type="checkbox"
               checked={selected.includes(option)}
               onChange={() => toggle(option)}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              
             />
             {option}
           </label>
@@ -116,7 +116,7 @@ function FieldInput({ field, value, onChange }) {
 
   // text, email, number, password, date all fall through to a plain input
   return (
-    <input
+    <Input
       type={field.type}
       value={value || ""}
       placeholder={field.placeholder}
