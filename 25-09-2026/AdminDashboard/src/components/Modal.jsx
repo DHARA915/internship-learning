@@ -40,8 +40,6 @@ const Modal = ({
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
-    console.log("Data from Modal Component",data)
-
     onSubmit?.(data);
   };
 
@@ -49,17 +47,17 @@ const Modal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-0 overflow-hidden rounded-xl border border-border bg-card p-0 text-card-foreground shadow-lg sm:max-w-2xl">
         <form onSubmit={handleSubmit}>
-            <DialogHeader className="space-y-1.5 border-b border-border px-8 py-5 text-left">
-              <DialogTitle className="text-lg font-semibold leading-none tracking-tight text-foreground">
-                {title}
-              </DialogTitle>
+          <DialogHeader className="space-y-1.5 border-b border-border px-8 py-5 text-left">
+            <DialogTitle className="text-lg font-semibold leading-none tracking-tight text-foreground">
+              {title}
+            </DialogTitle>
 
-              {description && (
-                <DialogDescription className="text-sm text-muted-foreground">
-                  {description}
-                </DialogDescription>
-              )}
-            </DialogHeader>
+            {description && (
+              <DialogDescription className="text-sm text-muted-foreground">
+                {description}
+              </DialogDescription>
+            )}
+          </DialogHeader>
 
           <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-5 px-8 py-6">
             {fields.map((field) => (
