@@ -84,7 +84,7 @@ import { SidebarTrigger } from "./ui/sidebar";
 import { NAV_ITEMS } from "./sidebar/config";
 import { useLocation } from "react-router-dom";
 import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";z
 
 const Header = () => {
   const location = useLocation();

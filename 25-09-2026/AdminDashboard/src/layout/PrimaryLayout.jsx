@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { SidebarProvider } from '@/components/ui/sidebar'
-import Sidebar from '@/components/sidebar/Sidebar'
-import Header from '@/components/Header'
+import { SidebarProvider } from '../components/ui/sidebar'
+import Sidebar from '../components/sidebar/Sidebar'
+import Header from '../components/Header'
 import { Outlet,useLocation } from 'react-router-dom'
 
 const PrimaryLayout = () => {
