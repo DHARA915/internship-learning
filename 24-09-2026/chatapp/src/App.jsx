@@ -10,11 +10,11 @@ function App() {
 
   return (
     <BrowserRouter>
-  <Routes>
-      <Route element={<PrimaryLayout />}>
-        <Route path="/" element={<Chatwindow />} />
-      </Route>
-    </Routes>
+      <Routes>
+        <Route element={<PrimaryLayout />}>
+          <Route path="/" element={<Chatwindow />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   )
 }
