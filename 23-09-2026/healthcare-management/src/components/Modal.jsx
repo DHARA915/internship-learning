@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,17 +33,31 @@ const Modal = ({
   onSubmit,
   submitLabel = "Save",
   cancelLabel = "Cancel",
+  initialData={}//for edit mode auto fill stored data
 }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+  const [formData,setFormData]=useState({})
 
-    console.log("Data from Modal Component",data)
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-    onSubmit?.(data);
-  };
+  console.log("Data from Modal Component:", formData);
+
+  onSubmit?.(formData);
+};
+
+
+useEffect(() => {
+  if (open) {
+    const values = {};
+
+    fields.forEach((field) => {
+      values[field.name] = initialData?.[field.name] ?? "";
+    });
+
+    setFormData(values);
+  }
+}, [open, initialData, fields]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,6 +100,13 @@ const Modal = ({
                   type={field.type || "text"}
                   placeholder={field.placeholder}
                   required={field.required}
+                   value={formData[field.name] ?? ""}
+                    onChange={(e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field.name]: e.target.value,
+    }));
+  }}
                   className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/30"
                 />
 

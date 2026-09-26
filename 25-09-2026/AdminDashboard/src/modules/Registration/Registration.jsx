@@ -28,6 +28,7 @@ const Registration = () => {
   const {
     trigger,
     handleSubmit,
+    getValues
   } = form;
 
   const nextStep = async () => {
