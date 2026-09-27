@@ -3,6 +3,7 @@ import PrimaryLayout from './layout/PrimaryLayout'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Registration from './modules/Registration/Registration'
 import ProductManagement from './modules/Product Management/ProductManagement';
+import Users from './modules/Users/Users';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route element={<PrimaryLayout />}>
           <Route path="/Registration" element={<Registration />} />
           <Route path="/product-management" element={<ProductManagement />} />
+          <Route path="/users" element={<Users/>} />
          
         </Route>
       {/* Default rote */}

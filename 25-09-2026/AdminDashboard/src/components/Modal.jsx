@@ -33,6 +33,7 @@ const Modal = ({
   onSubmit,
   submitLabel = "Save",
   cancelLabel = "Cancel",
+  initialData = {},
 }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +46,7 @@ const Modal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-0 overflow-hidden rounded-xl border border-border bg-card p-0 text-card-foreground shadow-lg sm:max-w-2xl">
+      <DialogContent className="gap-0 overflow-hidden rounded-xl border border-border bg-secondary p-0 text-card-foreground shadow-lg sm:max-w-2xl">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="space-y-1.5 border-b border-border px-8 py-5 text-left">
             <DialogTitle className="text-lg font-semibold leading-none tracking-tight text-foreground">
@@ -59,7 +60,7 @@ const Modal = ({
             )}
           </DialogHeader>
 
-          <FieldGroup className="grid grid-cols-2 gap-x-6 gap-y-5 px-8 py-6">
+          <FieldGroup className="grid grid-cols-2  gap-x-6 gap-y-5 px-8 py-6">
             {fields.map((field) => (
               <Field
                 key={field.name}
@@ -84,6 +85,7 @@ const Modal = ({
                   type={field.type || "text"}
                   placeholder={field.placeholder}
                   required={field.required}
+                  defaultValue={initialData[field.name] ?? ""}
                   className="border-border bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/30"
                 />
 
@@ -96,7 +98,7 @@ const Modal = ({
             ))}
           </FieldGroup>
 
-          <DialogFooter className="gap-2 border-t border-border bg-muted/40 px-8 py-4 sm:justify-end">
+          <DialogFooter className="gap-2 mb-1 border-t border-border bg-muted/40 px-8 py-4 sm:justify-end">
             <Button
               type="button"
               variant="outline"
@@ -108,7 +110,7 @@ const Modal = ({
 
             <Button
               type="submit"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary hover:bg-primary/90"
             >
               {submitLabel}
             </Button>

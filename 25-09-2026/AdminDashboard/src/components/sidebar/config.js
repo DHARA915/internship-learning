@@ -18,10 +18,10 @@ export const NAV_ITEMS = [
     actionLabel: 'Manage Products'
   },
   {
-    to: "/cart",
-    label: "Cart",
+    to: "/users",
+    label: "Users",
     icon: Calendar,
-    actionLabel: 'Manage Cart'
+    actionLabel: 'Manage Users'
 
   },
 ];
