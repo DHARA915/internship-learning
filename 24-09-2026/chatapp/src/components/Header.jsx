@@ -12,12 +12,12 @@ const Header = () => {
         (chat) => chat.chatId === activeChatId
     );
 
-   console.log("Active Chat:",activeChat)
+  //  console.log("Active Chat:",activeChat)
 
   return (
     <header className="flex h-16 shrink-0 items-center border-b border-border bg-background px-5">
       <h1 className="text-lg font-semibold text-tertiary">
-        {activeChat ? activeChat.name : "Chat App"}
+        {activeChat ? activeChat.name : "Chat App"} 
       </h1>
     </header>
   );

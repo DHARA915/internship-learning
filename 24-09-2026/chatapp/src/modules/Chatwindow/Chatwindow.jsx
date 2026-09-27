@@ -1,13 +1,16 @@
 
 import React, { useState } from "react";
-import { useSelector ,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 // import { Messages } from "./data";
-import { addMessages ,editMessages,deleteMessages } from "../../redux/Slices/messageSlice";
+import { addMessages, editMessages, deleteMessages } from "../../redux/Slices/messageSlice";
+import { Pencil, Trash2 } from "lucide-react";
+
 
 const Chatwindow = () => {
     const [messageText, setMessageText] = useState("");
+    const [editinMessageId, setEditingMessageId] = useState("");
 
-    const messages=useSelector((state)=>state.message.messages)
+    const messages = useSelector((state) => state.message.messages)
 
     const dispatch = useDispatch()
 
@@ -16,32 +19,67 @@ const Chatwindow = () => {
         (state) => state.chat.activeChatId
     );
 
-    console.log("From chatWindow:", activeChatId )
+    // console.log("From chatWindow:", activeChatId )
 
     // Find the selected chat
     const activeChat = messages.find(
         (chat) => chat.chatId === activeChatId
     );
 
-    console.log("Selected chat from chatWindow ", activeChat)
+    // console.log("Selected chat from chatWindow ", activeChat)
 
     // Get messages of selected chat
     const chatMessages = activeChat?.messages || [];
 
 
-    const handleSubmit = ()=>{
-        console.log("handle submit clicked")
-       if(!messageText.trim()) return;
+    const handleSubmit = () => {
 
-       dispatch(
-        addMessages({
-            chatId:activeChatId,
-            text:messageText
-        })
-       )
+        if (!messageText.trim()) return;
 
-       console.log("after dispatch ")
+        console.log("Clicking edit editmessageId", editinMessageId)
+
+        if (editinMessageId) {
+            dispatch(
+                editMessages({
+                    chatId: activeChatId,
+                    messageId: editinMessageId,
+                    text: messageText.trim()
+                })
+            )
+            setEditingMessageId(null);
+        }
+        else {
+
+            dispatch(
+                addMessages({
+                    chatId: activeChatId,
+                    text: messageText
+                })
+            )
+        }
+        setMessageText("");
     }
+
+    const handleEdit = (msg) => {
+        setEditingMessageId(msg.id);
+        console.log("Selected MessageId", msg, " ", msg.id)
+        setMessageText(msg.text)
+        console.log("Selected text", msg, " ", msg.text)
+
+    }
+
+    const handleDelete = (messageId) => {
+        
+        console.log("MessageId",messageId)
+        dispatch(
+            deleteMessages({
+                chatId: activeChat.chatId,
+                messageId
+            })
+        )
+    }
+
+
 
     return (
         <div className="flex h-full flex-col bg-background">
@@ -52,15 +90,42 @@ const Chatwindow = () => {
                 {chatMessages.map((msg, index) => (
                     <div
                         key={msg.id}
-                        className="flex justify-start"
+                        className="flex justify-start group"
                     >
                         <div
-                            className="inline-block max-w-xs break-words rounded-lg rounded-bl-none bg-tertiary px-3 py-2 text-sm text-tertiary md:max-w-md"
+                            className="relative  inline-block max-w-xs break-words rounded-lg rounded-bl-none bg-tertiary px-3 py-2 text-sm text-tertiary md:max-w-md"
                         >
-                            <div>{msg.text}</div>
+                            <div>
+                                {msg.text}
+                                {msg.edited && (
+                                    <span className="ml-2 text-xs opacity-50">
+                                        (edited)
+                                    </span>
+                                )}
+
+                            </div>
 
                             <div className="mt-1 text-xs opacity-60">
                                 {msg.timestamp}
+                            </div>
+                            <div className="absolute -right-14 top-1/2 hidden -translate-y-1/2 items-center gap-1 group-hover:flex">
+
+                                <button
+                                    onClick={() => handleEdit(msg)}
+                                    className="rounded p-1 text-secondary transition hover:bg-secondary hover:text-secondary"
+                                    title="Edit"
+                                >
+                                    <Pencil size={14} />
+                                </button>
+
+                                <button
+                                    onClick={() => handleDelete(msg.id)}
+                                    className="rounded p-1 text-secondary transition hover:bg-secondary hover:text-red-500"
+                                    title="Delete"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+
                             </div>
                         </div>
                     </div>

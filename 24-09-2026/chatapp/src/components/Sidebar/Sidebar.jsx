@@ -21,12 +21,12 @@ const Sidebar = () => {
         localStorage.getItem("activeChatId") || null
     );
 
-    console.log("ChatId:", activeChatId);
+    // console.log("ChatId:", activeChatId);
 
     // for getting all messages....
     const message = useSelector((state)=>state.message.messages)
 
-    console.log("From Sidebar messages",message)
+    // console.log("From Sidebar messages",message)
 
     const onClick = (id) => {
         // Update React state
@@ -52,12 +52,12 @@ const Sidebar = () => {
                     const isActive = chat.chatId === activeChatId;
 
                     const chatmessages=message.find((item)=>item.chatId===chat.chatId)
-                    console.log("From Sidebar chat messages ...",chatmessages)
+                    // console.log("From Sidebar chat messages ...",chatmessages)
                     // for last message
                       const lastMessage =
         chatmessages?.messages[chatmessages.messages.length - 1];
 
-        console.log("Last Message:",lastMessage)
+        // console.log("Last Message:",lastMessage)
                     return (
                         <button
                             key={chat.chatId}
@@ -86,7 +86,7 @@ const Sidebar = () => {
 
                                     {chat.timestamp && (
                                         <span className="shrink-0 text-xs text-secondary">
-                                            {lastMessage.timestamp}
+                                            {lastMessage?.timestamp||""}
                                         </span>
                                     )}
                                 </div>

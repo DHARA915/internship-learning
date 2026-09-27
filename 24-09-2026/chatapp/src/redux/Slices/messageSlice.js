@@ -20,8 +20,8 @@ const messageSlice = createSlice({
         addMessages: (state, action) => {
             const { chatId, text } = action.payload;
 
-            console.log("MessageSlice action",action)
-            console.log("MessageSlice action payload",action.payload)
+            // console.log("MessageSlice action",action)
+            // console.log("MessageSlice action payload",action.payload)
 
             const chat = state.messages.find((chat) => chat.chatId === chatId);
 
@@ -34,12 +34,14 @@ const messageSlice = createSlice({
                 edited: false,
             });
 
-            console.log("After addMessage",chat.messages)
+            // console.log("After addMessage",chat.messages)
 
         },
 
         editMessages: (state, action) => {
             const { chatId, messageId, text } = action.payload;
+
+            console.log(chatId," ",messageId," ",text)
 
             const chat = state.messages.find((chat) => chat.chatId === chatId);
             if (!chat) return;
@@ -47,6 +49,10 @@ const messageSlice = createSlice({
             const message = chat.messages.find((message) => message.id === messageId);
 
             if (!message) return;
+
+            if(message.text===text){
+                return;
+            }
 
             message.text = text;
             message.timestamp = getCurrentTime();
@@ -56,12 +62,15 @@ const messageSlice = createSlice({
         deleteMessages: (state, action) => {
             const { chatId, messageId } = action.payload;
 
+            console.log("From slice:", chatId)
+
             const chat = state.messages.find((chat) => chat.chatId === chatId);
 
             if (!chat) return;
 
             chat.messages = chat.messages.filter((message) => message.id !== messageId)
 
+            console.log("After Deleted Messsges:",chat.messages)
         }
     }
 
