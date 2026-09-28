@@ -12,7 +12,7 @@ export const NAV_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    to: "/product-management",
+    to: "/products/manage",
     label: "Product Management",
     icon: Users,
     actionLabel: 'Manage Products'
