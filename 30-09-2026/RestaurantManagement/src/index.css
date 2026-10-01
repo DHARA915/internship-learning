@@ -17,6 +17,7 @@
   --bg-primary: #fcfcf9;     /* cards, modals, tables */
   --bg-secondary: #f2f4ec;   /* page background, sidebar */
   --bg-tertiary: #e3e8d9; 
+  --bg-background: #290a63; /* page background, sidebar */
      /* hover rows, inputs, inset areas */
 
   /* text */
@@ -33,7 +34,8 @@
   --brand: #b8321f;          /* main buttons, active nav */
   --brand-hover: #9c2a19;
   --brand-soft: #f8e3de;     /* tinted badge / highlight background */
-  --on-brand: #ffffff;       /* text on top of --brand */
+  --on-brand: #ffffff;
+  --button-primary:#87928b /* text on top of --brand */
 
   --accent: #e9a11b;         /* saffron: promos, ratings, highlights */
   --on-accent: #2a1b00;
@@ -94,6 +96,8 @@
 
   --color-bone-white:#FAF9F6;
   --color-text-hover:#ffffff
+  --color-button-primary:#87928b
+
 }
 
 /* ==========================================================
@@ -111,6 +115,9 @@
 }
 @utility bg-tertiary {
   background-color: var(--bg-tertiary);
+}
+@utity bg-background {
+  background-color: var(--bg-background);
 }
 
 @utility text-primary {

@@ -38,8 +38,6 @@ const AppHeader = () => {
             <h1 className="text-sm font-semibold text-primary sm:text-base">
               {currentPage?.title ?? "Restaurant Management"}
             </h1>
-
-            <p className="text-xs text-tertiary">{RESTAURANT_NAME}</p>
           </div>
         </div>
       </div>

@@ -23,6 +23,11 @@ export const adminLinks: AdminLink[] = [
         icon: List,
     },
     {
+        title: "Modifiers",
+        href: "/admin/menu-modifiers",
+        icon: UtensilsCrossed,
+    },
+    {
         title: "Menu Items",
         href: "/admin/menu-items",
         icon: UtensilsCrossed,
