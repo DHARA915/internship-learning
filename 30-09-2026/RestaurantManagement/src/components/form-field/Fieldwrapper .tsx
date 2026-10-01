@@ -32,7 +32,7 @@ export function FieldWrapper({
       )}
       {children}
       {error ? (
-        <p id={`${name}-error`} className="text-sm text-destructive">
+        <p id={`${name}-error`} className=" text-danger text-sm text-destructive">
           {error}
         </p>
       ) : helperText ? (

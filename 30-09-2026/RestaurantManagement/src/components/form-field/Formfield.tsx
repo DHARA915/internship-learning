@@ -1,9 +1,9 @@
-import { InputField } from "./fields/InputField";
-import { TextareaField } from "./fields/Textareafield";
-import { SelectField } from "./fields/Selectfield";
-import { RadioField } from "./fields/Radiofield";
-import { CheckboxField } from "./fields/CheckboxField";
-import { MultiSelectField } from "./fields/Multiselectfield";
+import { InputField } from "./fields/InputField.tsx";
+import { TextareaField } from "./fields/Textareafield.tsx";
+import { SelectField } from "./fields/Selectfield.tsx";
+import { RadioField } from "./fields/Radiofield.tsx";
+import { CheckboxField } from "./fields/CheckboxField.tsx";
+import { MultiSelectField } from "./fields/Multiselectfield.tsx";
 import type { FormFieldProps } from "./fields/Types.ts";
 
 /**
