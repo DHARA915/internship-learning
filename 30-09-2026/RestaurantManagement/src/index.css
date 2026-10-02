@@ -15,9 +15,19 @@
 :root {
   /* backgrounds: page -> panel -> inset */
   --bg-primary: #fcfcf9;     /* cards, modals, tables */
-  --bg-secondary: #f2f4ec;   /* page background, sidebar */
+  --bg-secondary: #f0f1eb;   /* page background, sidebar */
   --bg-tertiary: #e3e8d9; 
-  --bg-background: #290a63; /* page background, sidebar */
+  --bg-primary-dull:#f7e3c0;
+  --bg-background: #290a63;
+
+  /* For Buttons */ 
+  --button-primary: #f89a06;
+  --button-primary-hover:#f39b0d;
+  
+  
+
+
+  /* page background, sidebar */
      /* hover rows, inputs, inset areas */
 
   /* text */
@@ -95,8 +105,10 @@
   --color-info: var(--info);
 
   --color-bone-white:#FAF9F6;
-  --color-text-hover:#ffffff
-  --color-button-primary:#87928b
+  --color-text-hover:#ffffff;
+  --color-button-primary:#f39b0d;
+  --color-button-primary-hover:#e9a11b;
+
 
 }
 
@@ -129,6 +141,14 @@
 @utility text-tertiary {
   color: var(--text-tertiary);
 }
+@utility text-hover {
+  color: var(--text-hover);
+}
+
+@utility row-dull{
+  background-color:var(--bg-primary-dull)
+}
+
 
 /* ==========================================================
    4. BASE

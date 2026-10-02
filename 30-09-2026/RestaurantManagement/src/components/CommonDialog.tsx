@@ -190,7 +190,7 @@ export function CommonDialog({
             <Button
               type="submit"
               disabled={loading}
-              className="cursor-pointer rounded-lg bg-success mb-2 text-on-brand shadow-sm hover:bg-success-soft"
+              className="cursor-pointer rounded-lg bg-button-primary mb-2 text-on-brand shadow-sm hover:bg-success-soft"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {saveLabel}

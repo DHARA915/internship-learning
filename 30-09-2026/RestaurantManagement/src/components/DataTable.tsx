@@ -1,162 +1,3 @@
-// "use client";
-
-// import * as React from "react";
-// import { Trash2 } from "lucide-react";
-// import {
-//   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-// } from "../components/ui/table";
-// import { Button } from "../components/ui/button";
-// import {
-//   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-//   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-// } from "../components/ui/alert-dialog";
-// import { cn } from "../lib/utils";
-// import { CommonDialog, type FieldConfig, type FieldType } from "../components/CommonDialog";
-
-// export interface Column<T> {
-//   key: string;
-//   header: string;
-//   /** custom display in the table only */
-//   cell?: (row: T, index: number) => React.ReactNode;
-//   className?: string;
-
-//   /** edit-form settings (all optional) */
-//   type?: FieldType;                       // default "text"
-//   options?: FieldConfig["options"];       // for type "select"
-//   required?: boolean;
-//   editable?: boolean;                     // false -> not shown in edit form (id, createdAt...)
-// }
-
-// interface DataTableProps<T> {
-//   columns: Column<T>[];
-//   data: T[];
-//   getRowId?: (row: T) => string | number;
-//   emptyText?: string;
-//   /** Pass it -> delete icon appears on each row */
-//   // onDelete?: (row: T) => void | Promise<void>;
-//    onDelete?: (row: T) => unknown;
-//   /** Pass it -> double click opens pre-filled edit modal. Gets the updated row. */
-//   // onEdit?: (updated: T, original: T) => void | Promise<void>;
-//    onEdit?: (updated: T, original: T) => unknown;
-//   editTitle?: string;
-//   editDescription?: string;
-//   /** Optional: your own fields for the edit modal (instead of auto-generated ones) */
-//   renderEditForm?: React.ComponentProps<typeof CommonDialog>["children"];
-//   validate?: React.ComponentProps<typeof CommonDialog>["validate"];
-// }
-
-// export function DataTable<T extends Record<string, any>>({
-//   columns, data, getRowId = (r) => r.id, emptyText = "No records found.",
-//   onDelete, onEdit, editTitle = "Edit record", editDescription,
-//   renderEditForm, validate,
-// }: DataTableProps<T>)
-//  {
-//   const [editing, setEditing] = React.useState<T | null>(null);
-//   const [deleting, setDeleting] = React.useState<T | null>(null);
-  
-
-//   // edit form is generated from columns
-//   const fields: FieldConfig[] = React.useMemo(
-//     () =>
-//       columns
-//         .filter((c) => c.editable !== false)
-//         .map((c) => ({
-//           name: c.key, label: c.header, type: c.type,
-//           options: c.options, required: c.required,
-//         })),
-//     [columns]
-//   );
-
-//   return (
-//     <>
-//       <div className="rounded-lg border bg-card">
-//         <Table>
-//           <TableHeader>
-//             <TableRow className="hover:bg-transparent">
-//               {columns.map((c) => (
-//                 <TableHead key={c.key} className={c.className}>{c.header}</TableHead>
-//               ))}
-//               {onDelete && <TableHead className="w-12" />}
-//             </TableRow>
-//           </TableHeader>
-//           <TableBody>
-//             {data.length === 0 ? (
-//               <TableRow className="hover:bg-transparent">
-//                 <TableCell colSpan={columns.length + (onDelete ? 1 : 0)}
-//                   className="h-24 text-center text-muted-foreground">
-//                   {emptyText}
-//                 </TableCell>
-//               </TableRow>
-//             ) : (
-//               data.map((row, index) => (
-//                 <TableRow
-//                   key={getRowId(row)}
-//                   tabIndex={onEdit ? 0 : undefined}
-//                   title={onEdit ? "Double-click to edit" : undefined}
-//                   className={cn(onEdit && "cursor-pointer select-none")}
-//                   onDoubleClick={() => onEdit && setEditing(row)}
-//                   onKeyDown={(e) => e.key === "Enter" && onEdit && setEditing(row)}
-//                 >
-//                   {columns.map((c) => (
-//                     <TableCell key={c.key} className={c.className}>
-//                       {c.cell ? c.cell(row, index) : (row[c.key] as React.ReactNode)}
-//                     </TableCell>
-//                   ))}
-//                   {onDelete && (
-//                     <TableCell className="text-right">
-//                       <Button variant="ghost" size="icon" aria-label="Delete row"
-//                         className=" cursor-pointer hover:bg-brand-soft h-8 w-8 text-muted-foreground hover:text-destructive"
-//                         onClick={(e) => { e.stopPropagation(); setDeleting(row); }}
-//                         onDoubleClick={(e) => e.stopPropagation()}>
-//                         <Trash2 className="h-4 w-4 text-danger cursor-pointer" />
-//                       </Button>
-//                     </TableCell>
-//                   )}
-//                 </TableRow>
-//               ))
-//             )}
-//           </TableBody>
-//         </Table>
-//       </div>
-
-//       {onEdit && editing && (
-//         <CommonDialog
-//           key={String(getRowId(editing))}
-//           open
-//           onOpenChange={(o) => !o && setEditing(null)}
-//           title={editTitle}
-//           description={editDescription}
-//           fields={renderEditForm ? undefined : fields}
-//           defaultValues={editing}
-//           validate={validate}
-//           onSubmit={async (values) => {await onEdit({ ...editing, ...values }, editing);
-// }}
-//         >
-//           {renderEditForm}
-//         </CommonDialog>
-//       )}
-
-//       {onDelete && (
-//         <AlertDialog  open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
-//           <AlertDialogContent className="bg-secondary"> 
-//             <AlertDialogHeader>
-//               <AlertDialogTitle>Delete this record?</AlertDialogTitle>
-//               <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
-//             </AlertDialogHeader>
-//             <AlertDialogFooter>
-//               <AlertDialogCancel variant="outline" size="default" cursor-pointer>Cancel</AlertDialogCancel>
-//               <AlertDialogAction variant="default" size="default" className="bg-danger cursor-pointer text-white"  onClick={async () => {
-//   if (deleting) await onDelete(deleting);
-//   setDeleting(null);
-// }}>Delete</AlertDialogAction>
-//             </AlertDialogFooter>
-//           </AlertDialogContent>
-//         </AlertDialog>
-//       )}
-//     </>
-//   );
-// }
-
 "use client";
 
 import * as React from "react";
@@ -270,12 +111,13 @@ export function DataTable<T extends Record<string, any>>({
                     title={onEdit ? "Double-click to edit" : undefined}
                     onDoubleClick={() => onEdit && setEditing(row)}
                     onKeyDown={(e) => e.key === "Enter" && onEdit && setEditing(row)}
-                    className={cn(
-                      "group border-0 transition-colors duration-150",
-                      "hover:bg-brand-soft/60 focus-visible:bg-brand-soft/60",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40",
-                      onEdit && "cursor-pointer select-none"
-                    )}
+                   className={cn(
+  "group border-0 transition-colors duration-150",
+  "hover:row-dull",
+  "focus-visible:row-dull",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40",
+  onEdit && "cursor-pointer select-none"
+)}
                   >
                     {columns.map((c) => (
                       <TableCell
@@ -300,7 +142,7 @@ export function DataTable<T extends Record<string, any>>({
                           variant="ghost"
                           size="icon"
                           aria-label="Delete row"
-                          className="h-7 w-7 cursor-pointer rounded-full text-muted-foreground opacity-60 transition-all hover:bg-danger/10 hover:text-danger group-hover:opacity-100 focus-visible:opacity-100"
+                          className="h-7 w-7 cursor-pointer rounded-full text-danger opacity-60 transition-all hover:bg-danger/10 hover:text-danger group-hover:opacity-100 focus-visible:opacity-100"
                           onClick={(e) => { e.stopPropagation(); setDeleting(row); }}
                           onDoubleClick={(e) => e.stopPropagation()}
                         >

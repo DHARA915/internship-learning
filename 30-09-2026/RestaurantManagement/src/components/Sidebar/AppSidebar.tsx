@@ -27,7 +27,9 @@ interface AppSidebarProps {
 const getActiveHref = (links: AdminLink[], pathname: string) =>
   links
     .filter(
-      (l) => pathname === l.href || pathname.startsWith(`${l.href.replace(/\/$/, "")}/`)
+      (l) =>
+        pathname === l.href ||
+        pathname.startsWith(`${l.href.replace(/\/$/, "")}/`),
     )
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
@@ -36,16 +38,13 @@ const AppSidebar = ({ links }: AppSidebarProps) => {
   const activeHref = getActiveHref(links, pathname);
 
   return (
-    <Sidebar className="  bg-gradient-to-br
-    from-primary
-    via-primary
-    to-brand-soft">
+    <Sidebar className="bg-primary">
       {/* Brand */}
       <SidebarHeader className="border-b border-line p-0">
         <div className="flex items-center gap-3 px-4 py-4">
           {/* Monogram tile with a saffron "pilot light" */}
           <div className="relative shrink-0">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-brand text-on-brand shadow-sm">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-button-primary text-on-brand shadow-sm">
               <span className="text-xl font-semibold leading-none">
                 {RESTAURANT_NAME.charAt(0).toUpperCase()}
               </span>
@@ -65,10 +64,7 @@ const AppSidebar = ({ links }: AppSidebarProps) => {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className=" bg-gradient-to-br
-    from-primary
-    via-primary
-    to-brand-soft px-2 py-3">
+      <SidebarContent className=" bg-primary  px-2 py-3">
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-xs font-medium text-tertiary">
             Management
@@ -82,31 +78,36 @@ const AppSidebar = ({ links }: AppSidebarProps) => {
 
                 return (
                   <SidebarMenuItem key={link.href}>
-                    <SidebarMenuButton 
-                    
-                      isActive={isActive}
-                      className="
-                        relative h-10 rounded-lg px-3
-                        text-secondary transition-colors
-                        hover:bg-tertiary hover:text-primary
-                        data-[active=true]:bg-brand-soft
-                        data-[active=true]:font-medium
-                        data-[active=true]:text-brand
-                        data-[active=true]:hover:bg-brand-soft
-                        data-[active=true]:hover:text-brand
-                        before:absolute before:inset-y-2 before:-left-2 before:w-[3px]
-                        before:rounded-full before:bg-brand before:opacity-0
-                        data-[active=true]:before:opacity-100
-                        hover:bg-brand-soft hover:text-brand 
-                      "
+                    <SidebarMenuButton
+                      asChild
+                      className={`
+      relative h-10 rounded-lg px-3
+      transition-colors
+
+      ${
+        isActive
+          ? "bg-button-primary text-hover font-medium hover:bg-button-primary hover:text-hover"
+          : "text-secondary hover:bg-button-primary hover:text-hover"
+      }
+
+      before:absolute
+      before:inset-y-2
+      before:-left-2
+      before:w-[3px]
+      before:rounded-full
+      before:bg-brand
+      ${isActive ? "before:opacity-100" : "before:opacity-0"}
+    `}
                     >
                       <Link
                         to={link.href}
                         aria-current={isActive ? "page" : undefined}
+                        className="w-full"
                       >
-                        <div className="flex items-center gap-3 w-full ">
+                        <div className="flex items-center justify-start gap-5">
+
                         <Icon className="size-[18px]" />
-                        <div>{link.title}</div>
+                        <span>{link.title}</span>
                         </div>
                       </Link>
                     </SidebarMenuButton>

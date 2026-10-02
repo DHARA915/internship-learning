@@ -43,7 +43,7 @@ const MenuSectionFields = ({ values, setValue, errors }: Ctx) => {
         aria-label="Status"
         checked={isActive}
         onCheckedChange={(c) => setValue("status", c ? "Active" : "Inactive")}
-        className="mt-3 data-checked:bg-green-400 data-unchecked:bg-gray-300 dark:data-unchecked:bg-gray-600"
+        className="mt-3 data-checked:bg-slate-200 data-unchecked:bg-gray-300 dark:data-unchecked:bg-gray-600"
       />
       
     </>
@@ -88,7 +88,7 @@ const AddMenuSection = () => {
         <CommonDialog
           title="Add Menu Section"
           trigger={
-            <Button className="flex items-center gap-2 bg-brand text-white hover:bg-brand/90">
+            <Button className="flex items-center gap-2 cursor-pointer bg-button-primary text-white hover:bg-button-primary-hover">
               <Plus className="h-4 w-4" /> Add
             </Button>
           }

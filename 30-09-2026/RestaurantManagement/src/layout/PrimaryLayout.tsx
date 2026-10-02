@@ -13,7 +13,7 @@ const PrimaryLayout = () => {
     <SidebarProvider>
       <AppSidebar links={adminLinks} />
 
-      <SidebarInset className="bg-primary">
+      <SidebarInset className="bg-secondary">
         <AppHeader />
 
         <main className="flex-1 p-6">

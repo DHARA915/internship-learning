@@ -21,10 +21,7 @@ const AppHeader = () => {
 
   return (
     <header
-      className="flex h-19 shrink-0 items-center justify-between border-b border-line  bg-gradient-to-br
-    from-primary
-    via-primary
-    to-brand-soft px-6"
+      className="flex h-19 shrink-0 items-center justify-between border-b border-line bg-primary px-6"
     >
       {/* Left */}
       <div className="flex items-center gap-3">
@@ -50,7 +47,7 @@ const AppHeader = () => {
           <p className="text-xs text-tertiary">Restaurant Manager</p>
         </div>
 
-        <div className="flex size-9 items-center justify-center rounded-full bg-brand text-sm font-semibold text-on-brand">
+        <div className="flex size-9 items-center justify-center rounded-full bg-button-primary text-sm font-semibold text-on-brand">
           A
         </div>
       </div>
