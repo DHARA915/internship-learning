@@ -142,7 +142,7 @@ export function CommonDialog({
       <DialogContent className="gap-0 overflow-hidden rounded-2xl border-line bg-primary p-0 shadow-xl sm:max-w-xl">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col">
           <DialogHeader className="space-y-1 px-6 pb-4 pt-6 text-left">
-            <DialogTitle className="text-lg font-semibold tracking-tight text-primary">
+            <DialogTitle className="flex h-6 items-center text-lg font-semibold leading-6 tracking-tight text-primary">
               {title}
             </DialogTitle>
             {description && (
@@ -177,7 +177,9 @@ export function CommonDialog({
             </div>
           )}
  
-          <DialogFooter className="gap-2 border-t border-line bg-primary px-6 py-4 sm:justify-end">
+          <DialogFooter className="gap-2 border-t border-line bg-primary  sm:justify-end">
+            <div className="flex   gap-1.5">
+
             <Button
               type="button"
               variant="outline"
@@ -190,11 +192,12 @@ export function CommonDialog({
             <Button
               type="submit"
               disabled={loading}
-              className="cursor-pointer rounded-lg bg-button-primary mb-2 text-on-brand shadow-sm hover:bg-success-soft"
+              className="cursor-pointer rounded-lg bg-button-primary  text-on-brand shadow-sm hover:bg-success-soft"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {saveLabel}
             </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

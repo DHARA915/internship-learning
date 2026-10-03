@@ -12,6 +12,7 @@ import {
 } from "../components/ui/alert-dialog";
 import { cn } from "../lib/utils";
 import { CommonDialog, type FieldConfig, type FieldType } from "../components/CommonDialog";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export interface Column<T> {
   key: string;
@@ -190,7 +191,7 @@ export function DataTable<T extends Record<string, any>>({
         </CommonDialog>
       )}
 
-      {onDelete && (
+      {/* {onDelete && (
         <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
           <AlertDialogContent className="max-w-md rounded-2xl border-border/60 bg-card p-6 shadow-xl">
             <AlertDialogHeader className="gap-4">
@@ -228,7 +229,16 @@ export function DataTable<T extends Record<string, any>>({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      )}
+      )} */}
+      {onDelete && (
+  <ConfirmDialog
+    open={!!deleting}
+    onOpenChange={(o) => !o && setDeleting(null)}
+    onConfirm={async () => {
+      if (deleting) await onDelete(deleting);
+    }}
+  />
+)}
     </>
   );
 }

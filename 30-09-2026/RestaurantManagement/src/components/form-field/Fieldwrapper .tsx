@@ -23,7 +23,7 @@ export function FieldWrapper({
   children,
 }: FieldWrapperProps) {
   return (
-    <div className={cn("grid w-full gap-1.5", className)}>
+    <div className={cn("grid w-full gap-3", className)}>
       {label && (
         <Label htmlFor={name}>
           {label}

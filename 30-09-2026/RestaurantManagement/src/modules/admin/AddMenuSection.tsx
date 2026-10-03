@@ -14,6 +14,7 @@ import {
 } from "../../Redux/Slices/menuSectionSlice"; // <- adjust path
 import type { MenuSection } from "../../utils/Menusectiondata";
 import type { AppDispatch } from "../../Redux/store.ts";
+import { Badge } from "../../components/ui/badge.tsx";
 
 /* ---------- fields shared by Add + Edit dialogs ---------- */
 type Ctx = {
@@ -64,13 +65,10 @@ const columns: Column<MenuSection>[] = [
   {
     key: "status",
     header: "Status",
-    cell: (r) => (
-      <span className="inline-flex items-center gap-2">
-        <span
-          className={`h-2.5 w-2.5 rounded-full ${r.status === "Active" ? "bg-green-500" : "bg-red-500"}`}
-        />
+       cell: (r) => (
+      <Badge variant={r.status === "Active" ? "active" : "inactive"}>
         {r.status}
-      </span>
+      </Badge>
     ),
   },
 ];
@@ -92,7 +90,7 @@ const AddMenuSection = () => {
               <Plus className="h-4 w-4" /> Add
             </Button>
           }
-          defaultValues={{ name: "", isActive: true }} // active by default
+          defaultValues={{ name: "", isActive: true }} 
           validate={validate}
           onSubmit={(v) => {
             dispatch(

@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminDashboard from "./Admindashboard";
 import AddMenuItems from "./AddMenuItems";
 import AddMenuSection from "./AddMenuSection";
+import AddModifier from "./AddModifier";
 
 const AdminRoutes = () => {
   return (
@@ -12,6 +13,7 @@ const AdminRoutes = () => {
       <Route path="dashboard" element={<AdminDashboard />} />
       <Route path="menu-sections" element={<AddMenuSection />} />
       <Route path="menu-items" element={<AddMenuItems />} />
+      <Route path="menu-modifiers" element={<AddModifier />} />
       <Route path="*" element={<Navigate to="dashboard" replace />} />
     </Routes>
   );
