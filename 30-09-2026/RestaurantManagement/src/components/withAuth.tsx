@@ -10,7 +10,7 @@ type Role = "admin" | "user";
 
 const HOME: Record<Role, string> = {
   admin: "/admin/dashboard",
-  user: "/user",
+  user: "/user/home",
 };
 
 function withAuth<P extends object>(
@@ -34,15 +34,15 @@ function withAuth<P extends object>(
       return <Navigate to="/login" replace />;
     }
 
-    // // Logged in, but user data not loaded yet: WAIT, don't redirect
-    // if (!currentUser) {
-    //   return <div className="p-6">Loading...</div>;
-    // }
+    // Logged in, but user data not loaded yet: WAIT, don't redirect
+    if (!currentUser) {
+      return <div className="p-6">Loading...</div>;
+    }
 
-    // // Loaded, but wrong role: send to their own home
-    // if (currentUser.role !== allowedRole) {
-    //   return <Navigate to={HOME[currentUser.role]} replace />;
-    // }
+    // Loaded, but wrong role: send to their own home
+    if (currentUser.role !== allowedRole) {
+      return <Navigate to={HOME[currentUser.role]} replace />;
+    }
 
     return <Component {...props} />;
   };

@@ -127,7 +127,7 @@ export default function Login() {
         })
       );
 
-      navigate(user.role === "admin" ? "/admin/dashboard" : "/user", {
+      navigate(user.role === "admin" ? "/admin/dashboard" : "/user/home", {
         replace: true,
       });
     } catch (err) {
@@ -213,7 +213,7 @@ export default function Login() {
                 transition={{ delay: 0.2 }}
                 className="flex items-center gap-3 text-white"
               >
-                <div className="flex size-9 items-center justify-center rounded-lg bg-brand">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-button-primary">
                   <UtensilsCrossed
                     className="size-4"
                     aria-hidden="true"
@@ -338,10 +338,10 @@ export default function Login() {
                   items-center
                   gap-2.5
                   xl:gap-5
-                  lg:hidden
+                  md:hidden
                 "
               >
-                <div className="flex size-9 items-center justify-center rounded-lg bg-brand text-on-brand">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-button-primary text-on-brand">
                   <UtensilsCrossed className="size-4" />
                 </div>
 
@@ -500,15 +500,15 @@ export default function Login() {
                       justify-center
                       gap-2
                       rounded-lg
-                      bg-brand
+                      bg-button-primary
                       px-5
                       text-sm
                       font-semibold
-                      text-on-brand
+                      text-primary
                       shadow-lg
                       shadow-brand/20
                       transition-colors
-                      hover:bg-brand-hover
+                      hover:bg-button-primary-hover
                       disabled:cursor-not-allowed
                       disabled:opacity-60
                     "

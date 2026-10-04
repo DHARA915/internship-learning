@@ -114,7 +114,7 @@ export function DataTable<T extends Record<string, any>>({
                     onKeyDown={(e) => e.key === "Enter" && onEdit && setEditing(row)}
                    className={cn(
   "group border-0 transition-colors duration-150",
-  "hover:row-dull",
+  "hover:bg-hover",
   "focus-visible:row-dull",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40",
   onEdit && "cursor-pointer select-none"

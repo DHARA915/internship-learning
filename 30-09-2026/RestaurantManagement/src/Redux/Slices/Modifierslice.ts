@@ -7,7 +7,6 @@ import {
 import type { RootState } from "../store";
 import {
   modifierSeed,
-  type MenuCategory,
   type ModifierGroup,
 } from "../../utils/Modifierdata";
 
@@ -55,17 +54,18 @@ const modifierSlice = createSlice({
 export const { addModifier, updateModifier, deleteModifier } =
   modifierSlice.actions;
 
-// /* selectors */
-// const selectAll = (s: RootState) => s.modifiers.modifiers;
-// export const selectActiveModifiers = createSelector([selectAll], (all) =>
-//   all.filter((m) => m.status === "Active"),
-// );
+/* selectors */
+const selectAll = (s: RootState) => s.modifiers.modifiers;
+export const selectActiveModifiers = createSelector([selectAll], (all) =>
+  all.filter((m) => m.status === "Active"),
+);
 
-// /** Active groups for one menu category (all active groups when no category is given) */
-// export const selectModifiersForCategory = createSelector(
-//   [selectActiveModifiers, (_s: RootState, category?: MenuCategory) => category],
-//   (active, category) =>
-//     category ? active.filter((m) => m.categories.includes(category)) : active,
-// );
+export const selectModifiersForSection = createSelector(
+  [selectActiveModifiers, (_s: RootState, menuSectionId?: number) => menuSectionId],
+  (active, menuSectionId) =>
+    menuSectionId == null
+      ? active
+      : active.filter((m) => m.menuSectionIds.includes(menuSectionId)),
+);
 
 export default modifierSlice.reducer;

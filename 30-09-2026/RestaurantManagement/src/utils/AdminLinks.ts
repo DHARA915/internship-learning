@@ -1,7 +1,10 @@
 import {
     LayoutDashboard,
     List,
+    SlidersHorizontal,
+    PanelsTopLeft,
     UtensilsCrossed,
+    
     type LucideIcon,
 } from "lucide-react";
 
@@ -9,6 +12,7 @@ export interface AdminLink {
     title: string;
     href: string;
     icon: LucideIcon;
+    image?: string;
 }
 
 export const adminLinks: AdminLink[] = [
@@ -20,12 +24,12 @@ export const adminLinks: AdminLink[] = [
     {
         title: "Menu Sections",
         href: "/admin/menu-sections",
-        icon: List,
+        icon: PanelsTopLeft,
     },
     {
         title: "Modifiers",
         href: "/admin/menu-modifiers",
-        icon: UtensilsCrossed,
+        icon: SlidersHorizontal,
     },
     {
         title: "Menu Items",

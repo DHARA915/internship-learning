@@ -11,7 +11,7 @@ import { adminLinks } from "../utils/AdminLinks";
 const PrimaryLayout = () => {
   return (
     <SidebarProvider>
-      <AppSidebar links={adminLinks} />
+      <AppSidebar />
 
       <SidebarInset className="bg-secondary">
         <AppHeader />

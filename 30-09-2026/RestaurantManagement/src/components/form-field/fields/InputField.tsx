@@ -166,7 +166,7 @@ export function InputField({
             aria-label={showPassword ? "Hide password" : "Show password"}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
           >
-            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            {showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
           </button>
         )}
       </div>

@@ -37,7 +37,20 @@ const MenuSectionFields = ({ values, setValue, errors }: Ctx) => {
         onChange={(e: any) => setValue("name", e?.target ? e.target.value : e)}
         error={errors.name}
       />
-
+      <FormField
+  type="text"
+  name="icon"
+  label="Icon Image URL"
+  placeholder="https://example.com/icon.png"
+  value={values.icon ?? ""}
+  onChange={(e: any) =>
+    setValue(
+      "icon",
+      e?.target ? e.target.value : e
+    )
+  }
+  error={errors.icon}
+/>
       
         <Switch
         id="status"
@@ -55,6 +68,12 @@ const validate = (v: FormValues) => {
   const errors: Record<string, string> = {};
   if (!String(v.name ?? "").trim())
     errors.name = "Menu section name is required";
+
+    if (!String(v.icon ?? "").trim()) {
+    errors.icon = "Icon image URL is required";
+  }
+
+
   return errors;
 };
 
@@ -62,6 +81,17 @@ const validate = (v: FormValues) => {
 const columns: Column<MenuSection>[] = [
   { key: "srNo", header: "Sr. No", className: "w-20", cell: (_r, i) => i + 1 },
   { key: "name", header: "Menu Section" },
+  {
+  key: "icon",
+  header: "Icon",
+  cell: (row) => (
+    <img
+      src={row.icon}
+      alt={row.name}
+      className="size-5 rounded-lg object-contain"
+    />
+  ),
+},
   {
     key: "status",
     header: "Status",
@@ -77,6 +107,7 @@ const columns: Column<MenuSection>[] = [
 const AddMenuSection = () => {
   const dispatch = useDispatch<AppDispatch>();
   const sections = useSelector((s: RootState) => s.menuSections.menuSections);
+  console.log("All Sections:" , sections)
 
   return (
     <div className="space-y-4 p-6">
@@ -90,13 +121,19 @@ const AddMenuSection = () => {
               <Plus className="h-4 w-4" /> Add
             </Button>
           }
-          defaultValues={{ name: "", isActive: true }} 
+        defaultValues={{
+  name: "",
+  description: "",
+  icon: "",
+  status: "Active",
+}}
           validate={validate}
           onSubmit={(v) => {
             dispatch(
               addMenuSection({
                 name: String(v.name).trim(),
                 description: String(v.description ?? "").trim(),
+                   icon: String(v.icon ?? "").trim(),
                 status: v.status === "Inactive" ? "Inactive" : "Active",
               }),
             );
@@ -120,6 +157,7 @@ const AddMenuSection = () => {
               data: {
                 name: updated.name.trim(),
                 description: updated.description.trim(),
+                 icon: updated.icon.trim(),
                 status: updated.status,
               },
             }),
