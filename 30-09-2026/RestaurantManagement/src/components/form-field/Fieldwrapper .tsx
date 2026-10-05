@@ -23,21 +23,25 @@ export function FieldWrapper({
   children,
 }: FieldWrapperProps) {
   return (
-    <div className={cn("grid w-full gap-3", className)}>
+    <div className={cn("grid w-full gap-2", className)}>
       {label && (
         <Label htmlFor={name}>
           {label}
-          {required && <span className="ml-0.5 text-destructive">*</span>}
+          {required && <span className="ml-0.5 text-brand">*</span>}
         </Label>
       )}
       {children}
-      {error ? (
-        <p id={`${name}-error`} className=" text-danger text-sm text-destructive">
-          {error}
-        </p>
-      ) : helperText ? (
-        <p className="text-sm text-muted-foreground">{helperText}</p>
-      ) : null}
+            {/* always rendered, so the field height never changes */}
+      <p
+        id={`${name}-error`}
+        role={error ? "alert" : undefined}
+        className={cn(
+          "min-h-2 text-xs leading-4",
+          error ? "text-danger" : "text-tertiary"
+        )}
+      >
+        {error ?? helperText}
+      </p>
     </div>
   );
 }

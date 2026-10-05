@@ -71,7 +71,7 @@ interface CommonDialogProps {
  
 const inputBase =
   "h-10 rounded-lg border-line bg-primary px-3 text-sm text-primary shadow-none transition-colors " +
-  "placeholder:text-tertiary focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand/20";
+  "placeholder:text-tertiary";
  
 export function CommonDialog({
   title,
@@ -155,7 +155,7 @@ export function CommonDialog({
           {hasBody && (
             <div className="max-h-[60vh] overflow-y-auto border-t border-line px-6 py-5">
               {fields.length > 0 && (
-                <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
+                <div className="grid gap-x-4 gap-y-1 sm:grid-cols-2">
                   {fields.map((f) => (
                     <FieldRenderer
                       key={f.name}
@@ -219,9 +219,11 @@ function FieldRenderer({
   const id = `field-${f.name}`;
   const type = f.type ?? "text";
   const invalid = !!error;
-  const invalidCls = invalid
-    ? "border-danger/60 focus-visible:border-danger focus-visible:ring-danger/20"
-    : "";
+  // const invalidCls = invalid
+  //   ? "border-danger/60 focus-visible:border-danger focus-visible:ring-danger/20"
+  //   : "";
+
+  const invalidCls = "";
  
   if (type === "checkbox") {
     return (
@@ -239,7 +241,7 @@ function FieldRenderer({
           />
           <span className="text-sm font-medium text-primary">{f.label}</span>
         </label>
-        {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
+        <p className="mt-1.5 min-h-4 text-xs leading-4 text-danger">{error}</p>
       </div>
     );
   }
@@ -305,7 +307,8 @@ function FieldRenderer({
         {f.required && <span className="ml-0.5 text-danger">*</span>}
       </Label>
       {control}
-      {error && <p className="text-xs text-danger">{error}</p>}
+      {/* {error && <p className="text-xs text-danger">{error}</p>} */}
+      <p className="min-h-4 text-xs leading-4 text-danger">{error}</p>
     </div>
   );
 }
