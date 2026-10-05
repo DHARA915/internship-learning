@@ -31,6 +31,11 @@ const initialState: CartState = {
   items: [],
 };
 
+
+// same dish + same options = same key
+export const buildCartKey = (itemId: number, optionIds: string[]) =>
+  `${itemId}|${[...optionIds].sort().join(",")}`;
+
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -68,13 +73,45 @@ const cartSlice = createSlice({
       state.items = state.items.filter((i) => i.key !== action.payload);
     },
 
+      updateCartModifiers: (
+      state,
+      action: PayloadAction<{ key: string; modifiers: CartModifier[] }>
+    ) => {
+      const index = state.items.findIndex((i) => i.key === action.payload.key);
+      if (index === -1) return;
+
+      const item = state.items[index];
+      item.modifiers = action.payload.modifiers;
+      item.modifierTotal = item.modifiers.reduce((s, m) => s + m.price, 0);
+      item.unitPrice = item.basePrice + item.modifierTotal;
+      item.lineTotal = item.unitPrice * item.quantity;
+
+      const newKey = buildCartKey(
+        item.itemId,
+        item.modifiers.map((m) => m.optionId)
+      );
+
+      const duplicateIndex = state.items.findIndex(
+        (i, idx) => idx !== index && i.key === newKey
+      );
+
+      if (duplicateIndex !== -1) {
+        const duplicate = state.items[duplicateIndex];
+        duplicate.quantity += item.quantity;
+        duplicate.lineTotal = duplicate.unitPrice * duplicate.quantity;
+        state.items = state.items.filter((_, idx) => idx !== index);
+      } else {
+        item.key = newKey;
+      }
+    },
+
     clearCart: (state) => {
       state.items = [];
     },
   },
 });
 
-export const { addToCart, changeQuantity, removeFromCart, clearCart } =
+export const { addToCart, changeQuantity, removeFromCart, clearCart,updateCartModifiers } =
   cartSlice.actions;
 
 export default cartSlice.reducer;

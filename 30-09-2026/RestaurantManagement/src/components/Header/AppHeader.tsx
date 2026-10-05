@@ -68,7 +68,7 @@ const AppHeader = () => {
   >
     <ShoppingCart className="size-5" />
     {cartCount > 0 && (
-      <span className="absolute -right-1.5 -top-1.5 flex min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-5 text-on-brand">
+      <span className="absolute -right-1.5 -top-1.5 flex min-w-5 items-center justify-center rounded-full bg-button-primary px-1 text-[10px] font-bold leading-5 text-on-brand">
         {cartCount}
       </span>
     )}

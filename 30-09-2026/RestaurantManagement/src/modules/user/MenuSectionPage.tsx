@@ -3,7 +3,7 @@ import { useParams, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Minus, Plus } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { addToCart, type CartItem } from "../../Redux/Slices/cartSlice";
+import { addToCart, type CartItem, buildCartKey } from "../../Redux/Slices/cartSlice";
 import type { AppDispatch, RootState } from "../../Redux/store";
 import Card from "../../components/Card";
 import {
@@ -23,47 +23,8 @@ import {
   modifierSeed,
   type ModifierGroup,
   type ModifierOption,
-} from "../../utils/Modifierdata"; // adjust to your real file name
-
-/* ---------- modifier helpers ---------- */
-
-interface PricedOption extends ModifierOption {
-  price: number;
-}
-
-interface ItemModifierGroup {
-  group: ModifierGroup;
-  options: PricedOption[];
-}
-
-// Groups this item offers: a group is shown only if the item has a price
-// entry for it (matched by groupId + option id).
-const getItemGroups = (item: MenuItem): ItemModifierGroup[] =>
-  modifierSeed
-    .filter((g) => g.status === "Active")
-    .map((group) => {
-      const options: PricedOption[] = [];
-      for (const opt of group.options) {
-        const mp = item.modifierPrices.find(
-          (p) => p.groupId === group.id && p.optionId === opt.id
-        );
-        if (mp) options.push({ ...opt, price: mp.price });
-      }
-      return { group, options };
-    })
-    .filter((g) => g.options.length > 0);
-
-// Required single-choice groups start with their cheapest option selected
-const getDefaultSelection = (item: MenuItem): Record<string, string[]> => {
-  const result: Record<string, string[]> = {};
-  for (const { group, options } of getItemGroups(item)) {
-    if (group.selection === "single" && group.required) {
-      const cheapest = options.reduce((a, b) => (b.price < a.price ? b : a));
-      result[group.id] = [cheapest.id];
-    }
-  }
-  return result;
-};
+} from "../../utils/Modifierdata"; 
+import { getItemGroups, getDefaultSelection } from "../../utils/modifierHelpers";
 
 /* ---------- small UI piece ---------- */
 
@@ -91,8 +52,7 @@ const MenuSectionPage = () => {
     (s: RootState) => s.menuSections.menuSections
   );
 
-  const cartItems = useSelector((s:RootState)=>s.cart.items)
-  console.log("CartItems:", cartItems)
+ 
 
   // All hooks must stay above the early return below
   const [open, setOpen] = useState(false);
@@ -166,10 +126,7 @@ const MenuSectionPage = () => {
   );
 
   const cartItem = {
-      key: `${selectedItem.id}|${chosenModifiers
-    .map((m) => m.optionId)
-    .sort()
-    .join(",")}`,//add key to distinct same item with different modifier 
+    key: buildCartKey(selectedItem.id, chosenModifiers.map((m) => m.optionId)),//add key to distinct same item with different modifier 
     itemId: selectedItem.id,
     name: selectedItem.name,
     image: selectedItem.image,
