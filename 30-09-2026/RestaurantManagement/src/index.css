@@ -36,7 +36,8 @@
 
   /* lines */
   --line: #d5dbcb;
-  --line-strong: #b9c2ab;
+  /* --line-strong: #b9c2ab; */
+  --line-strong: #717374;
 
   /* brand */
   --brand: #b8321f;          /* main buttons, active nav */

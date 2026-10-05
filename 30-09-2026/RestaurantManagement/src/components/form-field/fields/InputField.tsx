@@ -5,6 +5,7 @@ import { Input } from "../../ui/input";
 import { FieldWrapper } from "../Fieldwrapper "; 
 import type { InputFieldProps,InputType } from "./Types";
 
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const DEFAULT_PLACEHOLDER: Partial<Record<InputType, string>> = {

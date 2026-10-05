@@ -132,19 +132,7 @@ export function DataTable<T extends Record<string, any>>({
                 data.map((row, index) => (
                   <TableRow
                     key={getRowId(row)}
-                    tabIndex={onEdit ? 0 : undefined}
-                    // title={onEdit ? "Double-click to edit" : undefined}
-                    onDoubleClick={() => onEdit && setEditing(row)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && onEdit && setEditing(row)
-                    }
-                    className={cn(
-                      "group border-0 transition-colors duration-150",
-                      "hover:bg-hover",
-                      "focus-visible:row-dull",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40",
-                      onEdit && "cursor-pointer select-none",
-                    )}
+                    className="group"
                   >
                     {columns.map((c) => (
                       <TableCell
@@ -248,45 +236,7 @@ export function DataTable<T extends Record<string, any>>({
         </CommonDialog>
       )}
 
-      {/* {onDelete && (
-        <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
-          <AlertDialogContent className="max-w-md rounded-2xl border-border/60 bg-card p-6 shadow-xl">
-            <AlertDialogHeader className="gap-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-danger/10 text-danger">
-                <Trash2 className="h-5 w-5" />
-              </div>
-              <div className="space-y-1.5">
-                <AlertDialogTitle className="text-lg font-semibold">
-                  Delete this record?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-sm leading-relaxed">
-                  This permanently removes the record and can't be undone.
-                </AlertDialogDescription>
-              </div>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="mt-2 gap-2">
-              <AlertDialogCancel
-                variant="outline"
-                size="default"
-                className="cursor-pointer rounded-lg"
-              >
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                variant="default"
-                size="default"
-                className="cursor-pointer rounded-lg bg-danger text-white shadow-sm hover:bg-danger/90"
-                onClick={async () => {
-                  if (deleting) await onDelete(deleting);
-                  setDeleting(null);
-                }}
-              >
-                Delete record
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )} */}
+
       {onDelete && (
         <ConfirmDialog
           open={!!deleting}
