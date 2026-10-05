@@ -44,7 +44,7 @@ const AppHeader = () => {
     <header className=" sticky top-0 z-30 flex h-19 shrink-0 items-center justify-between border-b border-line bg-primary px-6">
       {/* Left */}
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="text-secondary hover:bg-brand-soft hover:text-brand" />
+        <SidebarTrigger className="text-button-primary hover:row-dull" />
 
         <div className="h-6 w-px bg-line" />
 

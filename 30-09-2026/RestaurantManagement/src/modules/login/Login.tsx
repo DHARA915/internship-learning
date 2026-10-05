@@ -504,7 +504,7 @@ export default function Login() {
                       px-5
                       text-sm
                       font-semibold
-                      text-primary
+                      text-hover
                       shadow-lg
                       shadow-brand/20
                       transition-colors
