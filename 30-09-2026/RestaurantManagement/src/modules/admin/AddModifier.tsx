@@ -40,28 +40,12 @@ const inputCls =
   "rounded-lg border-line bg-primary px-3 text-sm text-primary shadow-none transition-colors " +
   "placeholder:text-tertiary";
 
-const chipCls = (on: boolean) =>
-  cn(
-    "cursor-pointer rounded-lg border px-3 py-1.5 text-sm transition-colors",
-    on
-      ? "border-button-primary row-dull text-primary"
-      : "border-line bg-primary text-secondary hover:bg-secondary",
-  );
-
-// const blankOptions = (type: ModifierType): ModifierOption[] => {
-//   const l = MODIFIER_LIMITS[type];
-//   const names = l.defaults ?? Array<string>(l.min).fill("");
-//   return names.map((name) => ({ id: nanoid(), name }));
-// };
-
-// AFTER: a new group starts with exactly one empty option
-
-
+// a new group starts with exactly one empty option
 const blankOptions = (): ModifierOption[] => [
-  { id: nanoid(), name: "", isVeg: true },
+  { id: nanoid(), name: "",},
 ];
 
-// NEW: the two choices for an add-on
+// the two choices for an add-on
 const selectionOptions = [
   { label: "Choose One", value: "single" },
   { label: "Choose Many", value: "multiple" },
@@ -72,21 +56,12 @@ const modifierTypeOptions = (
 ).map((t) => ({ label: MODIFIER_TYPE_LABELS[t], value: t }));
 
 const ModifierFields = ({ values, setValue, errors }: Ctx) => {
-  const sections = useSelector((s: RootState) => s.menuSections.menuSections);
   const type: ModifierType = values.type ?? "preference";
   const limit = MODIFIER_LIMITS[type];
   const isAddon = type === "addon";
   const options: ModifierOption[] = values.options ?? [];
-  const sectionIds: number[] = values.menuSectionIds ?? [];
   const selection: Selection = values.selection ?? limit.selection;
   const isActive = values.status !== "Inactive";
-
-  // active sections, plus any already selected so an edit never loses one
-  // const sectionOptions = sections
-  //   .filter((s) => s.status === "Active" || sectionIds.includes(s.id))
-  //   .map((s) => ({ label: s.name, value: String(s.id) }));
-
-
 
   const changeType = (t: ModifierType) => {
     if (t === type) return;
@@ -99,6 +74,7 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
       "options",
       options.map((o, idx) => (idx === i ? { ...o, ...updates } : o)),
     );
+
   const addOption = () =>
     setValue("options", [...options, { id: nanoid(), name: "", isVeg: true }]);
 
@@ -118,7 +94,7 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
           type="text"
           name="name"
           label="Modifier Group Name"
-          placeholder="e.g. Add-on Sauces"
+          placeholder="e.g. Size, Portion, Extra Cheese"
           value={values.name ?? ""}
           onChange={(value) => setValue("name", value)}
           error={errors.name}
@@ -138,53 +114,22 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
         />
       </div>
 
-      {/* <FormField
-        type="multiselect"
-        name="menuSectionIds"
-        label="Used for"
-        value={sectionIds.map(String)}
-        options={sectionOptions}
-        placeholder="Select menu sections"
-        onChange={(value) =>
-          setValue("menuSectionIds", (value as string[]).map(Number))
-        }
-        error={errors.menuSectionIds}
-        required
-      /> */}
-
-      <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
-        {isAddon && (
-          <div>
-            <FormField
-              type="select"
-              name="selection"
-              label="Selection Type"
-              value={selection}
-              options={selectionOptions}
-              placeholder="Select single or multi"
-              onChange={(value) => setValue("selection", value as Selection)}
-              error={errors.selection}
-              required
-            />
-          </div>
-        )}
-
-        {/* <div className={cn(!isAddon && "sm:col-span-2")}>
+      {/* add-on only: choose one or choose many */}
+      {isAddon && (
+        <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
           <FormField
-            type="multiselect"
-            name="menuSectionIds"
-            label="Used for"
-            value={sectionIds.map(String)}
-            options={sectionOptions}
-            placeholder="Select menu sections"
-            onChange={(value) =>
-              setValue("menuSectionIds", (value as string[]).map(Number))
-            }
-            error={errors.menuSectionIds}
+            type="select"
+            name="selection"
+            label="Selection Type"
+            value={selection}
+            options={selectionOptions}
+            placeholder="Choose one or many"
+            onChange={(value) => setValue("selection", value as Selection)}
+            error={errors.selection}
             required
           />
-        </div> */}
-      </div>
+        </div>
+      )}
 
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
@@ -205,6 +150,7 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
               className={inputCls}
             />
 
+            {/* add-on only: default price */}
             {limit.hasPrice && (
               <Input
                 type="number"
@@ -223,6 +169,7 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
               />
             )}
 
+            {/* delete only with 2+ options; spacer keeps rows aligned */}
             {options.length > 1 ? (
               <Button
                 type="button"
@@ -256,7 +203,9 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
         </Button>
 
         <p className="text-xs text-tertiary">
-          Prices are set per item in the Add Item section.
+          {limit.hasPrice
+            ? "Default price is prefilled when adding an item. You can change it per item in the Add Item section."
+            : "Prices are set per item in the Add Item section."}
         </p>
       </div>
 
@@ -282,13 +231,12 @@ const validate = (v: FormValues) => {
   const type: ModifierType = (v.type as ModifierType) ?? "preference";
   const limit = MODIFIER_LIMITS[type];
 
-  // NEW: add-on must have a selection type
   if (
     limit.chooseSelection &&
     v.selection !== "single" &&
     v.selection !== "multiple"
   )
-    errors.selection = "Select single or multi select";
+    errors.selection = "Choose one or choose many";
 
   const opts: ModifierOption[] = v.options ?? [];
   const names = opts.map((o) => o.name.trim().toLowerCase()).filter(Boolean);
@@ -316,16 +264,12 @@ const normalize = (v: FormValues): NewModifier => {
     type,
     selection,
     required: limit.required,
-    menuSectionIds: ((v.menuSectionIds ?? []) as (number | string)[]).map(
-      Number,
-    ),
     status: v.status === "Inactive" ? "Inactive" : "Active",
     options: (v.options ?? [])
       .map((o: ModifierOption) => ({
         id: o.id || nanoid(),
         name: o.name.trim(),
-        isVeg: o.isVeg ?? true, // was being dropped
-        ...(limit.hasPrice ? { price: Number(o.price) || 0 } : {}), // NEW: default price
+        ...(limit.hasPrice ? { price: Number(o.price) || 0 } : {}),
       }))
       .filter((o: ModifierOption) => o.name),
   };
@@ -335,25 +279,26 @@ const normalize = (v: FormValues): NewModifier => {
 const AddModifier = () => {
   const dispatch = useDispatch<AppDispatch>();
   const modifiers = useSelector((s: RootState) => s.modifiers.modifiers);
-  const sections = useSelector((s: RootState) => s.menuSections.menuSections);
-  const [filter, setFilter] = useState<number | "all">("all");
 
-   const chipOptions = useMemo(
+  // CHANGED: the filter is by modifier TYPE (All / Preference / Add-on), not by menu section
+  const [filter, setFilter] = useState<ModifierType | "all">("all");
+
+  const filterOptions = useMemo<
+    { value: ModifierType | "all"; label: string; count: number }[]
+  >(
     () => [
-      { value: "all" as const, label: "All" },
-      ...sections.map((s) => ({
-        value: s.id,
-        label: s.name,
-        count: modifiers.filter((m) => m.menuSectionIds?.includes(s.id)).length,
+      { value: "all", label: "All", count: modifiers.length },
+      ...(Object.keys(MODIFIER_TYPE_LABELS) as ModifierType[]).map((t) => ({
+        value: t,
+        label: MODIFIER_TYPE_LABELS[t],
+        count: modifiers.filter((m) => m.type === t).length,
       })),
     ],
-    [sections, modifiers],
+    [modifiers],
   );
 
   const visible =
-    filter === "all"
-      ? modifiers
-      : modifiers.filter((m) => m.menuSectionIds?.includes(filter));
+    filter === "all" ? modifiers : modifiers.filter((m) => m.type === filter);
 
   const columns: Column<ModifierGroup>[] = useMemo(
     () => [
@@ -364,19 +309,10 @@ const AddModifier = () => {
         cell: (_r, i) => i + 1,
       },
       { key: "name", header: "Modifier Group" },
-      // {
-      //   key: "type",
-      //   header: "Type",
-      //   cell: (r) => MODIFIER_TYPE_LABELS[r.type],
-      // },
       {
         key: "type",
         header: "Type",
-        cell: (r) => (
-          <span>
-            {MODIFIER_TYPE_LABELS[r.type]}
-          </span>
-        ),
+        cell: (r) => MODIFIER_TYPE_LABELS[r.type],
       },
       {
         key: "options",
@@ -404,53 +340,48 @@ const AddModifier = () => {
         ),
       },
     ],
-    [sections],
+    [],
   );
 
   return (
     <div className="space-y-4 p-6">
       <div className="flex items-center justify-between">
-        <div className="flex gap-5">
-
-        <h1 className="border-l-4 border-button-primary pl-3 text-xl font-semibold">Modifiers</h1>
-
-        </div>
+        <h1 className="border-l-4 border-button-primary pl-3 text-xl font-semibold">
+          Modifiers
+        </h1>
 
         <div className="flex items-center gap-3">
-      <Filter options={chipOptions} value={filter} onChange={setFilter} />
+          <Filter options={filterOptions} value={filter} onChange={setFilter} />
 
+          <CommonDialog
+            title="Add Modifier Group"
+            description="Define the choices customers see. Set prices when adding an item."
+            trigger={
+              <Button className="flex items-center gap-2 cursor-pointer bg-button-primary text-white hover:bg-button-primary-hover">
+                <Plus className="h-4 w-4" /> Add
+              </Button>
+            }
+            defaultValues={{
+              name: "",
+              // new group starts with the type that is currently filtered
+              type: filter === "all" ? "preference" : filter,
+              selection: filter === "addon" ? "multiple" : "single",
+              status: "Active",
+              options: blankOptions(),
+            }}
+            validate={validate}
+            onSubmit={(v) => {
+              const data = normalize(v);
 
-        <CommonDialog
-          title="Add Modifier Group"
-          description="Define the choices customers see. Set prices when adding an item."
-          trigger={
-            <Button className="flex items-center gap-2 cursor-pointer bg-button-primary text-white hover:bg-button-primary-hover">         
-              <Plus className="h-4 w-4" /> Add
-            </Button>
-          }
-          defaultValues={{
-            name: "",
-            type: "preference",
-            selection: "single",
-            status: "Active",
-            menuSectionIds: filter === "all" ? [] : [filter],
-            options: blankOptions(),
-          }}
-          validate={validate}
-          onSubmit={(v) => {
-            const data = normalize(v);
+              console.log("Added Modifier:", data);
 
-            console.log("Submitted JSON:", data);
-
-            dispatch(addModifier(data));
-          }}
-        >
-          {(ctx) => <ModifierFields {...ctx} />}
-        </CommonDialog>
+              dispatch(addModifier(data));
+            }}
+          >
+            {(ctx) => <ModifierFields {...ctx} />}
+          </CommonDialog>
         </div>
-
       </div>
-
 
       <DataTable
         columns={columns}

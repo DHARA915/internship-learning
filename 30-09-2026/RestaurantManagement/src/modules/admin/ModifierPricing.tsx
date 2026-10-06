@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { FormField } from "../../components/form-field/FormField.tsx";
-import { selectModifiersForSection } from "../../Redux/Slices/Modifierslice.ts";
+// import { selectModifiersForSection } from "../../Redux/Slices/Modifierslice.ts";
 import type { RootState } from "../../Redux/store.ts";
 import type { ItemModifierPrice } from "../../utils/Modifierdata.ts";
 import { useMemo } from "react";
@@ -27,9 +27,9 @@ export function ModifierPricing({
   onChange,
   errors = {},
 }: Props) {
-  const groups = useSelector((s: RootState) =>
-    selectModifiersForSection(s, menuSectionId),
-  );
+  // const groups = useSelector((s: RootState) =>
+  //   selectModifiersForSection(s, menuSectionId),
+  // );
 
 // filtering option based on veg option
   const visibleGroups = useMemo(

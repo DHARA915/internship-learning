@@ -1,26 +1,29 @@
-
-
-export type ModifierType =  "addon" | "preference";
+export type ModifierType = "addon" | "preference";
 export type Selection = "single" | "multiple";
 export type Status = "Active" | "Inactive";
 
 export interface ModifierOption {
   id: string;
   name: string;
-  isVeg:boolean;
-  price?:number;
+  price?: number; // default price (add-on). Items can override it in Add Item.
 }
 
-/** A modifier group, e.g. "Crust", "Burger Add-ons". No prices here. */
+/**
+ * A general modifier group, e.g. "Size", "Portion", "Extra Cheese".
+ * CHANGED: no menuSectionIds any more. A group is not tied to a menu section;
+ * each menu item picks the groups it needs (Add Item page).
+ */
 export interface ModifierGroup {
   id: string;
   name: string;
   type: ModifierType;
-  selection: Selection; // base/preference = pick one, addon/extra = pick several
-  required: boolean; // customer must choose (base/preference) or may skip (addon/extra)
-  menuSectionIds: number[]; // ids from Menusectiondata this group is offered for
+  selection: Selection; // preference = choose one, add-on = admin picks one or many
+  required: boolean; // preference: customer must choose; add-on: may skip
   status: Status;
   options: ModifierOption[];
+
+    // Temporary — keep for existing code
+  menuSectionIds?: any[];
 }
 
 /** Prices live on the menu item (Add Item page), one entry per option the item offers. */
@@ -37,47 +40,47 @@ export const MODIFIER_TYPE_LABELS: Record<ModifierType, string> = {
 
 export interface ModifierLimit {
   min: number;
-  selection: Selection;
+  selection: Selection; // default selection mode
   required: boolean;
   placeholders: string[];
-  defaults?: string[];
-  chooseSelection?: boolean;
-  hasPrice?: boolean; // prefilled when the type is picked in the form
+  chooseSelection?: boolean; // admin picks single / multiple (add-on)
+  hasPrice?: boolean; // options carry a default price (add-on)
 }
 
 export const MODIFIER_LIMITS: Record<ModifierType, ModifierLimit> = {
-preference: {
-    min: 1, selection: "single", required: true,
+  preference: {
+    min: 1,
+    selection: "single",
+    required: true,
     placeholders: ["Small", "Medium", "Large"],
   },
   addon: {
-    min: 1, selection: "multiple", required: false,
-    chooseSelection: true, hasPrice: true,
+    min: 1,
+    selection: "multiple",
+    required: false,
+    chooseSelection: true,
+    hasPrice: true,
     placeholders: ["Garlic mayo", "Peri peri", "Chipotle"],
   },
 };
 
 //type for modifieroptions
-
 type ModifierOptionInput =
   | string
   | {
       name: string;
       isVeg: boolean;
-      price?:number;
+      price?: number;
     };
 
 /* ---------- seed JSON ---------- */
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 
-/** Ids from Menusectiondata. */
-const SEC = { drinks: 1, pizza: 2, burgers: 3, desserts: 4, starters: 5 , pasta:6 , Sandwiches:7 ,fries:8 } as const;
-
+// CHANGED: no menuSectionIds argument
 const group = (
   id: string,
   name: string,
   type: ModifierType,
-  menuSectionIds: number[],
   options: ModifierOptionInput[],
 ): ModifierGroup => ({
   id,
@@ -85,256 +88,215 @@ const group = (
   type,
   selection: MODIFIER_LIMITS[type].selection,
   required: MODIFIER_LIMITS[type].required,
-  menuSectionIds,
   status: "Active",
 
   options: options.map((o) => {
-    const option =
-      typeof o === "string"
-        ? { name: o, isVeg: true }
-        : o;
+    const option = typeof o === "string" ? { name: o, isVeg: true } : o;
 
     return {
       id: `${id}_${slug(option.name)}`,
       name: option.name,
       isVeg: option.isVeg,
-      price:(option as {price?:number}).price //Undefined unless admin give it
+      price: (option as { price?: number }).price, // undefined unless a default is given
     };
   }),
 });
 
+/**
+ * General groups, shared by every menu section.
+ * Ids of the groups that existed before are kept (mod_base, mod_drink_size, mod_portion ...)
+ * so prices already saved on menu items still point to a real group and option.
+ */
+
+
 export const modifierSeed: ModifierGroup[] = [
-  /* Drinks */
-  group(
-    "mod_drink_size",
-    "Drink Size",
-    "preference",
-    [SEC.drinks],
-    ["Small", "Medium", "Large"]
-  ),
+  // =========================================================
+  // 1. SIZE
+  // =========================================================
+  {
+    id: "mod_size",
+    name: "Size",
+    type: "preference",
+    selection: "single",
+    required: true,
+    status: "Active",
+    options: [
+      { id: "opt_size_small", name: "Small" },
+      { id: "opt_size_medium", name: "Medium" },
+      { id: "opt_size_large", name: "Large" },
+    ],
+  },
 
-  group(
-    "mod_drink_extras",
-    "Drink Extras",
-    "addon",
-    [SEC.drinks],
-    ["Extra shot", "Whipped cream", "Flavour syrup"]
-  ),
+  // =========================================================
+  // 2. CRUST
+  // =========================================================
+  {
+    id: "mod_crust",
+    name: "Crust",
+    type: "preference",
+    selection: "single",
+    required: true,
+    status: "Active",
+    options: [
+      { id: "opt_crust_thin", name: "Thin Crust" },
+      { id: "opt_crust_hand_tossed", name: "Hand Tossed" },
+      { id: "opt_crust_whole_wheat", name: "Whole Wheat" },
+      { id: "opt_crust_cheese_burst", name: "Cheese Burst" },
+    ],
+  },
 
-  /* Pizza */
-  group(
-    "mod_base",
-    "Pizza Size",
-    "preference",
-    [SEC.pizza],
-    ["Regular", "Medium", "Large"]
-  ),
+  // =========================================================
+  // 3. PIZZA TOPPINGS
+  // =========================================================
+  {
+    id: "mod_pizza_toppings",
+    name: "Pizza Toppings",
+    type: "addon",
+    selection: "multiple",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_topping_mushroom", name: "Mushrooms" },
+      { id: "opt_topping_olive", name: "Black Olives" },
+      { id: "opt_topping_jalapeno", name: "Jalapeños" },
+      { id: "opt_topping_onion", name: "Onions" },
+      { id: "opt_topping_capsicum", name: "Capsicum" },
+      { id: "opt_topping_corn", name: "Sweet Corn" },
+      { id: "opt_topping_paneer", name: "Paneer" },
+    ],
+  },
 
-  group(
-    "mod_crust",
-    "Crust",
-    "preference",
-    [SEC.pizza],
-    ["Hand tossed", "Thin crust", "Cheese burst", "Whole wheat"]
-  ),
+  // =========================================================
+  // 4. EXTRA CHEESE
+  // =========================================================
+  {
+    id: "mod_extra_cheese",
+    name: "Extra Cheese",
+    type: "addon",
+    selection: "single",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_cheese_mozzarella", name: "Mozzarella" },
+      { id: "opt_cheese_cheddar", name: "Cheddar" },
+      { id: "opt_cheese_parmesan", name: "Parmesan" },
+    ],
+  },
 
-  group(
-    "mod_pizza_toppings",
-    "Pizza Toppings",
-    "addon",
-    [SEC.pizza],
-    [
-      "Olives",
-      "Jalapeños",
-      "Mushrooms",
-      "Onions",
-      "Bell peppers",
-      "Sweet corn",
-      "Paneer",
-    ]
-  ),
+  // =========================================================
+  // 5. BURGER ADD-ONS
+  // =========================================================
+  {
+    id: "mod_burger_addons",
+    name: "Burger Add-ons",
+    type: "addon",
+    selection: "multiple",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_burger_cheese", name: "Cheese Slice" },
+      { id: "opt_burger_jalapeno", name: "Jalapeños" },
+      { id: "opt_burger_pickles", name: "Pickles" },
+      { id: "opt_burger_onion", name: "Caramelized Onion" },
+      { id: "opt_burger_egg", name: "Fried Egg" },
+      { id: "opt_burger_patty", name: "Extra Patty" },
+    ],
+  },
 
-  group(
-    "mod_seasoning",
-    "Seasoning Sachets",
-    "addon",
-    [SEC.pizza],
-    ["Oregano", "Chilli flakes", "Garlic powder"]
-  ),
+  // =========================================================
+  // 6. SAUCES & DIPS
+  // =========================================================
+  {
+    id: "mod_sauces_dips",
+    name: "Sauces & Dips",
+    type: "addon",
+    selection: "multiple",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_sauce_garlic_mayo", name: "Garlic Mayo" },
+      { id: "opt_sauce_peri_peri", name: "Peri Peri Sauce" },
+      { id: "opt_sauce_bbq", name: "Smoky BBQ" },
+      { id: "opt_sauce_chipotle", name: "Chipotle Sauce" },
+      { id: "opt_dip_cheese", name: "Cheese Dip" },
+      { id: "opt_dip_mint", name: "Mint Mayo" },
+    ],
+  },
 
-  /* Burgers */
-  group(
-    "mod_patty_count",
-    "Patty Count",
-    "preference",
-    [SEC.burgers],
-    ["Single", "Double", "Triple"]
-  ),
+  // =========================================================
+  // 7. BEVERAGE CUSTOMIZATION
+  // =========================================================
+  {
+    id: "mod_beverage",
+    name: "Beverage Customization",
+    type: "preference",
+    selection: "multiple",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_beverage_extra_ice", name: "Extra Ice" },
+      { id: "opt_beverage_no_ice", name: "No Ice" },
+      { id: "opt_beverage_less_sugar", name: "Less Sugar" },
+      { id: "opt_beverage_no_sugar", name: "No Sugar" },
+      { id: "opt_beverage_extra_syrup", name: "Extra Flavour Syrup" },
+    ],
+  },
 
-  group(
-    "mod_bun",
-    "Bun Type",
-    "preference",
-    [SEC.burgers],
-    ["Classic", "Brioche", "Multigrain", "Gluten-free"]
-  ),
+  // =========================================================
+  // 8. COFFEE EXTRAS
+  // =========================================================
+  {
+    id: "mod_coffee_extras",
+    name: "Coffee Extras",
+    type: "addon",
+    selection: "multiple",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_coffee_extra_shot", name: "Extra Espresso Shot" },
+      { id: "opt_coffee_whipped_cream", name: "Whipped Cream" },
+      { id: "opt_coffee_vanilla", name: "Vanilla Syrup" },
+      { id: "opt_coffee_caramel", name: "Caramel Syrup" },
+      { id: "opt_coffee_hazelnut", name: "Hazelnut Syrup" },
+    ],
+  },
 
-  group(
-    "mod_burger_addons",
-    "Burger Add-ons",
-    "addon",
-    [SEC.burgers],
-    [
-      "Cheese slice",
-      "Jalapeños",
-      "Caramelized onion",
-      { name: "Fried egg", isVeg: false },
-      "Pickles",
-      "Crispy lettuce",
-    ]
-  ),
+  // =========================================================
+  // 9. SIDE & FRIES
+  // =========================================================
+  {
+    id: "mod_side_customization",
+    name: "Side Customization",
+    type: "preference",
+    selection: "single",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_fries_regular", name: "Regular Fries" },
+      { id: "opt_fries_peri_peri", name: "Peri Peri Fries" },
+      { id: "opt_fries_cheesy", name: "Cheesy Fries" },
+      { id: "opt_fries_masala", name: "Masala Fries" },
+      { id: "opt_fries_loaded", name: "Loaded Fries" },
+    ],
+  },
 
-  /* Desserts */
-  group(
-    "mod_portion",
-    "Portion",
-    "preference",
-    [SEC.desserts],
-    ["Regular", "Large", "Sharing"]
-  ),
-
-  group(
-    "mod_dessert_toppings",
-    "Dessert Toppings",
-    "addon",
-    [SEC.desserts],
-    [
-      "Hot fudge",
-      "Caramel drizzle",
-      "Chopped nuts",
-      "Sprinkles",
-      "Whipped cream",
-      "Fresh berries",
-    ]
-  ),
-
-  group(
-    "mod_ice_cream",
-    "Add Ice Cream",
-    "addon",
-    [SEC.desserts],
-    ["Vanilla scoop", "Chocolate scoop", "Strawberry scoop"]
-  ),
-
-  /* Starters */
-  group(
-    "mod_dips",
-    "Dips",
-    "addon",
-    [SEC.starters,SEC.fries],
-    ["Ketchup", "Cheese dip", "Mint mayo", "Honey mustard"]
-  ),
-
-  /* Shared across sections */
-  group(
-    "mod_sauce",
-    "Add-on Sauces",
-    "addon",
-    [SEC.pizza, SEC.burgers, SEC.starters],
-    ["Garlic mayo", "Peri peri", "Chipotle", "Smoky BBQ"]
-  ),
-
-  group(
-    "mod_cheese",
-    "Extra Cheese",
-    "addon",
-    [SEC.pizza, SEC.burgers],
-    ["Mozzarella", "Cheddar", "Parmesan"]
-  ),
-
-  /* Pasta */
-group(
-  "mod_pasta_addons",
-  "Pasta Add-ons",
-  "addon",
-  [SEC.pasta],
-  [
-    { name: "Grilled chicken", isVeg: false },
-    "Mushrooms",
-    "Broccoli",
-    "Olives",
-    "Garlic bread",
-  ]
-),
-
-group(
-  "mod_pasta_cheese",
-  "Extra Cheese",
-  "addon",
-  [SEC.pasta],
-  [
-    "Mozzarella",
-    "Cheddar",
-    "Parmesan",
-  ]
-),
-
-  /* Sandwiches */
-  group(
-    "mod_bread",
-    "Bread",
-    "addon",
-    [SEC.Sandwiches],
-    ["White", "Brown", "Multigrain", "Sourdough"]
-  ),
-
-  group(
-    "mod_serve_style",
-    "Serve Style",
-    "preference",
-    [SEC.Sandwiches],
-    ["Grilled", "Toasted", "Cold"]
-  ),
-
-  group(
-    "mod_sandwich_addons",
-    "Sandwich Add-ons",
-    "addon",
-    [SEC.Sandwiches],
-    [
-      "Extra veggies",
-      "Cheese slice",
-      { name: "Egg", isVeg: false },
-      { name: "Grilled chicken", isVeg: false },
-      "Grilled paneer",
-    ]
-  ),
-
-  /* Fries */
-  // group(
-  //   "mod_fries_size",
-  //   "Fries Size",
-  //   "base",
-  //   [SEC.fries],
-  //   ["Regular", "Medium", "Large"]
-  // ),
-
-  group(
-    "mod_fries_seasoning",
-    "Fries Seasoning",
-    "preference",
-    [SEC.fries],
-    ["Salted", "Peri peri", "Cheesy", "Masala"]
-  ),
-
-  /* Starters */
-
-group(
-  "mod_manchurian_portion",
-  "Manchurian Portion",
-  "preference",
-  [SEC.starters],
-  ["Half", "Full"]
-),
-
+  // =========================================================
+  // 10. DESSERT TOPPINGS
+  // =========================================================
+  {
+    id: "mod_dessert_toppings",
+    name: "Dessert Toppings",
+    type: "addon",
+    selection: "multiple",
+    required: false,
+    status: "Active",
+    options: [
+      { id: "opt_dessert_chocolate", name: "Chocolate Sauce" },
+      { id: "opt_dessert_caramel", name: "Caramel Sauce" },
+      { id: "opt_dessert_sprinkles", name: "Sprinkles" },
+      { id: "opt_dessert_nuts", name: "Chopped Nuts" },
+      { id: "opt_dessert_whipped_cream", name: "Whipped Cream" },
+      { id: "opt_dessert_berries", name: "Fresh Berries" },
+    ],
+  },
 ];
