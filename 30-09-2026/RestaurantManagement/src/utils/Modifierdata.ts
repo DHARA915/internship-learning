@@ -1,6 +1,6 @@
 
 
-export type ModifierType = "base" | "addon" | "extra" | "preference";
+export type ModifierType =  "addon" | "preference";
 export type Selection = "single" | "multiple";
 export type Status = "Active" | "Inactive";
 
@@ -8,6 +8,7 @@ export interface ModifierOption {
   id: string;
   name: string;
   isVeg:boolean;
+  price?:number;
 }
 
 /** A modifier group, e.g. "Crust", "Burger Add-ons". No prices here. */
@@ -30,38 +31,29 @@ export interface ItemModifierPrice {
 }
 
 export const MODIFIER_TYPE_LABELS: Record<ModifierType, string> = {
-  base: "Base",
   addon: "Add-on",
-  extra: "Extra",
   preference: "Preference",
 };
 
 export interface ModifierLimit {
   min: number;
-  max: number;
   selection: Selection;
   required: boolean;
   placeholders: string[];
-  defaults?: string[]; // prefilled when the type is picked in the form
+  defaults?: string[];
+  chooseSelection?: boolean;
+  hasPrice?: boolean; // prefilled when the type is picked in the form
 }
 
 export const MODIFIER_LIMITS: Record<ModifierType, ModifierLimit> = {
-  base: {
-    min: 2, max: 5, selection: "single", required: true,
-    placeholders: ["Small", "Medium", "Large", "Extra large", "Family"],
-    defaults: ["Small", "Medium", "Large"],
+preference: {
+    min: 1, selection: "single", required: true,
+    placeholders: ["Small", "Medium", "Large"],
   },
   addon: {
-    min: 2, max: 8, selection: "multiple", required: false,
-    placeholders: ["Garlic mayo", "Peri peri", "Chipotle", "Smoky BBQ"],
-  },
-  extra: {
-    min: 2, max: 6, selection: "multiple", required: false,
-    placeholders: ["Mozzarella", "Cheddar", "Parmesan"],
-  },
-  preference: {
-    min: 2, max: 5, selection: "single", required: true,
-    placeholders: ["Mild", "Medium", "Spicy"],
+    min: 1, selection: "multiple", required: false,
+    chooseSelection: true, hasPrice: true,
+    placeholders: ["Garlic mayo", "Peri peri", "Chipotle"],
   },
 };
 
@@ -72,6 +64,7 @@ type ModifierOptionInput =
   | {
       name: string;
       isVeg: boolean;
+      price?:number;
     };
 
 /* ---------- seed JSON ---------- */
@@ -105,6 +98,7 @@ const group = (
       id: `${id}_${slug(option.name)}`,
       name: option.name,
       isVeg: option.isVeg,
+      price:(option as {price?:number}).price //Undefined unless admin give it
     };
   }),
 });
@@ -114,7 +108,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_drink_size",
     "Drink Size",
-    "base",
+    "preference",
     [SEC.drinks],
     ["Small", "Medium", "Large"]
   ),
@@ -131,7 +125,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_base",
     "Pizza Size",
-    "base",
+    "preference",
     [SEC.pizza],
     ["Regular", "Medium", "Large"]
   ),
@@ -139,7 +133,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_crust",
     "Crust",
-    "base",
+    "preference",
     [SEC.pizza],
     ["Hand tossed", "Thin crust", "Cheese burst", "Whole wheat"]
   ),
@@ -172,7 +166,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_patty_count",
     "Patty Count",
-    "base",
+    "preference",
     [SEC.burgers],
     ["Single", "Double", "Triple"]
   ),
@@ -180,7 +174,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_bun",
     "Bun Type",
-    "base",
+    "preference",
     [SEC.burgers],
     ["Classic", "Brioche", "Multigrain", "Gluten-free"]
   ),
@@ -204,7 +198,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_portion",
     "Portion",
-    "base",
+    "preference",
     [SEC.desserts],
     ["Regular", "Large", "Sharing"]
   ),
@@ -227,7 +221,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_ice_cream",
     "Add Ice Cream",
-    "extra",
+    "addon",
     [SEC.desserts],
     ["Vanilla scoop", "Chocolate scoop", "Strawberry scoop"]
   ),
@@ -253,7 +247,7 @@ export const modifierSeed: ModifierGroup[] = [
   group(
     "mod_cheese",
     "Extra Cheese",
-    "extra",
+    "addon",
     [SEC.pizza, SEC.burgers],
     ["Mozzarella", "Cheddar", "Parmesan"]
   ),
@@ -276,7 +270,7 @@ group(
 group(
   "mod_pasta_cheese",
   "Extra Cheese",
-  "extra",
+  "addon",
   [SEC.pasta],
   [
     "Mozzarella",
@@ -289,7 +283,7 @@ group(
   group(
     "mod_bread",
     "Bread",
-    "base",
+    "addon",
     [SEC.Sandwiches],
     ["White", "Brown", "Multigrain", "Sourdough"]
   ),
@@ -338,7 +332,7 @@ group(
 group(
   "mod_manchurian_portion",
   "Manchurian Portion",
-  "base",
+  "preference",
   [SEC.starters],
   ["Half", "Full"]
 ),

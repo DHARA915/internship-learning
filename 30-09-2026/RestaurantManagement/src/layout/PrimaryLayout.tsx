@@ -13,10 +13,10 @@ const PrimaryLayout = () => {
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset className="bg-secondary">
+      <SidebarInset className="bg-secondary h-svh overflow-hidden">
         <AppHeader />
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 overflow-y-auto scrollbar-hide">
           <Outlet />
         </main>
       </SidebarInset>

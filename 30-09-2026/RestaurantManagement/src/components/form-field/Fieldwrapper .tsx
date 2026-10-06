@@ -23,7 +23,7 @@ export function FieldWrapper({
   children,
 }: FieldWrapperProps) {
   return (
-    <div className={cn("grid w-full gap-2", className)}>
+    <div className={cn("flex flex-col justify-start w-full gap-2", className)}>
       {label && (
         <Label htmlFor={name}>
           {label}
@@ -32,16 +32,16 @@ export function FieldWrapper({
       )}
       {children}
             {/* always rendered, so the field height never changes */}
-      <p
+     {error ?  <p
         id={`${name}-error`}
         role={error ? "alert" : undefined}
         className={cn(
-          "min-h-2 text-xs leading-4",
+          " text-xs leading-4",
           error ? "text-danger" : "text-tertiary"
         )}
       >
         {error ?? helperText}
-      </p>
+      </p>: <></>}
     </div>
   );
 }

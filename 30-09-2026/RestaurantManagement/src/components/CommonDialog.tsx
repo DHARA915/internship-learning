@@ -97,7 +97,7 @@ export function CommonDialog({
     setOpenState(v);
     onOpenChange?.(v);
   };
- 
+
   // every time the dialog opens, start from the latest previous data
   React.useEffect(() => {
     if (open) {
@@ -123,7 +123,12 @@ export function CommonDialog({
     });
     Object.assign(errs, validate?.(values) ?? {});
     setErrors(errs);
-    if (Object.keys(errs).some((k) => errs[k])) return;
+    if (Object.keys(errs).some((k) => errs[k])) {
+        console.log("❌ Validation errors:", errs);
+  console.log("❌ Form values:", values);
+  return;
+
+    };
  
     setLoading(true);
     try {
@@ -138,7 +143,7 @@ export function CommonDialog({
  
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      {trigger && <DialogTrigger >{trigger}</DialogTrigger>}
       <DialogContent className="gap-0 overflow-hidden rounded-2xl border-line bg-primary p-0 shadow-xl sm:max-w-xl">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col">
           <DialogHeader className="space-y-1 px-6 pb-4 pt-6 text-left">
@@ -153,7 +158,7 @@ export function CommonDialog({
           </DialogHeader>
  
           {hasBody && (
-            <div className="max-h-[60vh] overflow-y-auto border-t border-line px-6 py-5">
+            <div className="max-h-[60vh] overflow-y-auto border-t border-line px-6 py-5 scrollbar-hide">
               {fields.length > 0 && (
                 <div className="grid gap-x-4 gap-y-1 sm:grid-cols-2">
                   {fields.map((f) => (
@@ -257,7 +262,7 @@ function FieldRenderer({
         disabled={f.disabled}
         aria-invalid={invalid}
         onChange={(e) => onChange(e.target.value)}
-        className={cn(inputBase, "h-auto min-h-[96px] resize-y py-2.5", invalidCls)}
+        className={cn(inputBase, "h-auto min-h-24 resize-y py-2.5", invalidCls)}
       />
     );
   } else if (type === "select") {

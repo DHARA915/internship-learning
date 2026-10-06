@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+/* @import "shadcn/tailwind.css"; */
 @import "@fontsource-variable/geist";
-@import "tailwindcss";
+
 
 /* Toggle dark mode by adding the `dark` class to <html> */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -146,6 +146,14 @@
 
 @utility row-dull{
   background-color:var(--bg-primary-dull)
+}
+
+/* For Hiding scrollbar  */
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 
