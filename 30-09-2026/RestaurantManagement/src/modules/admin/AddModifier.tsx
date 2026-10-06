@@ -34,8 +34,8 @@ type Ctx = {
 };
 
 const inputCls =
-  "h-10 rounded-lg border-line bg-primary px-3 text-sm text-primary shadow-none transition-colors " +
-  "placeholder:text-tertiary focus-visible:border-brand focus-visible:ring-2 focus-visible:ring-brand/20";
+  "rounded-lg border-line bg-primary px-3 text-sm text-primary shadow-none transition-colors " +
+  "placeholder:text-tertiary";
 
 const chipCls = (on: boolean) =>
   cn(
@@ -119,11 +119,7 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
           onChange={(value) => changeType(value as ModifierType)}
           error={errors.type}
           required
-          helperText={`${limit.required ? "Required" : "Optional"} · ${
-            limit.selection === "single"
-              ? "customer picks one"
-              : "customer can pick several"
-          }`}
+         
         />
       </div>
 

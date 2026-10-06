@@ -10,7 +10,7 @@ import { FieldWrapper } from "../Fieldwrapper ";
 import type { SelectFieldProps } from "./Types";
 
 const inputCls =
-  "h-9 rounded-lg border border-line bg-primary text-primary placeholder:text-tertiary";
+  " rounded-lg border border-line bg-primary text-primary placeholder:text-tertiary";
 
 export function SelectField({
   name,
