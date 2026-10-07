@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
-import { nanoid } from "@reduxjs/toolkit";
 import { Plus, Trash2, Check } from "lucide-react";
-
+import { Switch } from "../../components/ui/switch.tsx";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -11,8 +10,18 @@ import { Badge } from "../../components/ui/badge.tsx";
 import { CommonDialog, type FormValues } from "../../components/CommonDialog";
 import { DataTable, type Column } from "../../components/DataTable";
 import { FormField } from "../../components/form-field/FormField";
+import { useSearchParams } from "react-router-dom";
+import { Filter } from "../../components/Filter.tsx";
 import { cn } from "../../lib/utils";
 
+import type { RootState, AppDispatch } from "../../Redux/store";
+import {
+  addMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
+  type NewMenuItem,
+} from "../../Redux/Slices/menuItemSlice";
+import type { MenuItem, ItemModifierGroup } from "../../utils/MenuItemdata";
 import { selectActiveModifiers } from "../../Redux/Slices/Modifierslice.ts";
 import {
   MODIFIER_TYPE_LABELS,
@@ -25,18 +34,18 @@ type Ctx = {
   errors: Record<string, string>;
 };
 
-type ItemModifierOption = {
+type DraftOption = {
   id: string;
   name: string;
   price: number | "";
 };
 
-type ItemModifierGroup = {
+type DraftGroup = {
   groupId: string | number;
   groupName: string;
   type: string;
   selection: string;
-  options: ItemModifierOption[];
+  options: DraftOption[];
 };
 
 type GroupOption = {
@@ -45,14 +54,6 @@ type GroupOption = {
   count: number;
 };
 
-type MenuItemRow = {
-  id: string;
-  name: string;
-  isVeg: boolean;
-  image: string;
-  description: string;
-  modifiers: ItemModifierGroup[];
-};
 
 const read = (e: any) => (e?.target ? e.target.value : e);
 
@@ -112,8 +113,8 @@ const Thumb = ({ src, name }: { src: string; name: string }) => {
   );
 };
 
-const toItemGroup = (g: ModifierGroup): ItemModifierGroup => ({
-  groupId: g.id,
+const toItemGroup = (g: ModifierGroup): DraftGroup => ({
+  groupId: String(g.id),
   groupName: g.name,
   type: g.type,
   selection: g.selection,
@@ -223,7 +224,7 @@ const MenuItemFields = ({ values, setValue, errors }: Ctx) => {
     };
   }, [picking, typeFilter]);
 
-  const modifiers: ItemModifierGroup[] = values.modifiers ?? [];
+  const modifiers: DraftGroup[] = values.modifiers ?? [];
 
   const typeChoices: GroupOption[] = [
     {
@@ -265,7 +266,7 @@ const MenuItemFields = ({ values, setValue, errors }: Ctx) => {
 
         return g ? toItemGroup(g) : null;
       })
-      .filter(Boolean) as ItemModifierGroup[];
+      .filter(Boolean) as DraftGroup[];
 
     setValue("modifiers", [...kept, ...added]);
   };
@@ -358,9 +359,11 @@ const MenuItemFields = ({ values, setValue, errors }: Ctx) => {
       <div className="grid gap-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-secondary">Modifiers</p>
+            <p className="text-sm font-medium text-secondary">
+              Modifiers<span className="ml-0.5 text-danger">*</span>
+            </p>
             <p className="text-xs text-tertiary">
-              Add preferences and optional add-ons with pricing.
+              A preference is required. Every option needs a price; add-ons are optional.
             </p>
           </div>
 
@@ -505,7 +508,7 @@ const MenuItemFields = ({ values, setValue, errors }: Ctx) => {
 
             {g.options.map((o) => (
               <div key={o.id} className="flex items-center gap-2">
-                <Label className="flex-1 truncate text-sm text-tertairy">
+                <Label className="flex-1 truncate text-sm text-tertiary">
                   {o.name}
                 </Label>
                 <FormField
@@ -540,6 +543,15 @@ const MenuItemFields = ({ values, setValue, errors }: Ctx) => {
           <p className="text-xs text-danger">{errors.modifiers}</p>
         )}
       </div>
+        <Switch
+    id="menu-item-status"
+    checked={values.status !== "Inactive"}
+    onCheckedChange={(checked) =>
+      setValue("status", checked ? "Active" : "Inactive")
+    }
+    aria-label="Menu item status"
+    className="data-checked:bg-slate-200 data-unchecked:bg-gray-300 dark:data-unchecked:bg-gray-600"
+  />
     </>
   );
 };
@@ -557,42 +569,133 @@ const validate = (v: FormValues): Record<string, string> => {
     errors.image = "Enter a valid URL starting with http:// or https://";
   }
 
-  const groups: ItemModifierGroup[] = v.modifiers ?? [];
+  const groups: DraftGroup[] = v.modifiers ?? [];
 
-  const hasPreference = groups.some((g) => g.type === "preference");
+  // a price is "missing" only when blank; 0 is a valid price
+  const isBlank = (o: DraftOption) =>
+    o.price === "" || o.price == null || Number.isNaN(Number(o.price));
+
+  // a preference only counts if it still has at least one option
+  const hasPreference = groups.some(
+    (g) => g.type === "preference" && g.options.length > 0,
+  );
 
   if (!hasPreference) {
-    errors.modifiers = "Select at least one preference";
+    errors.modifiers = "Select at least one preference and add its prices";
   } else if (groups.some((g) => g.options.length === 0)) {
     errors.modifiers = "Each modifier group needs at least one option";
-  } else if (groups.some((g) => g.options.some((o) => Number(o.price) < 0))) {
-    errors.modifiers = "Price cannot be negative";
+  } else {
+    const unpriced = groups
+      .filter((g) => g.options.some(isBlank))
+      .map((g) => g.groupName);
+
+    if (unpriced.length) {
+      errors.modifiers = `Enter a price for every option in: ${unpriced.join(", ")}`;
+    } else if (
+      groups.some((g) => g.options.some((o) => Number(o.price) < 0))
+    ) {
+      errors.modifiers = "Price cannot be negative";
+    }
   }
 
   return errors;
 };
 
-const normalize = (v: FormValues): MenuItemRow => ({
-  id: v.id || nanoid(),
+const normalize = (v: FormValues): NewMenuItem => ({
   name: String(v.name).trim(),
   isVeg: v.isVeg !== false,
   image: String(v.image ?? "").trim(),
   description: String(v.description ?? "").trim(),
-  modifiers: ((v.modifiers ?? []) as ItemModifierGroup[])
+  status: v.status === "Inactive" ? "Inactive" : "Active",
+  modifiers: ((v.modifiers ?? []) as DraftGroup[])
     .filter((g) => g.options.length > 0)
-    .map((g) => ({
-      ...g,
-      options: g.options.map((o) => ({
-        ...o,
-        price: Number(o.price) || 0,
-      })),
-    })),
+    .map(
+      (g): ItemModifierGroup => ({
+        groupId: String(g.groupId),
+        groupName: g.groupName,
+        type: g.type,
+        selection: g.selection === "single" ? "single" : "multiple",
+        options: g.options.map((o) => ({
+          id: o.id,
+          name: o.name,
+          price: Number(o.price) || 0,
+        })),
+      }),
+    ),
 });
 
 const AddMenuItems = () => {
-  const [items, setItems] = useState<MenuItemRow[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const items = useSelector((s: RootState) => s.menuItems.menuItems);
 
-  const columns: Column<MenuItemRow>[] = useMemo(
+  const [searchParams] = useSearchParams();
+
+  const nameFilter = searchParams.get("name") ?? "all";
+  const typeFilter = searchParams.get("type") ?? "all"; // "veg" | "nonveg"
+  const statusFilter = searchParams.get("status") ?? "all"; // "Active" | "Inactive"
+
+  const nameOptions = useMemo(() => {
+    const names = Array.from(new Set(items.map((i) => i.name)));
+    return [
+      { value: "all", label: "All", count: items.length },
+      ...names.map((name) => ({
+        value: name,
+        label: name,
+        count: items.filter((i) => i.name === name).length,
+      })),
+    ];
+  }, [items]);
+
+  const typeOptions = useMemo(
+    () => [
+      { value: "all", label: "All", count: items.length },
+      { value: "veg", label: "Veg", count: items.filter((i) => i.isVeg).length },
+      {
+        value: "nonveg",
+        label: "Non-Veg",
+        count: items.filter((i) => !i.isVeg).length,
+      },
+    ],
+    [items],
+  );
+
+  const statusOptions = useMemo(
+    () => [
+      { value: "all", label: "All", count: items.length },
+      {
+        value: "Active",
+        label: "Active",
+        count: items.filter((i) => i.status === "Active").length,
+      },
+      {
+        value: "Inactive",
+        label: "Inactive",
+        count: items.filter((i) => i.status === "Inactive").length,
+      },
+    ],
+    [items],
+  );
+
+  const filterFields = [
+    { key: "name", label: "Item Name", options: nameOptions, defaultValue: "all" },
+    { key: "type", label: "Type", options: typeOptions, defaultValue: "all" },
+    { key: "status", label: "Status", options: statusOptions, defaultValue: "all" },
+  ];
+
+  const visible = useMemo(
+    () =>
+      items.filter((i) => {
+        const matchesName = nameFilter === "all" || i.name === nameFilter;
+        const matchesType =
+          typeFilter === "all" || (typeFilter === "veg" ? i.isVeg : !i.isVeg);
+        const matchesStatus =
+          statusFilter === "all" || i.status === statusFilter;
+        return matchesName && matchesType && matchesStatus;
+      }),
+    [items, nameFilter, typeFilter, statusFilter],
+  );
+
+  const columns: Column<MenuItem>[] = useMemo(
     () => [
       {
         key: "srNo",
@@ -627,22 +730,17 @@ const AddMenuItems = () => {
          isSort:true
       },
       {
-        key: "modifiers",
-        header: "Modifiers",
-        cell: (r) => (
-          <div className="flex flex-wrap gap-1.5">
-            {r.modifiers.length === 0 ? (
-              <span className="text-xs text-tertiary">None</span>
-            ) : (
-              r.modifiers.map((g) => (
-                <Badge key={g.groupId} variant="option">
-                  {g.groupName} · {g.options.length}
-                </Badge>
-              ))
-            )}
-          </div>
-        ),
-      },
+  key: "status",
+  header: "Status",
+  cell: (r) => (
+    <Badge
+      variant={r.status === "Active" ? "active" : "inactive"}
+    >
+      {r.status}
+    </Badge>
+  ),
+  isSort: true,
+},
     ],
     [],
   );
@@ -651,6 +749,9 @@ const AddMenuItems = () => {
     <div className="space-y-4 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Menu Items</h1>
+
+        <div className="flex items-center gap-3">
+          <Filter fields={filterFields} />
 
         <CommonDialog
           title="Add Menu Item"
@@ -666,6 +767,7 @@ const AddMenuItems = () => {
             isVeg: true,
             image: "",
             description: "",
+            status:"Active",
             modifiers: [],
           }}
           validate={validate}
@@ -674,20 +776,20 @@ const AddMenuItems = () => {
 
             console.log("Menu Item JSON:", JSON.stringify(data, null, 2));
 
-            setItems((prev) => [...prev, data]);
+            dispatch(addMenuItem(data));
           }}
         >
           {(ctx) => <MenuItemFields {...ctx} />}
         </CommonDialog>
+        </div>
       </div>
 
       <DataTable
         columns={columns}
-        data={items}
+        data={visible}
         searchFields={["name"]}
-        onDelete={(row) =>
-          setItems((prev) => prev.filter((i) => i.id !== row.id))
-        }
+        enableView
+        onDelete={(row) => dispatch(deleteMenuItem(row.id))}
         editTitle="Edit Menu Item"
         validate={validate}
         renderEditForm={(ctx) => <MenuItemFields {...ctx} />}
@@ -696,7 +798,7 @@ const AddMenuItems = () => {
 
           console.log("Updated Menu Item JSON:", JSON.stringify(data, null, 2));
 
-          setItems((prev) => prev.map((i) => (i.id === data.id ? data : i)));
+          dispatch(updateMenuItem({ id: updated.id, data }));
         }}
       />
     </div>

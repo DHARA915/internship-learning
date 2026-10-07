@@ -1,9 +1,8 @@
 import {
   createSlice,
-  createSelector,
+  nanoid,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import type { RootState } from "../store";
 import { menuItemSeed, type MenuItem } from "../../utils/MenuItemdata";
 
 export type NewMenuItem = Omit<MenuItem, "id" | "createdAt" | "updatedAt">;
@@ -21,19 +20,25 @@ const menuItemSlice = createSlice({
   initialState,
   reducers: {
     addMenuItem: {
-      reducer(state, action: PayloadAction<NewMenuItem & { createdAt: string; updatedAt: string }>) {
-        const id = Math.max(0, ...state.menuItems.map((m) => m.id)) + 1;
-        state.menuItems.push({ id, ...action.payload });
+      reducer(state, action: PayloadAction<MenuItem>) {
+        state.menuItems.push(action.payload);
       },
-      // dates are added here so the reducer stays pure
+      // id + dates are generated here so the reducer stays pure
       prepare(data: NewMenuItem) {
-        return { payload: { ...data, createdAt: today(), updatedAt: today() } };
+        return {
+          payload: {
+            id: nanoid(),
+            ...data,
+            createdAt: today(),
+            updatedAt: today(),
+          } as MenuItem,
+        };
       },
     },
     updateMenuItem: {
       reducer(
         state,
-        action: PayloadAction<{ id: number; data: NewMenuItem; updatedAt: string }>,
+        action: PayloadAction<{ id: string; data: NewMenuItem; updatedAt: string }>,
       ) {
         const { id, data, updatedAt } = action.payload;
         const i = state.menuItems.findIndex((m) => m.id === id);
@@ -45,11 +50,11 @@ const menuItemSlice = createSlice({
             updatedAt,
           };
       },
-      prepare(payload: { id: number; data: NewMenuItem }) {
+      prepare(payload: { id: string; data: NewMenuItem }) {
         return { payload: { ...payload, updatedAt: today() } };
       },
     },
-    deleteMenuItem(state, action: PayloadAction<number>) {
+    deleteMenuItem(state, action: PayloadAction<string>) {
       state.menuItems = state.menuItems.filter((m) => m.id !== action.payload);
     },
   },
@@ -57,11 +62,5 @@ const menuItemSlice = createSlice({
 
 export const { addMenuItem, updateMenuItem, deleteMenuItem } =
   menuItemSlice.actions;
-
-// /* selectors */
-// const selectAll = (s: RootState) => s.menuItems.menuItems;
-// export const selectActiveMenuItems = createSelector([selectAll], (all) =>
-//   all.filter((m) => m.status === "Active"),
-// );
 
 export default menuItemSlice.reducer;
