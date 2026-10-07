@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { nanoid } from "@reduxjs/toolkit";
 import { Plus, Trash2 } from "lucide-react";
@@ -10,6 +10,7 @@ import { Badge } from "../../components/ui/badge.tsx";
 import { CommonDialog, type FormValues } from "../../components/CommonDialog";
 import { DataTable, type Column } from "../../components/DataTable";
 import { FormField } from "../../components/form-field/FormField";
+import { useSearchParams } from "react-router-dom";
 import { cn } from "../../lib/utils";
 import { Filter } from "../../components/Filter.tsx";
 import type { RootState, AppDispatch } from "../../Redux/store";
@@ -28,6 +29,7 @@ import {
   type Selection,
 } from "../../utils/Modifierdata";
 import { formatPrice } from "../../utils/MenuItemdata.ts";
+
 
 /* ---------- shared dialog fields (Add + Edit) ---------- */
 type Ctx = {
@@ -280,25 +282,126 @@ const AddModifier = () => {
   const dispatch = useDispatch<AppDispatch>();
   const modifiers = useSelector((s: RootState) => s.modifiers.modifiers);
 
-  // CHANGED: the filter is by modifier TYPE (All / Preference / Add-on), not by menu section
-  const [filter, setFilter] = useState<ModifierType | "all">("all");
+  const [searchParams] = useSearchParams();
 
-  const filterOptions = useMemo<
-    { value: ModifierType | "all"; label: string; count: number }[]
-  >(
-    () => [
-      { value: "all", label: "All", count: modifiers.length },
-      ...(Object.keys(MODIFIER_TYPE_LABELS) as ModifierType[]).map((t) => ({
-        value: t,
-        label: MODIFIER_TYPE_LABELS[t],
-        count: modifiers.filter((m) => m.type === t).length,
-      })),
-    ],
-    [modifiers],
+const typeFilter =
+  (searchParams.get("type") as ModifierType | null) ?? "all";
+
+const groupFilter =
+  searchParams.get("group") ?? "all";
+
+const statusFilter =
+  (searchParams.get("status") as "Active" | "Inactive" | null) ?? "all";
+
+const typeOptions = useMemo(
+  () => [
+    {
+      value: "all" as const,
+      label: "All",
+      count: modifiers.length,
+    },
+    ...(Object.keys(MODIFIER_TYPE_LABELS) as ModifierType[]).map(
+      (type) => ({
+        value: type,
+        label: MODIFIER_TYPE_LABELS[type],
+        count: modifiers.filter((m) => m.type === type).length,
+      }),
+    ),
+  ],
+  [modifiers],
+);
+
+const groupOptions = useMemo(() => {
+  const groups = Array.from(
+    new Set(modifiers.map((modifier) => modifier.name)),
   );
 
-  const visible =
-    filter === "all" ? modifiers : modifiers.filter((m) => m.type === filter);
+  return [
+    {
+      value: "all",
+      label: "All",
+      count: modifiers.length,
+    },
+    ...groups.map((name) => ({
+      value: name,
+      label: name,
+      count: modifiers.filter(
+        (modifier) => modifier.name === name,
+      ).length,
+    })),
+  ];
+}, [modifiers]);
+
+const statusOptions = useMemo(
+  () => [
+    {
+      value: "all" as const,
+      label: "All",
+      count: modifiers.length,
+    },
+    {
+      value: "Active" as const,
+      label: "Active",
+      count: modifiers.filter((m) => m.status === "Active").length,
+    },
+    {
+      value: "Inactive" as const,
+      label: "Inactive",
+      count: modifiers.filter(
+        (m) => m.status === "Inactive",
+      ).length,
+    },
+  ],
+  [modifiers],
+);
+
+const filterFields = [
+  {
+    key: "type",
+    label: "Type",
+    options: typeOptions,
+    defaultValue: "all" as const,
+  },
+  {
+    key: "group",
+    label: "Modifier Group",
+    options: groupOptions,
+    defaultValue: "all",
+  },
+  {
+    key: "status",
+    label: "Status",
+    options: statusOptions,
+    defaultValue: "all" as const,
+  },
+];
+
+const visible = useMemo(() => {
+  return modifiers.filter((modifier) => {
+    const matchesType =
+      typeFilter === "all" ||
+      modifier.type === typeFilter;
+
+    const matchesGroup =
+      groupFilter === "all" ||
+      modifier.name === groupFilter;
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      modifier.status === statusFilter;
+
+    return (
+      matchesType &&
+      matchesGroup &&
+      matchesStatus
+    );
+  });
+}, [
+  modifiers,
+  typeFilter,
+  groupFilter,
+  statusFilter,
+]);
 
   const columns: Column<ModifierGroup>[] = useMemo(
     () => [
@@ -351,7 +454,7 @@ const AddModifier = () => {
         </h1>
 
         <div className="flex items-center gap-3">
-          <Filter options={filterOptions} value={filter} onChange={setFilter} />
+          <Filter fields={filterFields} />
 
           <CommonDialog
             title="Add Modifier Group"
@@ -361,14 +464,19 @@ const AddModifier = () => {
                 <Plus className="h-4 w-4" /> Add
               </Button>
             }
-            defaultValues={{
-              name: "",
-              // new group starts with the type that is currently filtered
-              type: filter === "all" ? "preference" : filter,
-              selection: filter === "addon" ? "multiple" : "single",
-              status: "Active",
-              options: blankOptions(),
-            }}
+           defaultValues={{
+  name: "",
+  type:
+    typeFilter === "all"
+      ? "preference"
+      : typeFilter,
+  selection:
+    typeFilter === "addon"
+      ? "multiple"
+      : "single",
+  status: "Active",
+  options: blankOptions(),
+}}
             validate={validate}
             onSubmit={(v) => {
               const data = normalize(v);
