@@ -30,7 +30,6 @@ import {
 } from "../../utils/Modifierdata";
 import { formatPrice } from "../../utils/MenuItemdata.ts";
 
-
 /* ---------- shared dialog fields (Add + Edit) ---------- */
 type Ctx = {
   values: FormValues;
@@ -43,9 +42,7 @@ const inputCls =
   "placeholder:text-tertiary";
 
 // a new group starts with exactly one empty option
-const blankOptions = (): ModifierOption[] => [
-  { id: nanoid(), name: "",},
-];
+const blankOptions = (): ModifierOption[] => [{ id: nanoid(), name: "" }];
 
 // the two choices for an add-on
 const selectionOptions = [
@@ -284,124 +281,103 @@ const AddModifier = () => {
 
   const [searchParams] = useSearchParams();
 
-const typeFilter =
-  (searchParams.get("type") as ModifierType | null) ?? "all";
+  const typeFilter = (searchParams.get("type") as ModifierType | null) ?? "all";
 
-const groupFilter =
-  searchParams.get("group") ?? "all";
+  const groupFilter = searchParams.get("group") ?? "all";
 
-const statusFilter =
-  (searchParams.get("status") as "Active" | "Inactive" | null) ?? "all";
+  const statusFilter =
+    (searchParams.get("status") as "Active" | "Inactive" | null) ?? "all";
 
-const typeOptions = useMemo(
-  () => [
-    {
-      value: "all" as const,
-      label: "All",
-      count: modifiers.length,
-    },
-    ...(Object.keys(MODIFIER_TYPE_LABELS) as ModifierType[]).map(
-      (type) => ({
+  const typeOptions = useMemo(
+    () => [
+      {
+        value: "all" as const,
+        label: "All",
+        count: modifiers.length,
+      },
+      ...(Object.keys(MODIFIER_TYPE_LABELS) as ModifierType[]).map((type) => ({
         value: type,
         label: MODIFIER_TYPE_LABELS[type],
         count: modifiers.filter((m) => m.type === type).length,
-      }),
-    ),
-  ],
-  [modifiers],
-);
-
-const groupOptions = useMemo(() => {
-  const groups = Array.from(
-    new Set(modifiers.map((modifier) => modifier.name)),
+      })),
+    ],
+    [modifiers],
   );
 
-  return [
-    {
-      value: "all",
-      label: "All",
-      count: modifiers.length,
-    },
-    ...groups.map((name) => ({
-      value: name,
-      label: name,
-      count: modifiers.filter(
-        (modifier) => modifier.name === name,
-      ).length,
-    })),
-  ];
-}, [modifiers]);
-
-const statusOptions = useMemo(
-  () => [
-    {
-      value: "all" as const,
-      label: "All",
-      count: modifiers.length,
-    },
-    {
-      value: "Active" as const,
-      label: "Active",
-      count: modifiers.filter((m) => m.status === "Active").length,
-    },
-    {
-      value: "Inactive" as const,
-      label: "Inactive",
-      count: modifiers.filter(
-        (m) => m.status === "Inactive",
-      ).length,
-    },
-  ],
-  [modifiers],
-);
-
-const filterFields = [
-  {
-    key: "type",
-    label: "Type",
-    options: typeOptions,
-    defaultValue: "all" as const,
-  },
-  {
-    key: "group",
-    label: "Modifier Group",
-    options: groupOptions,
-    defaultValue: "all",
-  },
-  {
-    key: "status",
-    label: "Status",
-    options: statusOptions,
-    defaultValue: "all" as const,
-  },
-];
-
-const visible = useMemo(() => {
-  return modifiers.filter((modifier) => {
-    const matchesType =
-      typeFilter === "all" ||
-      modifier.type === typeFilter;
-
-    const matchesGroup =
-      groupFilter === "all" ||
-      modifier.name === groupFilter;
-
-    const matchesStatus =
-      statusFilter === "all" ||
-      modifier.status === statusFilter;
-
-    return (
-      matchesType &&
-      matchesGroup &&
-      matchesStatus
+  const groupOptions = useMemo(() => {
+    const groups = Array.from(
+      new Set(modifiers.map((modifier) => modifier.name)),
     );
-  });
-}, [
-  modifiers,
-  typeFilter,
-  groupFilter,
-  statusFilter,
-]);
+
+    return [
+      {
+        value: "all",
+        label: "All",
+        count: modifiers.length,
+      },
+      ...groups.map((name) => ({
+        value: name,
+        label: name,
+        count: modifiers.filter((modifier) => modifier.name === name).length,
+      })),
+    ];
+  }, [modifiers]);
+
+  const statusOptions = useMemo(
+    () => [
+      {
+        value: "all" as const,
+        label: "All",
+        count: modifiers.length,
+      },
+      {
+        value: "Active" as const,
+        label: "Active",
+        count: modifiers.filter((m) => m.status === "Active").length,
+      },
+      {
+        value: "Inactive" as const,
+        label: "Inactive",
+        count: modifiers.filter((m) => m.status === "Inactive").length,
+      },
+    ],
+    [modifiers],
+  );
+
+  const filterFields = [
+    {
+      key: "type",
+      label: "Type",
+      options: typeOptions,
+      defaultValue: "all" as const,
+    },
+    {
+      key: "group",
+      label: "Modifier Group",
+      options: groupOptions,
+      defaultValue: "all",
+    },
+    {
+      key: "status",
+      label: "Status",
+      options: statusOptions,
+      defaultValue: "all" as const,
+    },
+  ];
+
+  const visible = useMemo(() => {
+    return modifiers.filter((modifier) => {
+      const matchesType = typeFilter === "all" || modifier.type === typeFilter;
+
+      const matchesGroup =
+        groupFilter === "all" || modifier.name === groupFilter;
+
+      const matchesStatus =
+        statusFilter === "all" || modifier.status === statusFilter;
+
+      return matchesType && matchesGroup && matchesStatus;
+    });
+  }, [modifiers, typeFilter, groupFilter, statusFilter]);
 
   const columns: Column<ModifierGroup>[] = useMemo(
     () => [
@@ -411,11 +387,12 @@ const visible = useMemo(() => {
         className: "w-20",
         cell: (_r, i) => i + 1,
       },
-      { key: "name", header: "Modifier Group" },
+      { key: "name", header: "Modifier Group",isSort:true },
       {
         key: "type",
         header: "Type",
         cell: (r) => MODIFIER_TYPE_LABELS[r.type],
+        isSort:true
       },
       {
         key: "options",
@@ -441,6 +418,7 @@ const visible = useMemo(() => {
             {r.status}
           </Badge>
         ),
+        isSort:true
       },
     ],
     [],
@@ -464,19 +442,13 @@ const visible = useMemo(() => {
                 <Plus className="h-4 w-4" /> Add
               </Button>
             }
-           defaultValues={{
-  name: "",
-  type:
-    typeFilter === "all"
-      ? "preference"
-      : typeFilter,
-  selection:
-    typeFilter === "addon"
-      ? "multiple"
-      : "single",
-  status: "Active",
-  options: blankOptions(),
-}}
+            defaultValues={{
+              name: "",
+              type: typeFilter === "all" ? "preference" : typeFilter,
+              selection: typeFilter === "addon" ? "multiple" : "single",
+              status: "Active",
+              options: blankOptions(),
+            }}
             validate={validate}
             onSubmit={(v) => {
               const data = normalize(v);

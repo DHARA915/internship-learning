@@ -36,7 +36,7 @@ export function Filter({ fields, className }: FilterProps) {
   const activeFilters = fields.filter(
     (field) => getValue(field) !== String(field.defaultValue)
   );
-
+  
   const isFiltered = activeFilters.length > 0;
 
   const updateFilter = (key: string, value: string) => {
