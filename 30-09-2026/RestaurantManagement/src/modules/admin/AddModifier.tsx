@@ -468,6 +468,7 @@ const AddModifier = () => {
       <DataTable
         columns={columns}
         data={visible}
+        enableView
         searchFields={["name"]}
         onDelete={(row) => dispatch(deleteModifier(row.id))}
         editTitle="Edit Modifier Group"

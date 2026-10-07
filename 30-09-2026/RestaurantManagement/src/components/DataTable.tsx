@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
+import { ViewDialog } from "./ViewDialog";
 import {
   Trash2,
   Inbox,
@@ -8,7 +9,7 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Search
+  Eye,
 } from "lucide-react";
 import {
   Table,
@@ -67,7 +68,7 @@ interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
 
-  // for search 
+  // for search
   searchFields?: (keyof T)[];
 
   getRowId?: (row: T) => string | number;
@@ -76,6 +77,9 @@ interface DataTableProps<T> {
   onDelete?: (row: T) => unknown;
   /** Pass it -> double click opens pre-filled edit modal. Gets the updated row. */
   onEdit?: (updated: T, original: T) => unknown;
+
+  enableView?: boolean;
+
   editTitle?: string;
   editDescription?: string;
   /** Optional: your own fields for the edit modal (instead of auto-generated ones) */
@@ -110,6 +114,7 @@ export function DataTable<T extends Record<string, any>>({
   searchFields = [],
   getRowId = (r) => r.id,
   emptyText = "No records found.",
+  enableView,
   onDelete,
   onEdit,
   editTitle = "Edit record",
@@ -121,10 +126,11 @@ export function DataTable<T extends Record<string, any>>({
 }: DataTableProps<T>) {
   const [editing, setEditing] = useState<T | null>(null);
   const [deleting, setDeleting] = useState<T | null>(null);
-  const [search,setSearch] = useState<string>("");
+  const [viewing, setViewing] = React.useState<T | null>(null);
+  const [search, setSearch] = useState<string>("");
 
   // console.log("Selected module columns:",columns)
-  console.log("Selected Module Data Array",data)
+  console.log("Selected Module Data Array", data);
 
   const [sortConfig, setSortConfig] = React.useState<{
     key: string;
@@ -136,22 +142,22 @@ export function DataTable<T extends Record<string, any>>({
 
   const paginated = pageSize > 0;
 
-    // For Searching...
+  // For Searching...
   const searchedData = React.useMemo(() => {
-  const query = search.trim().toLowerCase();
+    const query = search.trim().toLowerCase();
 
-  if (!query) {
-    return data;
-  }
+    if (!query) {
+      return data;
+    }
 
-  return data.filter((row) =>
-    searchFields.some((field) =>
-      String(row[field] ?? "")
-        .toLowerCase()
-        .includes(query),
-    ),
-  );
-}, [data, search, searchFields]);
+    return data.filter((row) =>
+      searchFields.some((field) =>
+        String(row[field] ?? "")
+          .toLowerCase()
+          .includes(query),
+      ),
+    );
+  }, [data, search, searchFields]);
 
   // For  Sorting....
   const sortedData = React.useMemo(() => {
@@ -182,8 +188,6 @@ export function DataTable<T extends Record<string, any>>({
     });
   }, [searchedData, sortConfig]);
 
-
-
   const totalPages = paginated
     ? Math.max(1, Math.ceil(sortedData.length / pageSize))
     : 1;
@@ -211,7 +215,7 @@ export function DataTable<T extends Record<string, any>>({
     [columns],
   );
 
-  const hasActions = !!onEdit || !!onDelete;
+  const hasActions = !!enableView || !!onEdit || !!onDelete;
   const colCount = columns.length + (onDelete ? 1 : 0);
 
   const handleSort = (column: Column<T>) => {
@@ -245,19 +249,18 @@ export function DataTable<T extends Record<string, any>>({
           }
         >
           <div className="relative w-full max-w-sm">
-
-  <FormField
-    type="search"
-    name="search"
-    value={search}
-    onChange={(value) => {
-      setSearch(String(value));
-      setPage(1);
-    }}
-    placeholder="Search..."
-    className="p-2"
-  />
-</div>
+            <FormField
+              type="search"
+              name="search"
+              value={search}
+              onChange={(value) => {
+                setSearch(String(value));
+                setPage(1);
+              }}
+              placeholder="Search..."
+              className="p-2"
+            />
+          </div>
 
           <Table className="w-full border-separate border-spacing-0">
             <TableHeader>
@@ -388,6 +391,16 @@ export function DataTable<T extends Record<string, any>>({
                               onDoubleClick={(e) => e.stopPropagation()}
                               onKeyDown={(e) => e.stopPropagation()}
                             >
+                              {enableView && (
+                                <DropdownMenuItem
+                                  className="cursor-pointer gap-2"
+                                  onClick={() => setViewing(row)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  View
+                                </DropdownMenuItem>
+                              )}
+
                               {onEdit && (
                                 <DropdownMenuItem
                                   className="cursor-pointer gap-2"
@@ -479,6 +492,20 @@ export function DataTable<T extends Record<string, any>>({
           </div>
         )}
       </div>
+
+      {enableView && (
+        <ViewDialog
+          open={!!viewing}
+          onOpenChange={(open) => {
+            if (!open) {
+              setViewing(null);
+            }
+          }}
+          data={viewing}
+          title="View Details"
+          description="View the complete details."
+        />
+      )}
 
       {onEdit && editing && (
         <CommonDialog
