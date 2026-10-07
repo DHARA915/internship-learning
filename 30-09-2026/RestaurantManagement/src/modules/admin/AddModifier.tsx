@@ -379,6 +379,8 @@ const AddModifier = () => {
     });
   }, [modifiers, typeFilter, groupFilter, statusFilter]);
 
+  console.log("Visible Data From AddModifier", visible)
+
   const columns: Column<ModifierGroup>[] = useMemo(
     () => [
       {
@@ -466,6 +468,7 @@ const AddModifier = () => {
       <DataTable
         columns={columns}
         data={visible}
+        searchFields={["name"]}
         onDelete={(row) => dispatch(deleteModifier(row.id))}
         editTitle="Edit Modifier Group"
         validate={validate}

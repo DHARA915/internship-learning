@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import {
   Trash2,
   Inbox,
@@ -7,6 +8,7 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Search
 } from "lucide-react";
 import {
   Table,
@@ -64,6 +66,10 @@ export interface Column<T> {
 interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
+
+  // for search 
+  searchFields?: (keyof T)[];
+
   getRowId?: (row: T) => string | number;
   emptyText?: string;
   /** Pass it -> delete icon appears on each row */
@@ -101,6 +107,7 @@ function getPageNumbers(current: number, total: number): PageItem[] {
 export function DataTable<T extends Record<string, any>>({
   columns,
   data,
+  searchFields = [],
   getRowId = (r) => r.id,
   emptyText = "No records found.",
   onDelete,
@@ -112,8 +119,9 @@ export function DataTable<T extends Record<string, any>>({
   pageSize: initialPageSize = 10,
   pageSizeOptions = [5, 10, 20],
 }: DataTableProps<T>) {
-  const [editing, setEditing] = React.useState<T | null>(null);
-  const [deleting, setDeleting] = React.useState<T | null>(null);
+  const [editing, setEditing] = useState<T | null>(null);
+  const [deleting, setDeleting] = useState<T | null>(null);
+  const [search,setSearch] = useState<string>("");
 
   // console.log("Selected module columns:",columns)
   console.log("Selected Module Data Array",data)
@@ -128,11 +136,28 @@ export function DataTable<T extends Record<string, any>>({
 
   const paginated = pageSize > 0;
 
+    // For Searching...
+  const searchedData = React.useMemo(() => {
+  const query = search.trim().toLowerCase();
+
+  if (!query) {
+    return data;
+  }
+
+  return data.filter((row) =>
+    searchFields.some((field) =>
+      String(row[field] ?? "")
+        .toLowerCase()
+        .includes(query),
+    ),
+  );
+}, [data, search, searchFields]);
+
   // For  Sorting....
   const sortedData = React.useMemo(() => {
-    if (!sortConfig) return data;
+    if (!sortConfig) return searchedData;
 
-    return [...data].sort((a, b) => {
+    return [...searchedData].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
@@ -155,7 +180,9 @@ export function DataTable<T extends Record<string, any>>({
 
       return sortConfig.direction === "asc" ? result : -result;
     });
-  }, [data, sortConfig]);
+  }, [searchedData, sortConfig]);
+
+
 
   const totalPages = paginated
     ? Math.max(1, Math.ceil(sortedData.length / pageSize))
@@ -217,6 +244,21 @@ export function DataTable<T extends Record<string, any>>({
             paginated ? { minHeight: HEADER_H + pageSize * ROW_H } : undefined
           }
         >
+          <div className="relative w-full max-w-sm">
+
+  <FormField
+    type="search"
+    name="search"
+    value={search}
+    onChange={(value) => {
+      setSearch(String(value));
+      setPage(1);
+    }}
+    placeholder="Search..."
+    className="p-2"
+  />
+</div>
+
           <Table className="w-full border-separate border-spacing-0">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -283,7 +325,7 @@ export function DataTable<T extends Record<string, any>>({
             </TableHeader>
 
             <TableBody>
-              {data.length === 0 ? (
+              {searchedData.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
                   <TableCell colSpan={colCount} className="py-16">
                     <div className="flex flex-col items-center gap-3 text-center">
@@ -375,15 +417,6 @@ export function DataTable<T extends Record<string, any>>({
             </TableBody>
           </Table>
         </div>
-
-        {/* {(data.length > 0 || onEdit) && (
-              <div className="flex items-center justify-between gap-6 whitespace-nowrap border-t border-border/60 bg-muted/30 px-4 py-1.5 text-xs text-muted-foreground">
-                <span>
-                  {data.length} {data.length === 1 ? "record" : "records"}
-                </span>
-              
-              </div>
-            )} */}
 
         {(data.length > 0 || onEdit) && (
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border/60 bg-muted/30 px-4 py-2 text-xs text-muted-foreground">

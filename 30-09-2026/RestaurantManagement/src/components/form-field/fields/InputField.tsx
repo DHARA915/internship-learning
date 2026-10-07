@@ -1,10 +1,8 @@
-
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Search } from "lucide-react";
 import { Input } from "../../ui/input";
-import { FieldWrapper } from "../Fieldwrapper "; 
-import type { InputFieldProps,InputType } from "./Types";
-
+import { FieldWrapper } from "../Fieldwrapper ";
+import type { InputFieldProps, InputType } from "./Types";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -21,7 +19,9 @@ const AUTOCOMPLETE: Partial<Record<InputType, string>> = {
   url: "url",
 };
 
-const INPUT_MODE: Partial<Record<InputType, "email" | "numeric" | "decimal" | "url">> = {
+const INPUT_MODE: Partial<
+  Record<InputType, "email" | "numeric" | "decimal" | "url">
+> = {
   email: "email",
   tel: "numeric",
   number: "decimal",
@@ -29,16 +29,33 @@ const INPUT_MODE: Partial<Record<InputType, "email" | "numeric" | "decimal" | "u
 };
 
 export function InputField({
-  name, label, type = "text", value = "", onChange, onBlur,
-  placeholder, error: externalError, helperText, required, disabled, className,
-  validate = true, onValidate,
-  minLength, maxLength, min, max, step, requireStrong = false,
+  name,
+  label,
+  type = "text",
+  value = "",
+  onChange,
+  onBlur,
+  placeholder,
+  error: externalError,
+  helperText,
+  required,
+  disabled,
+  className,
+  validate = true,
+  onValidate,
+  minLength,
+  maxLength,
+  min,
+  max,
+  step,
+  requireStrong = false,
 }: InputFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState(false);
   const [internalError, setInternalError] = useState<string>();
 
   const isPassword = type === "password";
+  const isSearch = type === "search";
   const error = externalError ?? internalError;
 
   // phone defaults to exactly 10 digits
@@ -47,7 +64,8 @@ export function InputField({
 
   /** returns an error message or undefined */
   const check = (v: string): string | undefined => {
-    if (v === "") return required ? `${label ?? "This field"} is required` : undefined;
+    if (v === "")
+      return required ? `${label ?? "This field"} is required` : undefined;
 
     switch (type) {
       case "email":
@@ -73,12 +91,14 @@ export function InputField({
 
       case "password": {
         const len = minLength ?? 8;
-        if (v.length < len) return `Password must be at least ${len} characters`;
+        if (v.length < len)
+          return `Password must be at least ${len} characters`;
         if (requireStrong) {
           if (!/[A-Z]/.test(v)) return "Add at least one uppercase letter";
           if (!/[a-z]/.test(v)) return "Add at least one lowercase letter";
           if (!/\d/.test(v)) return "Add at least one number";
-          if (!/[^A-Za-z0-9]/.test(v)) return "Add at least one special character";
+          if (!/[^A-Za-z0-9]/.test(v))
+            return "Add at least one special character";
         }
         return;
       }
@@ -86,7 +106,8 @@ export function InputField({
       case "number": {
         const n = Number(v);
         if (Number.isNaN(n)) return "Enter a valid number";
-        if (min !== undefined && n < min) return `Value must be at least ${min}`;
+        if (min !== undefined && n < min)
+          return `Value must be at least ${min}`;
         if (max !== undefined && n > max) return `Value must be at most ${max}`;
         return;
       }
@@ -106,14 +127,16 @@ export function InputField({
     onValidate?.(err, name);
   };
 
-  // for preventing scroll while number type 
+  // for preventing scroll while number type
   const preventWheel = (e: WheelEvent) => e.preventDefault();
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-  if (type === "number") {
-    e.currentTarget.addEventListener("wheel", preventWheel, { passive: false });
-  }
-};
+    if (type === "number") {
+      e.currentTarget.addEventListener("wheel", preventWheel, {
+        passive: false,
+      });
+    }
+  };
 
   /** clean the value while typing, depending on type */
   const sanitize = (raw: string) => {
@@ -147,17 +170,27 @@ export function InputField({
           disabled={disabled}
           inputMode={INPUT_MODE[type]}
           autoComplete={AUTOCOMPLETE[type]}
-          maxLength={type === "text" || type === "tel" ? (type === "tel" ? phoneMax : maxLength) : undefined}
+          maxLength={
+            type === "text" || type === "tel"
+              ? type === "tel"
+                ? phoneMax
+                : maxLength
+              : undefined
+          }
           min={type === "number" ? min : undefined}
           max={type === "number" ? max : undefined}
           step={type === "number" ? step : undefined}
-          className={isPassword ? "pr-10" : undefined}
+          className={isPassword ? "pr-10" : isSearch ? "pl-9" : undefined}
           aria-invalid={!!error}
           aria-describedby={error ? `${name}-error` : undefined}
           onFocus={handleFocus}
           onChange={handleChange}
           onBlur={handleBlur}
         />
+
+        {isSearch && (
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        )}
 
         {isPassword && (
           <button
@@ -167,7 +200,11 @@ export function InputField({
             aria-label={showPassword ? "Hide password" : "Show password"}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
           >
-            {showPassword ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+            {showPassword ? (
+              <Eye className="size-4" />
+            ) : (
+              <EyeOff className="size-4" />
+            )}
           </button>
         )}
       </div>
