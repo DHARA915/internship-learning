@@ -13,7 +13,7 @@ import { useSearchParams } from "react-router-dom";
 import { Filter } from "../../components/Filter.tsx";
 import type { ViewConfig } from "../../components/ViewDialog";
 import { cn } from "../../lib/utils";
-
+import { MoreValues } from "../../components/MoreValues.tsx";
 import type { RootState, AppDispatch } from "../../Redux/store";
 import {
   addMenu,
@@ -647,18 +647,18 @@ const AddMenuSection = () => {
           const list = activeItemsOf(r);
           if (list.length === 0)
             return <span className="text-xs text-tertiary">No active items</span>;
-          return (
-            <div className="flex flex-wrap gap-1.5">
-              {list.slice(0, 3).map((i) => (
-                <Badge key={i.id} variant="option">
-                  {i.name}
-                </Badge>
-              ))}
-              {list.length > 3 && (
-                <Badge variant="option">+{list.length - 3} more</Badge>
-              )}
-            </div>
-          );
+         return (
+      <MoreValues
+        items={list}
+        visibleCount={3}
+        title="More Items"
+        renderItem={(item) => (
+          <Badge key={item.id} variant="option">
+            {item.name}
+          </Badge>
+        )}
+      />
+    );
         },
       },
       {

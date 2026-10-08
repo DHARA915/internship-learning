@@ -1,3 +1,4 @@
+import { MoreValues } from "../../components/MoreValues.tsx";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { nanoid } from "@reduxjs/toolkit";
@@ -379,7 +380,7 @@ const AddModifier = () => {
     });
   }, [modifiers, typeFilter, groupFilter, statusFilter]);
 
-  console.log("Visible Data From AddModifier", visible)
+  console.log("Visible Data From AddModifier", visible);
 
   const columns: Column<ModifierGroup>[] = useMemo(
     () => [
@@ -389,27 +390,29 @@ const AddModifier = () => {
         className: "w-20",
         cell: (_r, i) => i + 1,
       },
-      { key: "name", header: "Modifier Group",isSort:true },
+      { key: "name", header: "Modifier Group", isSort: true },
       {
         key: "type",
         header: "Type",
         cell: (r) => MODIFIER_TYPE_LABELS[r.type],
-        isSort:true
+        isSort: true,
       },
       {
         key: "options",
         header: "Options",
-        cell: (r) => (
-          <div className="flex flex-wrap gap-1.5">
-            {r.options.map((o) => (
-              <Badge key={o.id} variant="option">
-                {o.name}
-                {r.type === "addon" && o.price
-                  ? ` · ${formatPrice(o.price)}`
+        cell: (row) => (
+          <MoreValues
+            items={row.options}
+            title="More Options"
+            renderItem={(option) => (
+              <Badge key={option.id} variant="option">
+                {option.name}
+                {row.type === "addon" && option.price
+                  ? ` · ${formatPrice(option.price)}`
                   : ""}
               </Badge>
-            ))}
-          </div>
+            )}
+          />
         ),
       },
       {
@@ -420,7 +423,7 @@ const AddModifier = () => {
             {r.status}
           </Badge>
         ),
-        isSort:true
+        isSort: true,
       },
     ],
     [],
