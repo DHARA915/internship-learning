@@ -112,6 +112,12 @@ export function InputField({
         return;
       }
 
+      case "time":
+        // native time inputs give "HH:mm" (24h)
+        return /^([01]\d|2[0-3]):[0-5]\d$/.test(v)
+          ? undefined
+          : "Enter a valid time";
+
       default: // text
         if (minLength !== undefined && v.length < minLength)
           return `Must be at least ${minLength} characters`;
@@ -179,7 +185,7 @@ export function InputField({
           }
           min={type === "number" ? min : undefined}
           max={type === "number" ? max : undefined}
-          step={type === "number" ? step : undefined}
+          step={type === "number" || type === "time" ? step : undefined}
           className={isPassword ? "pr-10" : isSearch ? "pl-9" : undefined}
           aria-invalid={!!error}
           aria-describedby={error ? `${name}-error` : undefined}

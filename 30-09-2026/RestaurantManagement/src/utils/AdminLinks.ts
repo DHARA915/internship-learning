@@ -22,7 +22,7 @@ export const adminLinks: AdminLink[] = [
         icon: LayoutDashboard
     },
     {
-        title: "Menu Sections",
+        title: "Menu",
         href: "/admin/menu-sections",
         icon: PanelsTopLeft,
     },

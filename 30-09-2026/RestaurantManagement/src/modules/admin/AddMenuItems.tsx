@@ -748,7 +748,9 @@ const AddMenuItems = () => {
   return (
     <div className="space-y-4 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Menu Items</h1>
+        <h1 className="border-l-4 border-button-primary pl-3 text-xl font-semibold">
+          Menu Items
+        </h1>
 
         <div className="flex items-center gap-3">
           <Filter fields={filterFields} />

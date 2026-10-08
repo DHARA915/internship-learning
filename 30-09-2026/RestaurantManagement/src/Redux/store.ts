@@ -4,6 +4,7 @@ import MenuSectionReducer from "./Slices/menuSectionSlice.ts";
 import ModifierReducer from './Slices/Modifierslice.ts'
 import MenuItemReducer from './Slices/menuItemSlice.ts'
 import CartReducer from './Slices/cartSlice.ts'
+import MenuReducer from './Slices/menuSectionSlice.ts'
 
 export const store =  configureStore({
     reducer: {
@@ -12,6 +13,7 @@ export const store =  configureStore({
         modifiers:ModifierReducer,
         menuItems:MenuItemReducer,
         cart:CartReducer,
+        menus:MenuReducer
     },
 });
 

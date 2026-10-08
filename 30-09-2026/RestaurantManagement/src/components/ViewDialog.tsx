@@ -9,53 +9,90 @@ import {
 import { Badge } from "./ui/badge";
 import { cn } from "../lib/utils";
 
-/**
- * Generic "view details" dialog. It works for any record and lays itself out
- * from the shape of the data:
- *   - image / name / veg / status  -> hero header
- *   - description                  -> full-width paragraph
- *   - arrays of groups (each with options / modifiers / items) -> group cards
- *   - everything else              -> label / value grid
- */
-interface ViewDialogProps<T extends Record<string, any>> {
+
+export type ViewFieldType =
+  | "text" // default
+  | "longtext" // paragraph, full width
+  | "status" // Active / Inactive badge
+  | "veg" // veg / non-veg mark
+  | "boolean" // Yes / No badge
+  | "price" // ₹ amount ("Free" for 0)
+  | "badge" // single neutral badge
+  | "chips" // array of strings / {name, price} objects, horizontal
+  | "groups"; // array of groups, each with its own options (e.g. modifiers)
+
+export interface ViewField<T = Record<string, any>> {
+  /** key on the record; supports "a.b" paths */
+  key: string;
+  label: string;
+  type?: ViewFieldType;
+  /** make the field span the full row (always true for longtext / chips / groups) */
+  full?: boolean;
+  /** compute the value from the whole record (derived / joined data) */
+  getValue?: (data: T) => any;
+  /** custom renderer; wins over `type` */
+  render?: (value: any, data: T) => React.ReactNode;
+  /** skip the field when this returns true */
+  hidden?: (data: T) => boolean;
+  /** type "groups": where each group keeps its options (default "options") */
+  itemsKey?: string;
+  /** type "groups": key holding the group name (default "name" / "groupName") */
+  nameKey?: string;
+}
+
+export interface ViewHeader<T = Record<string, any>> {
+  imageKey?: string;
+  titleKey: string;
+  descriptionKey?: string;
+  /** small fields shown beside the title, e.g. veg mark + status */
+  badges?: ViewField<T>[];
+}
+
+export interface ViewDialogProps<T extends Record<string, any>> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   data: T | null;
   title?: string;
   description?: string;
-  /** Fields that should not be displayed. */
-  excludeFields?: string[];
+  header?: ViewHeader<T>;
+  /** omit to auto-lay-out every non-id field */
+  fields?: ViewField<T>[];
+  /** dialog width class, default "max-w-3xl" */
+  className?: string;
+}
+
+/** what a module passes through DataTable (`viewConfig`) to describe its view */
+export interface ViewConfig<T = Record<string, any>> {
+  title?: string;
+  description?: string;
+  header?: ViewHeader<T>;
+  fields?: ViewField<T>[];
+  className?: string;
 }
 
 /* ---------- helpers ---------- */
-const IMAGE_KEYS = ["image", "imageUrl", "photo", "thumbnail"];
-const TITLE_KEYS = ["name", "title"];
-const CHILD_KEYS = ["options", "modifiers", "items"];
-
-const formatLabel = (key: string) =>
-  key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/_/g, " ")
-    .replace(/^./, (c) => c.toUpperCase());
+const getPath = (obj: any, path: string) =>
+  path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
 
 const isEmpty = (v: unknown) =>
   v === null || v === undefined || v === "" || (Array.isArray(v) && !v.length);
 
-const isPlainObject = (v: unknown): v is Record<string, any> =>
+const isObj = (v: unknown): v is Record<string, any> =>
   typeof v === "object" && v !== null && !Array.isArray(v);
-
-const childKeyOf = (g: Record<string, any>) =>
-  CHILD_KEYS.find((k) => Array.isArray(g[k]));
-
-// array of objects that each carry their own list of options
-const isGroupArray = (v: unknown): v is Record<string, any>[] =>
-  Array.isArray(v) &&
-  v.length > 0 &&
-  v.every((g) => isPlainObject(g) && childKeyOf(g));
 
 const formatPrice = (n: number) => (n === 0 ? "Free" : `₹${n}`);
 
+const formatLabel = (k: string) =>
+  k
+    .replace(/([A-Z])/g, " $1")
+    .replace(/_/g, " ")
+    .replace(/^./, (c) => c.toUpperCase());
+
+const FULL_TYPES: ViewFieldType[] = ["longtext", "chips", "groups"];
+
 /* ---------- small pieces ---------- */
+const Dash = () => <span className="text-tertiary">—</span>;
+
 const StatusBadge = ({ value }: { value: unknown }) => {
   const active = String(value).toLowerCase() === "active" || value === true;
   return (
@@ -98,7 +135,54 @@ const VegMark = ({ isVeg }: { isVeg: boolean }) => (
   </span>
 );
 
-const HeroImage = ({ src, name }: { src?: string; name: string }) => {
+const YesNo = ({ value }: { value: boolean }) => (
+  <Badge
+    variant="outline"
+    className={
+      value
+        ? "border-success/30 bg-success/10 text-success"
+        : "border-danger/30 bg-danger/10 text-danger"
+    }
+  >
+    {value ? "Yes" : "No"}
+  </Badge>
+);
+
+// "Large · ₹50" — strings, or objects with a name (+ optional price)
+const Chip = ({ item }: { item: unknown }) => {
+  let label = String(item);
+  let price: number | undefined;
+  if (isObj(item)) {
+    const nameKey = ["name", "label", "title", "value"].find((k) => !isEmpty(item[k]));
+    label = nameKey ? String(item[nameKey]) : "";
+    if (typeof item.price === "number") price = item.price;
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-primary px-2.5 py-1 text-sm text-secondary">
+      {label}
+      {price !== undefined && (
+        <span
+          className={cn(
+            "rounded-md px-1.5 text-xs font-medium leading-5",
+            price === 0 ? "bg-tertiary text-tertiary" : "row-dull text-button-primary",
+          )}
+        >
+          {formatPrice(price)}
+        </span>
+      )}
+    </span>
+  );
+};
+
+const Chips = ({ items }: { items: unknown[] }) => (
+  <div className="flex flex-wrap gap-2">
+    {items.map((it, i) => (
+      <Chip key={i} item={it} />
+    ))}
+  </div>
+);
+
+const Thumb = ({ src, name }: { src?: string; name: string }) => {
   const [failed, setFailed] = React.useState(false);
   if (!src || failed)
     return (
@@ -116,233 +200,262 @@ const HeroImage = ({ src, name }: { src?: string; name: string }) => {
   );
 };
 
-const SectionTitle = ({ label, count }: { label: string; count?: number }) => (
-  <div className="mb-2 flex items-center gap-2">
-    <h3 className="text-sm font-semibold text-primary">{label}</h3>
-    {count !== undefined && (
-      <span className="rounded-full bg-tertiary px-2 py-0.5 text-[11px] font-medium text-secondary">
-        {count}
-      </span>
-    )}
-  </div>
-);
-
-const Value = ({ value, fieldName }: { value: unknown; fieldName?: string }) => {
-  if (isEmpty(value)) return <span className="text-tertiary">—</span>;
-
-  if (fieldName?.toLowerCase() === "status") return <StatusBadge value={value} />;
-
-  if (typeof value === "boolean")
-    return (
-      <Badge
-        variant="outline"
-        className={
-          value
-            ? "border-success/30 bg-success/10 text-success"
-            : "border-danger/30 bg-danger/10 text-danger"
-        }
-      >
-        {value ? "Yes" : "No"}
-      </Badge>
-    );
-
-  if (Array.isArray(value))
-    return (
-      <div className="flex flex-wrap gap-1.5">
-        {value.map((item, i) => (
-          <Badge key={i} variant="outline" className="border-line bg-primary text-secondary">
-            {typeof item === "object" ? JSON.stringify(item) : String(item)}
-          </Badge>
-        ))}
-      </div>
-    );
-
-  if (isPlainObject(value))
-    return (
-      <div className="grid gap-3 sm:grid-cols-2">
-        {Object.entries(value)
-          .filter(([k]) => k !== "id" && k !== "srNo")
-          .map(([k, v]) => (
-            <Field key={k} label={formatLabel(k)}>
-              <Value value={v} fieldName={k} />
-            </Field>
-          ))}
-      </div>
-    );
-
+/* ---------- groups (modifier groups etc.) ---------- */
+const Groups = ({ groups, field }: { groups: any[]; field: ViewField<any> }) => {
+  const itemsKey = field.itemsKey ?? "options";
   return (
-    <span className="break-words text-sm font-medium text-primary">
-      {String(value)}
-    </span>
+    <div className="grid gap-3 md:grid-cols-2">
+      {groups.map((g, i) => {
+        if (!isObj(g)) return null;
+        const name =
+          (field.nameKey && g[field.nameKey]) ?? g.groupName ?? g.name ?? `Group ${i + 1}`;
+        const items: unknown[] = Array.isArray(g[itemsKey]) ? g[itemsKey] : [];
+        const selection =
+          g.selection === "single" ? "Choose one" : g.selection === "multiple" ? "Choose many" : null;
+
+        return (
+          <div key={i} className="overflow-hidden rounded-xl border border-line">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-tertiary/50 px-4 py-2.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-semibold text-primary">{String(name)}</span>
+                {g.type && (
+                  <Badge variant="outline" className="border-line bg-primary text-secondary">
+                    {formatLabel(String(g.type))}
+                  </Badge>
+                )}
+                {selection && <span className="text-xs text-tertiary">{selection}</span>}
+              </div>
+              <div className="flex items-center gap-2">
+                {g.required && (
+                  <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning">
+                    Required
+                  </Badge>
+                )}
+                <span className="text-xs text-tertiary">
+                  {items.length} {items.length === 1 ? "option" : "options"}
+                </span>
+              </div>
+            </div>
+            {items.length === 0 ? (
+              <p className="px-4 py-3 text-xs text-tertiary">No options added.</p>
+            ) : (
+              <div className="p-4">
+                <Chips items={items} />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 };
 
-const Field = ({
-  label,
-  children,
-  className,
-}: {
-  label: string;
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <div className={cn("min-w-0", className)}>
-    <p className="mb-1 text-xs font-medium text-tertiary">{label}</p>
-    {children}
-  </div>
-);
+/* ---------- value renderer ---------- */
+const renderValue = (f: ViewField<any>, data: any): React.ReactNode => {
+  const value = f.getValue ? f.getValue(data) : getPath(data, f.key);
+  if (f.render) return f.render(value, data);
+  if (isEmpty(value)) return <Dash />;
 
-/* ---------- group cards (modifier groups etc.) ---------- */
-const GroupCards = ({ groups }: { groups: Record<string, any>[] }) => (
-  <div className="grid gap-3">
-    {groups.map((g, gi) => {
-      const children: any[] = g[childKeyOf(g)!] ?? [];
-      const name = g.groupName ?? g.name ?? g.title ?? `Group ${gi + 1}`;
-      const selection =
-        g.selection === "single"
-          ? "Choose one"
-          : g.selection === "multiple"
-            ? "Choose many"
-            : null;
-      const required = g.required ?? g.isRequired;
-
+  switch (f.type) {
+    case "status":
+      return <StatusBadge value={value} />;
+    case "veg":
+      return <VegMark isVeg={value === true || value === "true"} />;
+    case "boolean":
+      return <YesNo value={Boolean(value)} />;
+    case "price":
       return (
-        <div key={g.groupId ?? g.id ?? gi} className="overflow-hidden rounded-xl border border-line">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-tertiary/50 px-4 py-2.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold text-primary">{name}</span>
-              {g.type && (
-                <Badge variant="outline" className="border-line bg-primary text-secondary">
-                  {formatLabel(String(g.type))}
-                </Badge>
-              )}
-              {selection && <span className="text-xs text-tertiary">{selection}</span>}
-            </div>
-            <div className="flex items-center gap-2">
-              {required && (
-                <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning">
-                  Required
-                </Badge>
-              )}
-              <span className="text-xs text-tertiary">
-                {children.length} {children.length === 1 ? "option" : "options"}
-              </span>
-            </div>
-          </div>
-
-          {children.length === 0 ? (
-            <p className="px-4 py-3 text-xs text-tertiary">No options added.</p>
-          ) : (
-            <ul className="divide-y divide-line/60">
-              {children.map((c, ci) => {
-                const obj = isPlainObject(c) ? c : { name: c };
-                const label = obj.name ?? obj.label ?? obj.optionName ?? obj.value ?? `Option ${ci + 1}`;
-                const price = obj.price ?? obj.additionalPrice;
-                return (
-                  <li key={obj.id ?? ci} className="flex items-center justify-between gap-3 px-4 py-2">
-                    <span className="text-sm text-secondary">{String(label)}</span>
-                    {typeof price === "number" && (
-                      <span
-                        className={cn(
-                          "text-sm font-medium",
-                          price === 0 ? "text-tertiary" : "text-primary",
-                        )}
-                      >
-                        {formatPrice(price)}
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
+        <span className="text-sm font-medium text-primary">{formatPrice(Number(value))}</span>
       );
-    })}
-  </div>
+    case "badge":
+      return (
+        <Badge variant="outline" className="border-line bg-primary text-secondary">
+          {String(value)}
+        </Badge>
+      );
+    case "longtext":
+      return <p className="text-sm leading-relaxed text-secondary">{String(value)}</p>;
+    case "chips":
+      return <Chips items={Array.isArray(value) ? value : [value]} />;
+    case "groups":
+      return Array.isArray(value) ? <Groups groups={value} field={f} /> : <Dash />;
+    default:
+      return <span className="break-words text-sm font-medium text-primary">{String(value)}</span>;
+  }
+};
+
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <p className="mb-1 text-xs font-medium text-tertiary">{children}</p>
 );
 
-/* ---------- main dialog ---------- */
+
+/* ---------- auto layout (module passed no fields) ---------- */
+const isIdKey = (k: string) => k === "id" || k === "srNo" || /Ids?$/.test(k);
+const CHILD_KEYS = ["options", "modifiers", "items"];
+
+const autoConfig = (
+  data: Record<string, any>,
+): { header?: ViewHeader<any>; fields: ViewField<any>[] } => {
+  const imageKey = ["image", "icon", "imageUrl", "photo", "thumbnail"].find(
+    (k) => k in data,
+  );
+  const titleKey = ["name", "title"].find((k) => typeof data[k] === "string");
+
+  const header: ViewHeader<any> | undefined =
+    imageKey || titleKey
+      ? {
+          imageKey,
+          titleKey: titleKey ?? "name",
+          descriptionKey: "description" in data ? "description" : undefined,
+          badges: [
+            ...(typeof data.isVeg === "boolean"
+              ? [{ key: "isVeg", label: "Type", type: "veg" as const }]
+              : []),
+            ...("status" in data
+              ? [{ key: "status", label: "Status", type: "status" as const }]
+              : []),
+          ],
+        }
+      : undefined;
+
+  const hero = new Set<string>(
+    header ? [imageKey, titleKey, "isVeg", "status", "description"].filter(Boolean) as string[] : [],
+  );
+
+  const fields = Object.entries(data)
+    .filter(([k]) => !isIdKey(k) && !hero.has(k))
+    .map(([key, v]): ViewField<any> => {
+      const label = formatLabel(key);
+      if (key.toLowerCase() === "status") return { key, label, type: "status" };
+      if (typeof v === "boolean") return { key, label, type: "boolean" };
+      if (Array.isArray(v)) {
+        const childKey = CHILD_KEYS.find((c) => isObj(v[0]) && Array.isArray(v[0][c]));
+        const grouped =
+          childKey && v.length > 0 && v.every((g) => isObj(g) && Array.isArray(g[childKey]));
+        return grouped
+          ? { key, label, type: "groups", itemsKey: childKey }
+          : { key, label, type: "chips" };
+      }
+      if (isObj(v))
+        return {
+          key,
+          label,
+          render: (val) => (
+            <span className="text-sm text-primary">
+              {Object.entries(val)
+                .filter(([k]) => !isIdKey(k))
+                .map(([k, x]) => `${formatLabel(k)}: ${String(x)}`)
+                .join(" · ")}
+            </span>
+          ),
+        };
+      if (typeof v === "string" && v.length > 60) return { key, label, type: "longtext" };
+      return { key, label };
+    });
+
+  return { header, fields };
+};
+
+/* ---------- main ---------- */
 export function ViewDialog<T extends Record<string, any>>({
   open,
   onOpenChange,
   data,
   title = "View Details",
   description = "View the complete details.",
-  excludeFields = ["id", "srNo"],
+  header: headerProp,
+  fields: fieldsProp,
+  className,
 }: ViewDialogProps<T>) {
   if (!data) return null;
 
-  const entries = Object.entries(data).filter(([k]) => !excludeFields.includes(k));
+  // no config from the module -> lay the record out automatically
+  const auto = autoConfig(data);
+  const header = headerProp ?? (fieldsProp ? undefined : auto.header);
+  const fields = fieldsProp ?? auto.fields;
 
-  // pull out the fields that make up the hero header
-  const imageKey = IMAGE_KEYS.find((k) => k in data);
-  const titleKey = TITLE_KEYS.find((k) => typeof data[k] === "string");
-  const hasHero = Boolean(imageKey || titleKey);
-  const heroKeys = new Set(
-    [imageKey, titleKey, "isVeg", "status", "description"].filter(Boolean) as string[],
-  );
+  const visible = fields.filter((f) => !f.hidden?.(data));
+  // groups get their own full-width section with a count; the rest go in the grid
+  const groupFields = visible.filter((f) => f.type === "groups" && !f.render);
+  const gridFields = visible.filter((f) => !(f.type === "groups" && !f.render));
 
-  const groupEntries = entries.filter(([, v]) => isGroupArray(v));
-  const fieldEntries = entries.filter(
-    ([k, v]) => !isGroupArray(v) && !(hasHero && heroKeys.has(k)),
-  );
-  // long text spans the full row
-  const isWide = (v: unknown) =>
-    Array.isArray(v) || isPlainObject(v) || (typeof v === "string" && v.length > 60);
+  const titleText = header ? String(getPath(data, header.titleKey) ?? "") : "";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-2xl gap-0 overflow-y-auto bg-primary p-0">
+      <DialogContent
+        className={cn("max-h-[85vh] max-w-3xl gap-0 overflow-y-auto bg-primary p-0", className)}
+      >
         <DialogHeader className="border-b border-line px-6 py-4">
           <DialogTitle className="text-lg font-semibold text-primary">{title}</DialogTitle>
           <DialogDescription className="text-sm text-tertiary">{description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 px-6 py-5">
-          {/* hero */}
-          {hasHero && (
+          {header && (
             <div className="flex items-start gap-4">
-              {imageKey && (
-                <HeroImage src={data[imageKey]} name={String(data[titleKey ?? ""] ?? "")} />
+              {header.imageKey && (
+                <Thumb src={getPath(data, header.imageKey)} name={titleText} />
               )}
               <div className="min-w-0 flex-1 space-y-2">
-                {titleKey && (
-                  <h2 className="break-words text-xl font-semibold text-primary">
-                    {String(data[titleKey])}
-                  </h2>
+                <h2 className="break-words text-xl font-semibold text-primary">
+                  {titleText || "—"}
+                </h2>
+                {header.badges && header.badges.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-3">
+                    {header.badges
+                      .filter((b) => !b.hidden?.(data))
+                      .map((b) => (
+                        <span key={b.key}>{renderValue(b, data)}</span>
+                      ))}
+                  </div>
                 )}
-                <div className="flex flex-wrap items-center gap-3">
-                  {typeof data.isVeg === "boolean" && <VegMark isVeg={data.isVeg} />}
-                  {"status" in data && <StatusBadge value={data.status} />}
-                </div>
-                {!isEmpty(data.description) && (
+                {header.descriptionKey && !isEmpty(getPath(data, header.descriptionKey)) && (
                   <p className="text-sm leading-relaxed text-secondary">
-                    {String(data.description)}
+                    {String(getPath(data, header.descriptionKey))}
                   </p>
                 )}
               </div>
             </div>
           )}
 
-          {/* remaining fields */}
-          {fieldEntries.length > 0 && (
+          {gridFields.length > 0 && (
             <div className="grid gap-x-6 gap-y-4 rounded-xl border border-line bg-tertiary/30 p-4 sm:grid-cols-2">
-              {fieldEntries.map(([k, v]) => (
-                <Field key={k} label={formatLabel(k)} className={cn(isWide(v) && "sm:col-span-2")}>
-                  <Value value={v} fieldName={k} />
-                </Field>
+              {gridFields.map((f) => (
+                <div
+                  key={f.key}
+                  className={cn(
+                    "min-w-0",
+                    (f.full || (f.type && FULL_TYPES.includes(f.type))) && "sm:col-span-2",
+                  )}
+                >
+                  <Label>{f.label}</Label>
+                  {renderValue(f, data)}
+                </div>
               ))}
             </div>
           )}
 
-          {/* groups */}
-          {groupEntries.map(([k, v]) => (
-            <section key={k}>
-              <SectionTitle label={formatLabel(k)} count={(v as unknown[]).length} />
-              <GroupCards groups={v as Record<string, any>[]} />
-            </section>
-          ))}
+          {groupFields.map((f) => {
+            const v = getPath(data, f.key);
+            return (
+              <section key={f.key}>
+                <div className="mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-primary">{f.label}</h3>
+                  <span className="rounded-full bg-tertiary px-2 py-0.5 text-[11px] font-medium text-secondary">
+                    {Array.isArray(v) ? v.length : 0}
+                  </span>
+                </div>
+                {isEmpty(v) ? (
+                  <p className="rounded-lg border border-dashed border-line px-3 py-4 text-center text-xs text-tertiary">
+                    Nothing added.
+                  </p>
+                ) : (
+                  renderValue(f, data)
+                )}
+              </section>
+            );
+          })}
         </div>
       </DialogContent>
     </Dialog>

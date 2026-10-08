@@ -12,7 +12,7 @@ export type FieldType =
   | "checkbox"
   | "multiselect";
 
-export type InputType = "text" | "email" | "password"|"search" | "number" | "tel" | "url";
+export type InputType = "text" | "email" | "password"|"search" | "number" | "tel" | "url"| "time";
 
 export interface Option {
   label: string;

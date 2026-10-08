@@ -1,71 +1,73 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
-  Menusectiondata,
-  type MenuSection,
-} from "../../utils/Menusectiondata";
+  createSlice,
+  createSelector,
+  nanoid,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
+import type { RootState } from "../store";
+import { menuSeed, type Menu } from "../../utils/Menusectiondata";
 
-interface MenuSectionState {
-  menuSections: MenuSection[];
+export type NewMenu = Omit<Menu, "id" | "createdAt" | "updatedAt">;
+
+interface MenuState {
+  menus: Menu[];
 }
 
-const initialState: MenuSectionState = {
-  menuSections: Menusectiondata,
-};
+const initialState: MenuState = { menus: menuSeed };
+
+const today = () => new Date().toISOString().slice(0, 10);
 
 const menuSectionSlice = createSlice({
-  name: "menuSections",
-
+  name: "menus",
   initialState,
-
   reducers: {
-    addMenuSection: (
-      state,
-      action: PayloadAction<
-        Omit<MenuSection, "id" | "createdAt" | "updatedAt">
-      >
-    ) => {
-      const now = new Date().toISOString();
-
-      state.menuSections.push({
-        id: Date.now(),
-        ...action.payload,
-        createdAt: now,
-        updatedAt: now,
-      });
+    addMenu: {
+      reducer(state, action: PayloadAction<Menu>) {
+        state.menus.push(action.payload);
+      },
+      // id + dates are generated here so the reducer stays pure
+      prepare(data: NewMenu) {
+        return {
+          payload: {
+            id: nanoid(),
+            ...data,
+            createdAt: today(),
+            updatedAt: today(),
+          } as Menu,
+        };
+      },
     },
-
-    updateMenuSection: (
-      state,
-      action: PayloadAction<{
-        id: number;
-        data: Partial<Omit<MenuSection, "id" | "createdAt">>;
-      }>
-    ) => {
-      const section = state.menuSections.find(
-        (section) => section.id === action.payload.id
-      );
-
-      if (section) {
-        Object.assign(section, action.payload.data);
-        section.updatedAt = new Date().toISOString();
-      }
+    updateMenu: {
+      reducer(
+        state,
+        action: PayloadAction<{ id: string; data: NewMenu; updatedAt: string }>,
+      ) {
+        const { id, data, updatedAt } = action.payload;
+        const i = state.menus.findIndex((m) => m.id === id);
+        if (i !== -1)
+          state.menus[i] = {
+            id,
+            ...data,
+            createdAt: state.menus[i].createdAt,
+            updatedAt,
+          };
+      },
+      prepare(payload: { id: string; data: NewMenu }) {
+        return { payload: { ...payload, updatedAt: today() } };
+      },
     },
-
-    deleteMenuSection: (
-      state,
-      action: PayloadAction<number>
-    ) => {
-      state.menuSections = state.menuSections.filter(
-        (section) => section.id !== action.payload
-      );
+    deleteMenu(state, action: PayloadAction<string>) {
+      state.menus = state.menus.filter((m) => m.id !== action.payload);
     },
   },
 });
 
-export const {
-  addMenuSection,
-  updateMenuSection,
-  deleteMenuSection,
-} = menuSectionSlice.actions;
+export const { addMenu, updateMenu, deleteMenu } = menuSectionSlice.actions;
+
+/* selectors */
+export const selectActiveMenus = createSelector(
+  [(s: RootState) => s.menus.menus],
+  (all) => all.filter((m) => m.status === "Active"),
+);
 
 export default menuSectionSlice.reducer;
