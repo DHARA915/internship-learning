@@ -169,7 +169,7 @@ const ModifierFields = ({ values, setValue, errors }: Ctx) => {
               />
             )}
 
-            {/* delete only with 2+ options; spacer keeps rows aligned */}
+           
             {options.length > 1 ? (
               <Button
                 type="button"
@@ -443,8 +443,9 @@ const AddModifier = () => {
             title="Add Modifier Group"
             description="Define the choices customers see. Set prices when adding an item."
             trigger={
-              <Button className="flex items-center gap-2 cursor-pointer bg-button-primary text-white hover:bg-button-primary-hover">
-                <Plus className="h-4 w-4" /> Add
+              <Button variant="primary">
+                <Plus className="h-4 w-4" />
+                Add
               </Button>
             }
             defaultValues={{

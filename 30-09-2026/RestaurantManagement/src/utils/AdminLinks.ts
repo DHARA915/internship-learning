@@ -36,5 +36,10 @@ export const adminLinks: AdminLink[] = [
         href: "/admin/menu-items",
         icon: UtensilsCrossed,
     },
+    {
+        title: "Compare Items",
+        href: "/admin/compare",
+        icon: UtensilsCrossed,
+    },
 
 ]

@@ -4,7 +4,6 @@ import Select from "react-select";
 import { Plus, Trash2, Check } from "lucide-react";
 import { Switch } from "../../components/ui/switch.tsx";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Badge } from "../../components/ui/badge.tsx";
 import { CommonDialog, type FormValues } from "../../components/CommonDialog";
@@ -759,10 +758,10 @@ const AddMenuItems = () => {
           title="Add Menu Item"
           description="Enter item details and attach modifier groups with item-specific prices."
           trigger={
-            <Button className="flex cursor-pointer items-center gap-2 bg-button-primary text-white hover:bg-button-primary-hover">
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
+            <Button variant="primary">
+  <Plus className="h-4 w-4" />
+  Add
+</Button>
           }
           defaultValues={{
             name: "",

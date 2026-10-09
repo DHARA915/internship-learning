@@ -732,10 +732,10 @@ const AddMenuSection = () => {
             title="Add Menu"
             description="Name the menu, set when it is available and pick the items it serves."
             trigger={
-              <Button className="flex cursor-pointer items-center gap-2 bg-button-primary text-white hover:bg-button-primary-hover">
-                <Plus className="h-4 w-4" />
-                Add
-              </Button>
+              <Button variant="primary">
+  <Plus className="h-4 w-4" />
+  Add
+</Button>
             }
             defaultValues={{
               name: "",

@@ -5,6 +5,7 @@ import AdminDashboard from "./Admindashboard";
 import AddMenuItems from "./AddMenuItems";
 import AddMenuSection from "./AddMenuSection";
 import AddModifier from "./AddModifier";
+import Products from "../CompareProducts/ComparePage";
 
 const AdminRoutes = () => {
   return (

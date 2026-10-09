@@ -19,6 +19,9 @@
   --bg-tertiary: #e3e8d9; 
   --bg-primary-dull:#f7e3c0;
 
+  /* For Product Comparing */
+  --bg-product-background:#f0f0f0;
+
 
   /* For Buttons */ 
   --button-primary: #f89a06;
@@ -53,7 +56,11 @@
   --success: #2e7d4f;        /* available, served, in stock */
   --warning: #b86e00;        /* preparing, low stock */
   --danger: #a61b3b;         /* cancelled, out of stock */
-  --info: #2b6cb0;           /* new order, reserved */
+  --info: #2b6cb0;    
+  
+  /* new order, reserved */
+
+
 }
 
 /* .dark {
@@ -127,7 +134,7 @@
 @utility bg-tertiary {
   background-color: var(--bg-tertiary);
 }
-@utity bg-background {
+@utility bg-background {
   background-color: var(--bg-background);
 }
 
@@ -146,6 +153,11 @@
 
 @utility row-dull{
   background-color:var(--bg-primary-dull)
+}
+
+/* For Product background */
+@utility bg-product{
+  background-color:var(--bg-product-background)
 }
 
 /* For Hiding scrollbar  */
