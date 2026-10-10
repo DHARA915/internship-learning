@@ -1,11 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import ImageGallarySkeleton from "./ImageGallarySkeleton";
 import {
   Heart,
   Image as ImageIcon,
   Images,
   MoreVertical,
   X,
+  Mountain,
+  Search
 } from "lucide-react";
 import { FormField } from "../../components/form-field/FormField";
 import {
@@ -22,6 +25,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Counter from "yet-another-react-lightbox/plugins/counter";
+import type {} from "yet-another-react-lightbox/plugins/captions";
 
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/captions.css";
@@ -38,7 +42,12 @@ const ImageGallary = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(-1);
 
-  
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const search = searchParams.get("q") ?? "";
   const selectedCategory = searchParams.get("category") ?? "All";
@@ -113,6 +122,30 @@ const ImageGallary = () => {
     lightboxIndex >= 0 ? filteredItems[lightboxIndex] : undefined;
 
   const likedCount = images.filter((item) => item.isLike).length;
+
+  // For empty filter
+  const hasActiveFilters = search.trim() !== "" || selectedCategory !== "All";
+
+  const emptyType: "gallery" | "favorites" | "search" | null =
+    filteredItems.length > 0
+      ? null
+      : images.length === 0
+        ? "gallery"
+        : activeTab === "favorites" && likedCount === 0
+          ? "favorites"
+          : "search";
+
+  const clearFilters = () => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("q");
+        next.delete("category");
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   const toggleLike = (id: string) => {
     setImages((prevImages) =>
@@ -319,7 +352,7 @@ const ImageGallary = () => {
             </Button>
           ))}
         </div>
-
+        {/* 
         <section className="grid grid-cols-2 gap-4 min-[420px]:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {filteredItems.map((item, index) => (
             <ImageCard
@@ -329,74 +362,152 @@ const ImageGallary = () => {
               onOpen={() => setLightboxIndex(index)}
             />
           ))}
-        </section>
-        <Lightbox
-  open={lightboxIndex >= 0 && filteredItems.length > 0}
-  index={Math.max(0, Math.min(lightboxIndex, filteredItems.length - 1))}
-  close={() => setLightboxIndex(-1)}
-  slides={filteredItems.map((item) => ({
-    src: item.image,
-    alt: item.title,
-    title: item.title,
-    description: item.category,
-  }))}
-  plugins={[Thumbnails, Zoom, Fullscreen, Slideshow, Counter]}  
-  on={{ view: ({ index }) => setLightboxIndex(index) }}
-  controller={{ closeOnBackdropClick: true }}
-  render={{
-    slideFooter: ({ slide }) => (
-      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 to-transparent px-4 pb-3 pt-8 text-left text-white">
-        {slide.title && (
-          <p className="text-base font-semibold leading-tight">{slide.title}</p>
-        )}
-        {slide.description && (
-          <p className="mt-0.5 text-sm text-white/80">{slide.description}</p>
-        )}
-      </div>
-    ),
-  }}
-  styles={{
-    root: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
-    container: {
-      inset: "6vh 25vw",
-      borderRadius: 16,
-      overflow: "hidden",
-    },
-  }}
-  toolbar={{
-    buttons: [
-      currentLightboxItem && (
-        <Button
-          key="like"
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={currentLightboxItem.isLike ? "Unlike" : "Like"}
-          onClick={() => toggleLike(currentLightboxItem.id)}
-          className="size-10 cursor-pointer rounded-full text-white hover:bg-white/10 hover:text-white"
-        >
-          <Heart
-            size={22}
-            className={
-              currentLightboxItem.isLike ? "fill-red-500 text-red-500" : ""
-            }
-          />
-        </Button>
-      ),
-      "close",
-    ],
-  }}
-/>
+        </section> */}
 
-        {filteredItems.length === 0 && (
+        {isLoading ? (
+          <ImageGallarySkeleton />
+        ) : emptyType ? (
+          <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white px-4 py-14 text-center">
+            {emptyType === "search" && (
+              <>
+                <Search
+                  className="mb-3 h-12 w-12 text-gray-400"
+                  strokeWidth={1.5}
+                />
+                <p className="font-semibold">No matches found.</p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Try refining your search or filters.
+                </p>
+                {hasActiveFilters && (
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="mt-4"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </>
+            )}
+
+            {emptyType === "favorites" && (
+              <>
+                <Heart
+                  className="mb-3 h-12 w-12 text-blue-400"
+                  strokeWidth={1.5}
+                />
+                <p className="font-semibold">
+                  You haven't added any favorites yet.
+                </p>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => setActiveTab("gallery")}
+                  className="mt-4 bg-blue-500 hover:bg-blue-600"
+                >
+                  Browse Gallery
+                </Button>
+              </>
+            )}
+
+            {emptyType === "gallery" && (
+              <>
+                <Mountain
+                  className="mb-3 h-12 w-12 text-blue-400"
+                  strokeWidth={1.5}
+                />
+                <p className="font-semibold">
+                  Start exploring to find beautiful moments.
+                </p>
+              </>
+            )}
+          </div>
+        ) : (
+          <section className="grid grid-cols-2 gap-4 min-[420px]:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {filteredItems.map((item, index) => (
+              <ImageCard
+                key={item.id}
+                item={item}
+                toggleLike={toggleLike}
+                onOpen={() => setLightboxIndex(index)}
+              />
+            ))}
+          </section>
+        )}
+
+        <Lightbox
+          open={lightboxIndex >= 0 && filteredItems.length > 0}
+          index={Math.max(0, Math.min(lightboxIndex, filteredItems.length - 1))}
+          close={() => setLightboxIndex(-1)}
+          slides={filteredItems.map((item) => ({
+            src: item.image,
+            alt: item.title,
+            title: item.title,
+            description: item.category,
+          }))}
+          plugins={[Thumbnails, Zoom, Fullscreen, Slideshow, Counter]}
+          on={{ view: ({ index }) => setLightboxIndex(index) }}
+          controller={{ closeOnBackdropClick: true }}
+          render={{
+            slideFooter: ({ slide }) => (
+              <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 to-transparent px-4 pb-3 pt-8 text-left text-white">
+                {slide.title && (
+                  <p className="text-base font-semibold leading-tight">
+                    {slide.title}
+                  </p>
+                )}
+                {slide.description && (
+                  <p className="mt-0.5 text-sm text-white/80">
+                    {slide.description}
+                  </p>
+                )}
+              </div>
+            ),
+          }}
+          styles={{
+            root: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
+            container: {
+              inset: "6vh 25vw",
+              borderRadius: 16,
+              overflow: "hidden",
+            },
+          }}
+          toolbar={{
+            buttons: [
+              currentLightboxItem && (
+                <Button
+                  key="like"
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={currentLightboxItem.isLike ? "Unlike" : "Like"}
+                  onClick={() => toggleLike(currentLightboxItem.id)}
+                  className="size-10 cursor-pointer rounded-full text-white hover:bg-white/10 hover:text-white"
+                >
+                  <Heart
+                    size={22}
+                    className={
+                      currentLightboxItem.isLike
+                        ? "fill-red-500 text-red-500"
+                        : ""
+                    }
+                  />
+                </Button>
+              ),
+              "close",
+            ],
+          }}
+        />
+        {/* {filteredItems.length === 0 && (
           <div className="rounded-xl border border-dashed border-gray-300 bg-white px-4 py-12 text-center">
             <ImageIcon className="mx-auto mb-3 h-8 w-8 text-gray-400" />
             <p className="font-medium">No images found</p>
-            <p className="mt-1 text-sm text-gray-500">
-              Try changing your search, category, or filters.
-            </p>
+           
           </div>
-        )}
+        )} */}
       </div>
     </main>
   );

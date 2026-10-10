@@ -32,7 +32,7 @@ export const ImageGallarydata: ImageGallaryType[] = [
   // Nature
   {
     id: "1",
-    image: "https://i.pinimg.com/236x/e3/08/5b/e3085b77479f9958b75299388b67979d.jpg",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk9INOgcrRXlUOBxgDvpTtU8YYFSZHRlu3lArRF9NCRQ&s=10",
     title: "Forest",
     category: "Nature",
     isLike: false,
