@@ -6,6 +6,7 @@ import AdminRoute from "./modules/admin/AdminRoute";
 import UserRoutes from "./modules/user/UserRoute";
 import ComparePage from "./modules/CompareProducts/ComparePage";
 import { Toaster } from "./components/ui/toast";
+import ImageGallary from "./modules/ImageGallary/ImageGallary";
 import "./App.css";
 
 const ProtectedAdminRoutes = WithAuth(AdminRoute, "admin");
@@ -23,7 +24,8 @@ function App() {
             <Route path="/user/*" element={<ProtectedUserDashboard />} />
           </Route>
 
-          <Route path="/admin/compare" element={<ComparePage />} />
+          <Route path="/admin/compare" element={<ComparePage/>} />
+          <Route path="/admin/gallary" element={<ImageGallary/>} />
 
           {/* Default */}
           <Route path="*" element={<Login />} />

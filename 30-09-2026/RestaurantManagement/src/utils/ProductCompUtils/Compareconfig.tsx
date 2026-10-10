@@ -77,7 +77,6 @@ const laptopSpecs: SpecRow[] = [
 ];
 
 // For Fridge Category
-
 const fridgeSpecs: SpecRow[] = [
   ...baseRows,
   row("Color", "color", Palette, "basic"),

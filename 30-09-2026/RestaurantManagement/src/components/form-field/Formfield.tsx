@@ -8,7 +8,7 @@ import type { FormFieldProps } from "./fields/Types.ts";
 
 /**
  * Common field component.
- * Pass `type` and the matching field is rendered:
+ * Pass ``type`` and the matching field is rendered:
  *
  *  text | email | password | number | tel | url  → InputField
  *  textarea                                       → TextareaField
