@@ -1,6 +1,7 @@
 import { LayoutDashboard,Home, type LucideIcon } from "lucide-react";
-import type { MenuSection } from "./Menusectiondata";
-
+import type { Menu } from "./Menusectiondata";
+import { useSelector } from "react-redux";
+import type { RootState } from "../Redux/store";
 export interface UserLink {
   title: string;
   href: string;
@@ -8,8 +9,9 @@ export interface UserLink {
   image?: string;
 }
 
+
 export const getUserLinks = (
-  menuSections: MenuSection[]
+  menus: Menu[]
 ): UserLink[] => {
   const dashboard: UserLink = {
     title: "Home",
@@ -17,12 +19,12 @@ export const getUserLinks = (
     icon: Home,
   };
 
-  const menuLinks: UserLink[] = menuSections
-    .filter((section) => section.status === "Active")
-    .map((section) => ({
-      title: section.name,
-      href: `/user/menu/${section.id}`,
-      image: section.icon,
+  const menuLinks: UserLink[] = menus
+    .filter((menu) => menu.status === "Active")
+    .map((menu) => ({
+      title: menu.name,
+      href: `/user/menu/${menu.id}`,
+      image: menu.icon,
     }));
 
   return [

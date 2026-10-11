@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState,useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LogOut } from "lucide-react";
@@ -58,12 +58,13 @@ const AppSidebar = () => {
   };
 
   const isAdmin = role === "admin";
-  const menuSections = useSelector(
-    (state: RootState) => state.menuSections.menuSections,
-  );
+  const menus = useSelector((state: RootState) => state.menus.menus);
 
-  const links = isAdmin ? adminLinks : getUserLinks(menuSections);
-  const activeHref = getActiveHref(links, pathname);
+const links = useMemo(
+  () => (isAdmin ? adminLinks : getUserLinks(menus)),
+  [isAdmin, menus],
+);
+const activeHref = getActiveHref(links, pathname);
 
   return (
     <Sidebar className="bg-primary">

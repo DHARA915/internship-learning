@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "../../components/ui/sidebar";
-
+import { useMemo } from "react";
 import { adminLinks } from "../../utils/AdminLinks";
 import { RESTAURANT_NAME } from "../../utils/restaurantCommon";
 import { useSelector } from "react-redux";
@@ -21,11 +21,12 @@ const AppHeader = () => {
   const isCartPage = location.pathname.startsWith("/user/cart");
 
   const currentUser = useSelector((s: RootState) => s.auth.currentUser);
-  const menuSections = useSelector(
-    (s: RootState) => s.menuSections.menuSections,
-  );
-  const isAdmin = currentUser?.role === "admin";
-  const links = isAdmin ? adminLinks : getUserLinks(menuSections);
+const menus = useSelector((s: RootState) => s.menus.menus);
+const isAdmin = currentUser?.role === "admin";
+const links = useMemo(
+  () => (isAdmin ? adminLinks : getUserLinks(menus)),
+  [isAdmin, menus],
+);
 
   const displayName = currentUser?.name ?? (isAdmin ? "Admin" : "User");
   const initial = displayName.charAt(0).toUpperCase();

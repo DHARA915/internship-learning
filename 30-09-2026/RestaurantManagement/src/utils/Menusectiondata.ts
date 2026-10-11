@@ -47,9 +47,12 @@ export const isMenuLive = (m: Menu, now = new Date()) => {
 };
 
 /* ---------- seed ---------- */
-// item ids match menuItemSeed (itm_001 …); itm_015 is Inactive on purpose
 const ids = (...nums: number[]) =>
   nums.map((n) => `itm_${String(n).padStart(3, "0")}`);
+
+/** range(13, 24) -> 13, 14, … 24 */
+const range = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, i) => from + i);
 
 let count = 0;
 const menu = (
@@ -76,10 +79,16 @@ const menu = (
 const WEEKDAYS = DAYS.slice(0, 5);
 
 export const menuSeed: Menu[] = [
-  menu("Breakfast", "Active", "07:00", "11:00", DAYS, ids(2, 4, 17)),
-  menu("Beverages", "Active", "10:00", "23:00", DAYS, ids(1, 2, 3, 4, 5, 6, 7, 8)),
-  menu("Lunch", "Active", "12:00", "16:00", WEEKDAYS, ids(26, 27, 28, 29, 30, 31, 32)),
-  menu("Snacks & Pizza", "Active", "16:00", "22:00", DAYS, ids(16, 17, 18, 19, 20, 21, 22, 23, 24, 25)),
-  menu("Desserts", "Active", "12:00", "23:30", DAYS, ids(9, 10, 11, 12, 13, 14, 15)),
-  menu("Late Night Bites", "Inactive", "22:00", "23:59", DAYS, ids(20, 24, 25)),
+  // Breakfast: items 13-24, plus Masala Chai (7) and Filter Coffee (8)
+  menu("Breakfast", "Active", "07:00", "11:00", DAYS, ids(...range(13, 24), 7, 8)),
+  // Beverages: items 1-12
+  menu("Beverages", "Active", "10:00", "23:00", DAYS, ids(...range(1, 12))),
+  // Lunch: items 25-38
+  menu("Lunch", "Active", "12:00", "16:00", WEEKDAYS, ids(...range(25, 38))),
+  // Snacks & Pizza: items 39-54
+  menu("Snacks & Pizza", "Active", "16:00", "22:00", DAYS, ids(...range(39, 54))),
+  // Desserts: items 55-66
+  menu("Desserts", "Active", "12:00", "23:30", DAYS, ids(...range(55, 66))),
+  // Late Night Bites: items 67-77, plus French Fries (43)
+  menu("Late Night Bites", "Inactive", "22:00", "23:59", DAYS, ids(...range(67, 77), 43)),
 ];

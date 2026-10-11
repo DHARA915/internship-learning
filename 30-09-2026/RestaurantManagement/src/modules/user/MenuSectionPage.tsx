@@ -1,11 +1,10 @@
 import { useState } from "react";
+import ItemCard, { VegMark, ItemImage } from "../../modules/user/ItemCard";
 import { useParams, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Minus, Plus } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { addToCart, type CartItem, buildCartKey } from "../../Redux/Slices/cartSlice";
+import { addToCart, buildCartKey } from "../../Redux/Slices/cartSlice";
 import type { AppDispatch, RootState } from "../../Redux/store";
-import Card from "../../components/Card";
 import {
   Drawer,
   DrawerContent,
@@ -15,50 +14,65 @@ import {
   DrawerFooter,
 } from "../../components/ui/drawer";
 import {
-  menuItemSeed,
   formatPrice,
   type MenuItem,
+  type ItemModifierGroup,
 } from "../../utils/MenuItemdata";
-import {
-  modifierSeed,
-  type ModifierGroup,
-  type ModifierOption,
-} from "../../utils/Modifierdata"; 
-import { getItemGroups, getDefaultSelection } from "../../utils/modifierHelpers";
+import { isMenuLive, fmtTime, daysLabel } from "../../utils/Menusectiondata";
 
-/* ---------- small UI piece ---------- */
+/* ---------- helpers ---------- */
 
-const VegMark = ({ isVeg }: { isVeg: boolean }) => (
-  <span
-    title={isVeg ? "Veg" : "Non-veg"}
-    className={`flex size-5 shrink-0 items-center justify-center rounded-sm border-2 bg-white ${
-      isVeg ? "border-green-600" : "border-red-600"
-    }`}
-  >
-    <span
-      className={`size-2.5 rounded-full ${
-        isVeg ? "bg-green-600" : "bg-red-600"
-      }`}
-    />
-  </span>
-);
+// cartSlice still types these ids as numbers, but the real ids are strings
+// ("itm_001", "menu_001"). Keep the real value and only satisfy the type.
+const asCartId = (id: string) => id as unknown as number;
+
+type Selection = Record<string, string[]>; // groupId -> chosen option ids
+
+// a "preference" group must be answered; an "addon" group is optional
+const isRequired = (g: ItemModifierGroup) => g.type === "preference";
+
+/** required groups start with their first option picked, add-ons start empty */
+const getDefaultSelection = (item: MenuItem): Selection =>
+  Object.fromEntries(
+    item.modifiers.map((g) => [
+      g.groupId,
+      isRequired(g) && g.options[0] ? [g.options[0].id] : [],
+    ]),
+  );
+
+/** every option picked for this item, with the group it belongs to */
+const getPicked = (item: MenuItem, selection: Selection) =>
+  item.modifiers.flatMap((group) =>
+    group.options
+      .filter((o) => selection[group.groupId]?.includes(o.id))
+      .map((option) => ({ group, option })),
+  );
+
+/** price of ONE unit = sum of the selected modifier options */
+const getUnitPrice = (item: MenuItem, selection: Selection) =>
+  getPicked(item, selection).reduce((sum, { option }) => sum + option.price, 0);
+
+const choiceHint = (g: ItemModifierGroup) => {
+  const pick = g.selection === "single" ? "Choose 1" : "Choose any";
+  return isRequired(g) ? `Required · ${pick}` : `Optional · ${pick}`;
+};
+
 
 /* ---------- page ---------- */
 
 const MenuSectionPage = () => {
+  // route param keeps its old name; its value is now a menu id (menu_001 ...)
   const { sectionId } = useParams();
   const dispatch = useDispatch<AppDispatch>();
-  const sections = useSelector(
-    (s: RootState) => s.menuSections.menuSections
-  );
-
- 
+  const menus = useSelector((s: RootState) => s.menus.menus);
+  // adjust if your store registers the menu item slice under another key
+  const menuItems = useSelector((s: RootState) => s.menuItems.menuItems);
 
   // All hooks must stay above the early return below
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [selected, setSelected] = useState<Record<string, string[]>>({});
+  const [selected, setSelected] = useState<Selection>({});
 
   const openItem = (item: MenuItem) => {
     setSelectedItem(item);
@@ -67,116 +81,135 @@ const MenuSectionPage = () => {
     setOpen(true);
   };
 
-  const toggleOption = (group: ModifierGroup, optionId: string) => {
+  const toggleOption = (group: ItemModifierGroup, optionId: string) => {
     setSelected((prev) => {
-      const current = prev[group.id] ?? [];
+      const current = prev[group.groupId] ?? [];
 
       if (group.selection === "single") {
-        return { ...prev, [group.id]: [optionId] };
+        // radio behaviour; an optional group can be cleared by tapping again
+        const alreadyPicked = current.includes(optionId);
+        return {
+          ...prev,
+          [group.groupId]:
+            alreadyPicked && !isRequired(group) ? [] : [optionId],
+        };
       }
 
       return {
         ...prev,
-        [group.id]: current.includes(optionId)
+        [group.groupId]: current.includes(optionId)
           ? current.filter((id) => id !== optionId)
           : [...current, optionId],
       };
     });
   };
 
-  const section = sections.find((s) => String(s.id) === sectionId);
+  const menu = menus.find((m) => m.id === sectionId);
 
-  if (!section || section.status !== "Active") {
+  if (!menu || menu.status !== "Active") {
     return <Navigate to="/user/home" replace />;
   }
 
-  const items = menuItemSeed.filter(
-    (item) => item.menuSectionId === section.id && item.status === "Active"
-  );
+  // A menu lists its items by id, in the order the admin chose.
+  // An item can belong to several menus.
+  const items = menu.itemIds
+    .map((id) => menuItems.find((i) => i.id === id))
+    .filter((i): i is MenuItem => !!i && i.status === "Active");
 
-  // Modifiers + price for the item open in the drawer
-  const itemGroups = selectedItem ? getItemGroups(selectedItem) : [];
+  // is the menu being served right now (day + time window)?
+  const live = isMenuLive(menu);
 
-  const modifierTotal = itemGroups.reduce(
-    (sum, { group, options }) =>
-      sum +
-      options
-        .filter((o) => selected[group.id]?.includes(o.id))
-        .reduce((s, o) => s + o.price, 0),
-    0
-  );
+  // ----- drawer: price + validation for the open item -----
+  const picked = selectedItem ? getPicked(selectedItem, selected) : [];
+  const unitPrice = selectedItem ? getUnitPrice(selectedItem, selected) : 0;
+  const lineTotal = unitPrice * quantity;
 
-  // price of ONE unit = base price + selected modifiers
-  const unitPrice = selectedItem ? selectedItem.price + modifierTotal : 0;
+  const missingGroups = selectedItem
+    ? selectedItem.modifiers.filter(
+        (g) => isRequired(g) && !(selected[g.groupId]?.length > 0),
+      )
+    : [];
+  const canAdd = !!selectedItem && missingGroups.length === 0;
 
   const handleAddToCart = () => {
-  if (!selectedItem) return;
+    if (!selectedItem || !canAdd) return;
 
-  // every modifier option the customer picked
-  const chosenModifiers = itemGroups.flatMap(({ group, options }) =>
-    options
-      .filter((o) => selected[group.id]?.includes(o.id))
-      .map((o) => ({
-        groupId: group.id,
-        groupName: group.name,
-        optionId: o.id,
-        name: o.name,
-        price: o.price,
-      }))
-  );
+    // every modifier option the customer picked
+    const chosenModifiers = picked.map(({ group, option }) => ({
+      groupId: group.groupId,
+      groupName: group.groupName,
+      optionId: option.id,
+      name: option.name,
+      price: option.price,
+    }));
 
-  const cartItem = {
-    key: buildCartKey(selectedItem.id, chosenModifiers.map((m) => m.optionId)),//add key to distinct same item with different modifier 
-    itemId: selectedItem.id,
-    name: selectedItem.name,
-    image: selectedItem.image,
-    isVeg: selectedItem.isVeg,
-    menuSectionId: selectedItem.menuSectionId,
-    basePrice: selectedItem.price,
-    modifiers: chosenModifiers,
-    modifierTotal,
-    unitPrice, // base price + modifiers, for ONE unit
-    quantity,
-    lineTotal: unitPrice * quantity,
+    const cartItem = {
+      // key keeps the same item with different modifiers as separate lines
+      key: buildCartKey(
+        asCartId(selectedItem.id),
+        chosenModifiers.map((m) => m.optionId),
+      ),
+      itemId: asCartId(selectedItem.id),
+      name: selectedItem.name,
+      image: selectedItem.image,
+      isVeg: selectedItem.isVeg,
+      menuSectionId: asCartId(menu.id), // the menu the customer ordered from
+      basePrice: 0, // dishes have no base price; all pricing comes from modifiers
+      modifiers: chosenModifiers,
+      modifierTotal: unitPrice,
+      unitPrice, // sum of selected modifiers, for ONE unit
+      quantity,
+      lineTotal,
+    };
+
+    dispatch(addToCart(cartItem));
+    setOpen(false);
   };
-
-  console.log("Add to cart:", JSON.stringify(cartItem, null, 2));
-  dispatch(addToCart(cartItem))
-  setOpen(false);
-};
 
   return (
     <div className="p-4 sm:p-6">
-      {/* Section header */}
+      {/* Menu header */}
       <div className="mb-6 flex items-center gap-4">
-        <img
-          src={section.icon}
-          alt=""
-          className="size-14 rounded-xl bg-brand-soft object-contain p-1"
-        />
+        {menu.icon ? (
+          <img
+            src={menu.icon}
+            alt=""
+            className="size-14 rounded-xl bg-brand-soft object-contain p-1"
+          />
+        ) : (
+          <div className="flex size-14 items-center justify-center rounded-xl bg-brand-soft text-xl font-semibold text-primary">
+            {menu.name.charAt(0)}
+          </div>
+        )}
+
         <div>
-          <h1 className="text-2xl font-semibold text-primary">
-            {section.name}
-          </h1>
-          <p className="text-sm text-secondary">{section.description}</p>
+          <h1 className="text-2xl font-semibold text-primary">{menu.name}</h1>
+          <p className="text-sm text-secondary">
+            {fmtTime(menu.timing.startTime)} – {fmtTime(menu.timing.endTime)} ·{" "}
+            {daysLabel(menu.timing.days)}
+          </p>
+          {!live && (
+            <p className="mt-1 text-xs font-medium text-red-600">
+              Not being served right now
+            </p>
+          )}
         </div>
       </div>
 
       {/* Items */}
       {items.length === 0 ? (
         <p className="text-sm text-secondary">
-          No items available in this section yet.
+          No items available in this menu yet.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((item) => (
-            <Card
+            <ItemCard
               key={item.id}
-              image={item.image}
-              title={item.name}
-              price={formatPrice(item.price)}
-              badge={<VegMark isVeg={item.isVeg} />}
+              item={item}
+              startPrice={getUnitPrice(item, getDefaultSelection(item))}
               onClick={() => openItem(item)}
+              disabled={!live}
             />
           ))}
         </div>
@@ -189,10 +222,10 @@ const MenuSectionPage = () => {
             <>
               {/* Fixed: image */}
               <div className="h-64 w-full shrink-0 overflow-hidden p-3">
-                <img
+                <ItemImage
                   src={selectedItem.image}
-                  alt={selectedItem.name}
-                  className="h-full w-full object-cover"
+                  name={selectedItem.name}
+                  className="h-full w-full rounded-lg"
                 />
               </div>
 
@@ -205,7 +238,7 @@ const MenuSectionPage = () => {
                   </DrawerTitle>
                 </div>
                 <p className="text-lg font-semibold text-button-primary">
-                  {formatPrice(selectedItem.price)}
+                  {formatPrice(unitPrice)}
                 </p>
                 <DrawerDescription className="w-full !max-w-none text-wrap text-sm leading-relaxed text-secondary">
                   {selectedItem.description}
@@ -214,28 +247,30 @@ const MenuSectionPage = () => {
 
               {/* Scrolls: modifiers only */}
               <div className="min-h-0 flex-1 overflow-y-auto pt-5">
-                {itemGroups.map(({ group, options }) => {
+                {selectedItem.modifiers.length === 0 && (
+                  <p className="px-5 pb-5 text-sm text-secondary">
+                    No customisation for this item.
+                  </p>
+                )}
+
+                {selectedItem.modifiers.map((group) => {
                   const single = group.selection === "single";
 
                   return (
-                    <div key={group.id} className="px-5 pb-5">
+                    <div key={group.groupId} className="px-5 pb-5">
                       <div className="mb-2 flex items-baseline justify-between">
                         <h4 className="text-sm font-semibold text-primary">
-                          {group.name}
+                          {group.groupName}
                         </h4>
                         <span className="text-xs text-tertiary">
-                          {group.required
-                            ? "Required · Choose 1"
-                            : single
-                              ? "Optional · Choose 1"
-                              : "Optional"}
+                          {choiceHint(group)}
                         </span>
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        {options.map((opt) => {
+                        {group.options.map((opt) => {
                           const isSelected =
-                            selected[group.id]?.includes(opt.id) ?? false;
+                            selected[group.groupId]?.includes(opt.id) ?? false;
 
                           return (
                             <button
@@ -282,7 +317,7 @@ const MenuSectionPage = () => {
                 })}
               </div>
 
-              {/* Fixed: quantity + add button */}
+              {/* Fixed: quantity + price + add button */}
               <DrawerFooter className="shrink-0 gap-4 border-t border-line p-5">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-primary">
@@ -315,12 +350,28 @@ const MenuSectionPage = () => {
                   </div>
                 </div>
 
+                <div className="flex items-center justify-between text-sm text-secondary">
+                  <span>
+                    {formatPrice(unitPrice)} × {quantity}
+                  </span>
+                  <span className="font-semibold text-primary">
+                    {formatPrice(lineTotal)}
+                  </span>
+                </div>
+
+                {missingGroups.length > 0 && (
+                  <p className="text-xs text-red-600">
+                    Please choose: {missingGroups.map((g) => g.groupName).join(", ")}
+                  </p>
+                )}
+
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className="h-11 w-full rounded-lg bg-button-primary  text-sm font-semibold text-hover hover:bg-button-primary-hover"
+                  disabled={!canAdd}
+                  className="h-11 w-full rounded-lg bg-button-primary text-sm font-semibold text-hover hover:bg-button-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Add To Cart  {formatPrice(unitPrice * quantity)}
+                  Add To Cart {formatPrice(lineTotal)}
                 </button>
               </DrawerFooter>
             </>
