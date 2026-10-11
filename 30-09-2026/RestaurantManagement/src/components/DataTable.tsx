@@ -535,6 +535,10 @@
 
         {onDelete && (
           <ConfirmDialog
+            icon={Trash2}
+            confirmLabel="Delete record"
+            title="Delete this record?"
+            description="This permanently removes the record and can't be undone."
             open={!!deleting}
             onOpenChange={(o) => !o && setDeleting(null)}
             onConfirm={async () => {

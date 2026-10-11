@@ -274,7 +274,7 @@ const ImageGallary = () => {
         </header>
 
         <div className="mb-6">
-          <h1 className="text-2xl font-bold sm:text-4xl">
+          <h1 className="md:text-2xl text-xl font-bold sm:text-4xl">
             Explore Beautiful Moments
           </h1>
           <p className="mt-1 text-sm text-gray-600">
@@ -295,7 +295,10 @@ const ImageGallary = () => {
             />
           </div>
 
-          <div className="w-40 cursor-pointer">
+          <div className="flex flex-row gap-2">
+
+          
+          <div className="w-30 cursor-pointer">
             <FormField
               type="select"
               name="category"
@@ -309,7 +312,7 @@ const ImageGallary = () => {
             />
           </div>
 
-          <div className="w-40">
+          <div className="w-30">
             <FormField
               type="select"
               name="sort"
@@ -319,6 +322,9 @@ const ImageGallary = () => {
               onChange={(value) => setSortBy(value as SortType)}
             />
           </div>
+
+          </div>
+
 
           <Button
             type="button"
@@ -352,17 +358,6 @@ const ImageGallary = () => {
             </Button>
           ))}
         </div>
-        {/* 
-        <section className="grid grid-cols-2 gap-4 min-[420px]:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {filteredItems.map((item, index) => (
-            <ImageCard
-              key={item.id}
-              item={item}
-              toggleLike={toggleLike}
-              onOpen={() => setLightboxIndex(index)}
-            />
-          ))}
-        </section> */}
 
         {isLoading ? (
           <ImageGallarySkeleton />

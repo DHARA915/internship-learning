@@ -34,12 +34,12 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   open,
   onOpenChange,
-  title = "Delete this record?",
-  description = "This permanently removes the record and can't be undone.",
-  confirmLabel = "Delete record",
+  title = "",
+  description = "",
+  confirmLabel,
   cancelLabel = "Cancel",
   variant = "danger",
-  icon: Icon = Trash2,
+  icon: Icon,
   onConfirm,
 }: ConfirmDialogProps) {
   const [loading, setLoading] = React.useState(false);
@@ -61,14 +61,28 @@ export function ConfirmDialog({
     <AlertDialog open={open} onOpenChange={(o) => !loading && onOpenChange(o)}>
       <AlertDialogContent className="gap-0 overflow-hidden rounded-2xl border-line bg-primary p-0 shadow-xl sm:max-w-md">
         <AlertDialogHeader className="gap-4 px-6 pb-5 pt-6 text-left">
-          <div
-            className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-full",
-              isDanger ? "bg-danger/10 text-danger" : "bg-brand-soft text-brand"
-            )}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
+          {Icon && (
+            <div
+              className={cn(
+                "flex h-11 w-11 items-center justify-center rounded-full",
+                isDanger
+                  ? "bg-danger/10 text-danger"
+                  : "bg-brand-soft text-brand",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex h-11 w-11 items-center justify-center rounded-full",
+                  isDanger
+                    ? "bg-danger/10 text-danger"
+                    : "bg-brand-soft text-brand",
+                )}
+              >
+                <Icon className="h-5 w-5" />
+              </div>
+            </div>
+          )}
+
           <div className="space-y-1">
             <AlertDialogTitle className="text-lg font-semibold leading-6 tracking-tight text-primary">
               {title}
@@ -94,7 +108,7 @@ export function ConfirmDialog({
                 "cursor-pointer rounded-lg shadow-sm",
                 isDanger
                   ? "bg-danger text-white hover:bg-danger/90"
-                  : "bg-button-primary text-on-brand hover:bg-success-soft"
+                  : "bg-button-primary text-on-brand hover:bg-success-soft",
               )}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -106,29 +120,3 @@ export function ConfirmDialog({
     </AlertDialog>
   );
 }
-
-/* ------------------------------------------------------------------
-   Usage
-
-   const [deleting, setDeleting] = React.useState<Row | null>(null);
-
-   <Button onClick={() => setDeleting(row)}>Delete</Button>
-
-   <ConfirmDialog
-     open={!!deleting}
-     onOpenChange={(o) => !o && setDeleting(null)}
-     onConfirm={async () => {
-       if (deleting) await onDelete(deleting);
-     }}
-   />
-
-   // custom text
-   <ConfirmDialog
-     open={open}
-     onOpenChange={setOpen}
-     title="Remove this user?"
-     description="They will lose access immediately."
-     confirmLabel="Remove user"
-     onConfirm={removeUser}
-   />
-------------------------------------------------------------------- */

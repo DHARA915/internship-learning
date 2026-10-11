@@ -1,13 +1,12 @@
 import React from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LogOut } from "lucide-react";
 import { logout } from "../../Redux/Slices/authSlice";
 import type { AppDispatch } from "../../Redux/store";
-import {
-  getUserLinks,
-  type UserLink,
-} from "../../utils/UserLinks";
+import { ConfirmDialog } from "../ConfirmDialog";
+import { getUserLinks, type UserLink } from "../../utils/UserLinks";
 import {
   Sidebar,
   SidebarContent,
@@ -37,17 +36,12 @@ type NavigationLink = {
   href: string;
 };
 
-const getActiveHref = (
-  links: NavigationLink[],
-  pathname: string
-) =>
+const getActiveHref = (links: NavigationLink[], pathname: string) =>
   links
     .filter(
       (link) =>
         pathname === link.href ||
-        pathname.startsWith(
-          `${link.href.replace(/\/$/, "")}/`
-        )
+        pathname.startsWith(`${link.href.replace(/\/$/, "")}/`),
     )
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
@@ -56,6 +50,7 @@ const AppSidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const role = useSelector((s: RootState) => s.auth.currentUser?.role);
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -64,13 +59,10 @@ const AppSidebar = () => {
 
   const isAdmin = role === "admin";
   const menuSections = useSelector(
-  (state: RootState) =>
-    state.menuSections.menuSections
-);
+    (state: RootState) => state.menuSections.menuSections,
+  );
 
-const links = isAdmin
-  ? adminLinks
-  : getUserLinks(menuSections);
+  const links = isAdmin ? adminLinks : getUserLinks(menuSections);
   const activeHref = getActiveHref(links, pathname);
 
   return (
@@ -143,16 +135,16 @@ const links = isAdmin
                         <div className="flex items-center justify-start gap-5">
                           {/* <Icon className="size-[18px]" /> */}
                           {Icon ? (
-  <Icon className="size-[18px]" />
-) : link.image ? (
-  <img
-    src={link.image}
-    alt=""
-    className="size-6 rounded object-cover"
-  />
-) : (
-  <span className="size-[18px]" />
-)}
+                            <Icon className="size-[18px]" />
+                          ) : link.image ? (
+                            <img
+                              src={link.image}
+                              alt=""
+                              className="size-6 rounded object-cover"
+                            />
+                          ) : (
+                            <span className="size-[18px]" />
+                          )}
                           <span>{link.title}</span>
                         </div>
                       </Link>
@@ -170,7 +162,7 @@ const links = isAdmin
           <SidebarMenuItem>
             <SidebarMenuButton
               type="button"
-              onClick={handleLogout}
+              onClick={() => setConfirmLogout(true)}
               className="h-10 rounded-lg px-3 text-secondary transition-colors bg-brand-soft text-brand hover:bg-brand hover:text-hover"
             >
               <LogOut className="size-[18px]" />
@@ -179,6 +171,14 @@ const links = isAdmin
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      <ConfirmDialog
+        title="Are you Sure you want to Logout."
+        confirmLabel="Yes"
+        icon={LogOut}
+        open={confirmLogout}
+        onOpenChange={setConfirmLogout}
+        onConfirm={handleLogout}
+      />
     </Sidebar>
   );
 };
