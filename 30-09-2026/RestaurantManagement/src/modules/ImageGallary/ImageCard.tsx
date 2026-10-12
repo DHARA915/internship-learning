@@ -1,6 +1,7 @@
 import { Heart, ImageOff } from "lucide-react";
 import { useState } from "react";
 import { type ImageCardProps } from "../../utils/ImageGallaryUtils/ImageGallarydata";
+import { Button } from "../../components/ui/button";
 
 const ImageCard = ({ item, toggleLike, onOpen }: ImageCardProps) => {
   const [failedSrc, setFailedSrc] = useState<string>();
@@ -10,7 +11,7 @@ const ImageCard = ({ item, toggleLike, onOpen }: ImageCardProps) => {
     <article className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-        <button type="button" onClick={onOpen} className="block w-full">
+        <Button type="button" onClick={onOpen} className="block w-full">
           {isBroken ? (
             <div
               role="img"
@@ -28,7 +29,7 @@ const ImageCard = ({ item, toggleLike, onOpen }: ImageCardProps) => {
               className="h-full w-full object-fill transition-transform duration-300 group-hover:scale-105"
             />
           )}
-        </button>
+        </Button>
       </div>
       <div className="flex min-w-0 items-center justify-between gap-3 p-3 sm:p-4">
         <div className="min-w-0 flex-1">
@@ -45,7 +46,7 @@ const ImageCard = ({ item, toggleLike, onOpen }: ImageCardProps) => {
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
-          <button
+          <Button
             type="button"
             onClick={() => toggleLike(item.id)}
             aria-label={
@@ -62,7 +63,7 @@ const ImageCard = ({ item, toggleLike, onOpen }: ImageCardProps) => {
                   : "fill-transparent text-gray-600"
               }`}
             />
-          </button>
+          </Button>
         </div>
       </div>
     </article>

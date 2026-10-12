@@ -376,10 +376,9 @@ const ImageGallary = () => {
                 {hasActiveFilters && (
                   <Button
                     type="button"
-                    variant="primary"
                     size="sm"
                     onClick={clearFilters}
-                    className="mt-4"
+                    className="mt-4 bg-blue-500 text-white"
                   >
                     Clear Filters
                   </Button>
@@ -398,7 +397,6 @@ const ImageGallary = () => {
                 </p>
                 <Button
                   type="button"
-                  variant="primary"
                   size="sm"
                   onClick={() => setActiveTab("gallery")}
                   className="mt-4 bg-blue-500 hover:bg-blue-600"

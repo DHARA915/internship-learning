@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
-import { formatPrice, type MenuItem } from "../../utils/MenuItemdata";
+import { formatPrice, type MenuItem } from "../../../utils/MenuItemdata";
 
 /* ---------- pieces the card is made of (also exported for the drawer) ---------- */
 
