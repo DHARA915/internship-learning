@@ -1,0 +1,144 @@
+/* app/globals.css  (Tailwind v4, light mode only) */
+@import "tailwindcss";
+
+/* ============================================================
+   1. Raw design tokens (edit values here only)
+   ============================================================ */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --background: #eff0f6;
+  --foreground: #111111;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --muted: #f6f7fb;
+  --muted-foreground: #5b6070;
+  --tertiary: #f6f7fb;
+  --overlay: rgba(17, 20, 40, 0.55);
+
+  /* Brand */
+  --primary: #2b47e8;
+  --primary-foreground: #ffffff;
+  --secondary: #e8ebfd;
+  --secondary-foreground: #1b2a9c;
+  --accent: #fdb515;
+  --accent-foreground: #111111;
+  --brand: #2b47e8;
+  --brand-soft: #e8ebfd;
+  --button-primary: #2b47e8;
+  --button-primary-hover: #2038c9;
+
+  /* Borders and focus */
+  --border: #050917;
+  --input: #b7b9c0;
+  --ring: #2b47e8;
+  --line: #e1e3ec;
+  --line-strong: #c9ccd9;
+
+  /* Status */
+  --destructive: #e5393b;
+  --danger: #e5393b;
+  --danger-soft: #fde4e4;
+  --success: #1aa34a;
+  --success-soft: #dff5e6;
+  --warning: #fdb515;
+  --warning-soft: #fff4d6;
+
+  /* Event categories */
+  --cat-technology: #2b6fd6;
+  --cat-business: #ec6a35;
+  --cat-design: #1db57a;
+  --cat-music: #eba000;
+  --cat-wellness: #e879a6;
+  --cat-workshops: #0a8a1f;
+
+  /* Radius base */
+  --radius: 0.75rem;
+}
+
+/* ============================================================
+   2. Expose tokens as Tailwind utilities
+      e.g. bg-primary, text-muted-foreground, border-line-strong
+   ============================================================ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-tertiary: var(--tertiary);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-button-primary: var(--button-primary);
+  --color-button-primary-hover: var(--button-primary-hover);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-destructive: var(--destructive);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  --color-cat-technology: var(--cat-technology);
+  --color-cat-business: var(--cat-business);
+  --color-cat-design: var(--cat-design);
+  --color-cat-music: var(--cat-music);
+  --color-cat-wellness: var(--cat-wellness);
+  --color-cat-workshops: var(--cat-workshops);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* Font: --font-jakarta is set by next/font in app/layout.tsx */
+@theme inline {
+  --font-sans: var(--font-jakarta), "Inter", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+}
+
+/* ============================================================
+   3. Base styles
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
