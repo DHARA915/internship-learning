@@ -1,10 +1,11 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState , Suspense } from "react";
 import AppSidebar from "../components/Sidebar/AppSidebar";
 import AppHeader from "../components/Header/AppHeader";
 import type { Role } from "../data/navlink";
+
 
 type AppShellProps = {
   role: Role;
@@ -16,6 +17,7 @@ const AppShell = ({ role, children }: AppShellProps) => {
 
   return (
     <div className="min-h-screen w-full lg:pl-64">
+
       <AppSidebar
         role={role}
         open={sidebarOpen}

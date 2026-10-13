@@ -19,13 +19,14 @@ export type NavLink = {
 
 export const adminLinks: NavLink[] = [
   { title: "Overview", href: "/adminDashboard", icon: LayoutGrid },
-  { title: "Registrations", href: "/registration", icon: Users },
+  { title: "Registrations", href: "/registeruser", icon: Users },
   { title: "Events", href: "/addevents", icon: CalendarDays },
 ];
 
 export const userLinks: NavLink[] = [
   { title: "Events", href: "/events", icon: CalendarDays },
   { title: "My bookings", href: "/booking", icon: Ticket },
+  { title: "Register", href: "/register", icon: Ticket },
 ];
 
 export const getLinks = (role: Role): NavLink[] =>

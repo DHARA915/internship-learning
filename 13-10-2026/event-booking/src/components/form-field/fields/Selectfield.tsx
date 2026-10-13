@@ -42,6 +42,7 @@ export function SelectField({
         disabled={disabled}
          items={options.map(({ label, value }) => ({ label, value }))}  
         onValueChange={(v) => onChange?.(v ?? "", name)}
+       
       >
         <SelectTrigger
           id={name}

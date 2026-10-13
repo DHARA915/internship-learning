@@ -95,4 +95,5 @@ export type FormFieldProps =
   | ({ type: "select" } & SelectFieldProps)
   | ({ type: "radio" } & RadioFieldProps)
   | ({ type: "checkbox" } & CheckboxFieldProps)
-  | ({ type: "multiselect" } & MultiSelectFieldProps);
+  | ({ type: "multiselect" } & MultiSelectFieldProps)
+  | ({ type: "mySelect" });

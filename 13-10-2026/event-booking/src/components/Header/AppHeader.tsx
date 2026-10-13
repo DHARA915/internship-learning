@@ -1,6 +1,6 @@
 // components/layout/AppHeader.tsx
 "use client";
-
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeft } from "lucide-react";
@@ -23,6 +23,7 @@ const AppHeader = ({ role, onMenuClick }: AppHeaderProps) => {
   const initial = DISPLAY_NAME.charAt(0).toUpperCase();
 
   return (
+
     <header className="sticky top-0 z-20 flex h-18 shrink-0 items-center justify-between border-b border-line bg-card px-4 sm:px-6">
       {/* Left */}
       <div className="flex items-center gap-3">
@@ -87,6 +88,8 @@ const AppHeader = ({ role, onMenuClick }: AppHeaderProps) => {
         </div>
       </div>
     </header>
+     
+
   );
 };
 

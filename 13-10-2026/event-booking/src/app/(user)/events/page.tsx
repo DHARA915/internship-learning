@@ -15,6 +15,7 @@ import EventDetailDialog from "@/components/user/Eventdetaildialog";
 import FormField from "@/components/form-field/FormField";
 import { Button } from "@/components/ui/button";
 import { cn } from "cn";
+import { useRouter } from "next/navigation";
 
 type PriceFilter = "all" | "free" | "paid";
 type SortKey =
@@ -49,6 +50,7 @@ const categoryDot: Record<EventCategory, string> = {
 };
 
 export default function BookingPage() {
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const events = useSelector(selectPublishedEvents);
 
@@ -226,17 +228,19 @@ export default function BookingPage() {
               key={event.id}
               event={event}
               onOpen={(e) => setSelectedId(e.id)}
-              onRegister={(e) => register(e.id)}
+              onRegister={(e) => router.push(`/registration/${e?.id}`)}
             />
           ))}
         </div>
       )}
 
-      <EventDetailDialog
-        event={selected}
-        onOpenChange={(open) => !open && setSelectedId(null)}
-        onRegister={(e) => register(e.id)}
-      />
+{selected && (
+  <EventDetailDialog
+    event={selected}
+    onOpenChange={(open) => !open && setSelectedId(null)}
+    onRegister={(e) => router.push(`/registration/${e?.id}`)}
+  />
+)}
     </div>
   );
 }

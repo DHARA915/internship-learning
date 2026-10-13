@@ -217,7 +217,7 @@ export function CommonDialog({
                         <div className={cn(isFullWidth && "sm:col-span-2")}>
                           <FormField
                             {...({
-                              type: field.type ?? "text",
+                              type: field.type ?? "mySelect",
                               name: field.name,
                               label: field.label,
                               value: values[field.name],

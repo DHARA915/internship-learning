@@ -5,6 +5,7 @@ import { RadioField } from "../form-field/fields/Radiofield";
 import { CheckboxField } from "../form-field/fields/CheckboxField";
 import { MultiSelectField } from "../form-field/fields/Multiselectfield";
 import type { FormFieldProps } from "./fields/Types.ts";
+import MySelect from "./fields/select";
 
 /**
  * Common field component.
@@ -24,6 +25,8 @@ const FormField = (props: FormFieldProps)=> {
     case "textarea":
       return <TextareaField {...props} />;
 
+    case 'mySelect':
+    return <MySelect/>;
     case "select":
       return <SelectField {...props} />;
 

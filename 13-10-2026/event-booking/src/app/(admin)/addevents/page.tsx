@@ -44,7 +44,6 @@ const TABS: { key: Tab; label: string }[] = [
 
 const CAPACITY_STEP = 10;
 
-// Full class names so Tailwind can see them
 const categoryTile: Record<EventCategory, string> = {
   Technology: "bg-cat-technology",
   Business: "bg-cat-business",
