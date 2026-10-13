@@ -18,6 +18,7 @@ import { useAuth } from "@/app/src/context/auth-context";
 
 const navLinks = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/dashboard", label: "Dashboard", icon: Notebook },
   { href: "/about", label: "About", icon: Info },
   { href: "/products", label: "Products", icon: Package },
   { href: "/blog", label: "Blog", icon: Notebook },
@@ -89,7 +90,7 @@ function NavbarContent() {
               <Button
                 type="button"
                 onClick={handleLogout}
-                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-foreground-secondary! transition-colors hover:bg-background-primary-soft hover:text-foreground-primary!"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-foreground-secondary! transition-colors hover:text-foreground-primary!"
               >
                 <LogOut size={18} />
                 Logout
@@ -148,7 +149,7 @@ function NavbarContent() {
               <Button
                 type="button"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-base font-medium text-foreground-secondary! transition-colors hover:bg-background-secondary"
+                className="flex w-full items-center gap-3 bg-background-primary rounded-lg px-3 py-3 text-base text-foreground-on-primary! font-medium  transition-colors "
               >
                 <LogOut size={20} />
                 Logout

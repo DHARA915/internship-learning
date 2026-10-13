@@ -19,10 +19,14 @@ export default function RootLayout({
       <body>
         <Providers>
           <Navbar />
-          <AuthGuard>{children}</AuthGuard>
+          {/* <AuthGuard>{children}</AuthGuard> */}
+          <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+            <div className="min-h-[calc(100dvh-10rem)] rounded-xl border border-border bg-background-card p-4 shadow-sm sm:p-6 lg:p-8">
+              <AuthGuard>{children}</AuthGuard>
+            </div>
+          </main>
         </Providers>
       </body>
     </html>
   );
 }
-
