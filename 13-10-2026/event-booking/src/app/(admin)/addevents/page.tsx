@@ -11,6 +11,7 @@ import {
   Send,
   Trash2,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import {
   formatPrice,
   seatsLeft,
@@ -728,7 +729,7 @@ export default function AddEventsPage() {
         saveLabel={editingEvent ? "Save changes" : "Create event"}
         onSubmit={handleSaveEvent}
         // Draft button shows when creating, or when editing a non-draft event
-        onSaveDraft={editingEvent?.status === "draft" ? undefined : handleSaveDraft}
+        // onSaveDraft={editingEvent?.status === "draft" ? undefined : handleSaveDraft}
       >
         <EventFields
           values={formValues}
@@ -738,33 +739,6 @@ export default function AddEventsPage() {
         />
       </CommonDialog>
 
-   {/* Delete confirmation */}
-{/* <ConfirmDialog
-  open={deletingEvent !== null}
-  onOpenChange={(isOpen) => {
-    if (!isOpen) setDeletingEvent(null);
-  }}
-  icon={Trash2}
-  variant="danger"
-  title="Delete event?"
-  description={
-    deletingEvent && (
-      <>
-        <span className="font-medium text-primary">{deletingEvent.title}</span>{" "}
-        will be removed permanently. This cannot be undone.
-        {deletingEvent.registered > 0 && (
-          <span className="mt-3 block rounded-lg bg-danger/10 px-3 py-2 text-danger">
-            {deletingEvent.registered}{" "}
-            {deletingEvent.registered === 1 ? "person is" : "people are"} already
-            registered for this event.
-          </span>
-        )}
-      </>
-    )
-  }
-  confirmLabel="Delete event"
-  onConfirm={handleDeleteEvent}
-/> */}
 
 <ConfirmDialog
   open={deletingEvent !== null}

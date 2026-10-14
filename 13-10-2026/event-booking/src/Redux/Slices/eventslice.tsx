@@ -1,11 +1,15 @@
-import { createSelector, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSelector,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import {
   events as seedEvents,
   parseAgenda,
   type CreateEventInput,
   type Event,
-} from "../../data/events/events"; 
+} from "../../data/events/events";
 
 // ---------- agenda helpers (agenda is stored as one string: "a | b | c") ----------
 
@@ -35,7 +39,6 @@ const normalize = <T extends Partial<CreateEventInput>>(data: T): T => {
   return next;
 };
 
-
 interface EventsState {
   items: Event[];
 }
@@ -61,7 +64,7 @@ const eventsSlice = createSlice({
     // UPDATE – partial changes by id
     eventUpdated(
       state,
-      action: PayloadAction<{ id: number; changes: Partial<CreateEventInput> }>
+      action: PayloadAction<{ id: number; changes: Partial<CreateEventInput> }>,
     ) {
       const { id, changes } = action.payload;
       const index = state.items.findIndex((e) => e.id === id);
@@ -81,12 +84,38 @@ const eventsSlice = createSlice({
     // Extras that fit this data model
     eventStatusToggled(state, action: PayloadAction<number>) {
       const event = state.items.find((e) => e.id === action.payload);
-      if (event) event.status = event.status === "draft" ? "published" : "draft";
+      if (event)
+        event.status = event.status === "draft" ? "published" : "draft";
     },
 
     eventRegistered(state, action: PayloadAction<number>) {
       const event = state.items.find((e) => e.id === action.payload);
       if (event && event.registered < event.capacity) event.registered += 1;
+    },
+
+    // a booking was made: take its seats (never above capacity)
+    seatsBooked(state, action: PayloadAction<{ id: number; tickets: number }>) {
+      const event = state.items.find((e) => e.id === action.payload.id);
+      if (event) {
+        event.registered = Math.min(
+          event.capacity,
+          event.registered + action.payload.tickets,
+        );
+      }
+    },
+
+    // a booking was cancelled: give its seats back (never below 0)
+    seatsReleased(
+      state,
+      action: PayloadAction<{ id: number; tickets: number }>,
+    ) {
+      const event = state.items.find((e) => e.id === action.payload.id);
+      if (event) {
+        event.registered = Math.max(
+          0,
+          event.registered - action.payload.tickets,
+        );
+      }
     },
   },
 });
@@ -97,6 +126,8 @@ export const {
   eventDeleted,
   eventStatusToggled,
   eventRegistered,
+  seatsBooked,
+  seatsReleased
 } = eventsSlice.actions;
 
 export default eventsSlice.reducer;
@@ -108,11 +139,13 @@ export const selectAllEvents = (state: RootState) => state.events.items;
 export const selectEventById = (state: RootState, id: number) =>
   state.events.items.find((e) => e.id === id);
 
-export const selectPublishedEvents = createSelector([selectAllEvents], (items) =>
-  items.filter((e) => e.status === "published")
+export const selectPublishedEvents = createSelector(
+  [selectAllEvents],
+  (items) => items.filter((e) => e.status === "published"),
 );
 
 /** Agenda of one event as a string[] (memoised, split on " | ") */
-export const selectAgendaByEventId = createSelector([selectEventById], (event) =>
-  event ? parseAgenda(event) : []
+export const selectAgendaByEventId = createSelector(
+  [selectEventById],
+  (event) => (event ? parseAgenda(event) : []),
 );

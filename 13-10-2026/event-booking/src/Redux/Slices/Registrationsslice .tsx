@@ -10,12 +10,14 @@ const registrationsSlice = createSlice({
       const nextId = state.items.reduce((max, r) => Math.max(max, r.id), 0) + 1;
       state.items.push({ ...action.payload, id: nextId });
     },
+    // cancel = remove the booking from the list
+    registrationRemoved(state, action: PayloadAction<number>) {
+      state.items = state.items.filter((r) => r.id !== action.payload);
+    },
   },
 });
 
-export const { registrationAdded } = registrationsSlice.actions;
+export const { registrationAdded, registrationRemoved } = registrationsSlice.actions;
 export default registrationsSlice.reducer;
 
-// export const selectAllRegistrations = (state: RootState) => state.registrations.items;
-// export const selectRegistrationsByEvent = (state: RootState, eventId: number) =>
-//   state.registrations.items.filter((r) => r.event_id === eventId);
+export const selectAllRegistrations = (state: RootState) => state.registrations.items;

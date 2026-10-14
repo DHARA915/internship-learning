@@ -1,4 +1,4 @@
-export type PaymentMethod = "upi" | "card" | "netbanking";
+export type PaymentMethod = "upi" | "card" | "netbanking" | "free";
 
 // Flat on purpose: no nested objects. Unused payment fields are empty strings.
 export interface Registration {
@@ -15,6 +15,7 @@ export interface Registration {
   total_amount: number;
   payment_method: PaymentMethod;
   upi_id: string;
+  qr_code?:string;
   card_name: string;
   card_last4: string; // never store the full card number or CVV
   bank_name: string;

@@ -4,7 +4,8 @@ import registrationReducer from '../Redux/Slices/Registrationsslice '
 
 export const store = configureStore({
   reducer: {
-    events:eventReducer
+    events:eventReducer,
+    registrations:registrationReducer,
   },
 });
 

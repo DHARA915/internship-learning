@@ -26,7 +26,7 @@ export const adminLinks: NavLink[] = [
 export const userLinks: NavLink[] = [
   { title: "Events", href: "/events", icon: CalendarDays },
   { title: "My bookings", href: "/booking", icon: Ticket },
-  { title: "Register", href: "/register", icon: Ticket },
+  // { title: "Register", href: "/register", icon: Ticket },
 ];
 
 export const getLinks = (role: Role): NavLink[] =>
