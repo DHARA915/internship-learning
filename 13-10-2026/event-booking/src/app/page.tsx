@@ -56,8 +56,8 @@ const roles: RoleCard[] = [
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-4xl">
+    <main className="flex min-h-dvh w-full items-center justify-center px-4">
+  <div className="w-full max-w-4xl">
         {/* Brand */}
         <div className="mb-8 flex items-center justify-center gap-3">
           <div className="flex size-11 items-center justify-center rounded-xl bg-button-primary text-primary-foreground">

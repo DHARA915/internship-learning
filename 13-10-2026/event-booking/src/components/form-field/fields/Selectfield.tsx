@@ -10,7 +10,7 @@ import { FieldWrapper } from "../Fieldwrapper ";
 import type { SelectFieldProps } from "./Types";
 
 const inputCls =
-  " rounded-lg border border-line bg-primary text-primary placeholder:text-tertiary";
+  " rounded-lg border border-line bg-primary text-foreground placeholder:text-tertiary";
 
 export function SelectField({
   name,
@@ -52,7 +52,7 @@ export function SelectField({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 
-        <SelectContent className="rounded-lg border-line bg-primary text-primary">
+        <SelectContent className="rounded-lg border-line text-black">
           {options.map((o) => (
             <SelectItem
               key={o.value}

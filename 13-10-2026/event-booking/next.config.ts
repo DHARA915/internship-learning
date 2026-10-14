@@ -7,8 +7,10 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
-  reactCompiler: true,
+  reactCompiler: false,
+
   turbopack: {
+    root: "D:/vs code/internship-learning/13-10-2026/event-booking",
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

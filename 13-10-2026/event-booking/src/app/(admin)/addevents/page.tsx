@@ -1,3 +1,4 @@
+// app/(admin)/addevents/page.tsx
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
@@ -7,6 +8,7 @@ import {
   Minus,
   PencilLine,
   Plus,
+  Send,
   Trash2,
 } from "lucide-react";
 import {
@@ -20,7 +22,6 @@ import {
   agendaToList,
   eventAdded,
   eventDeleted,
-  eventStatusToggled,
   eventUpdated,
   listToAgenda,
   selectAllEvents,
@@ -29,9 +30,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import FormField from "@/components/form-field/FormField";
 import { DataTable, type DataTableColumn } from "@/components/DataTable";
-import { CommonDialog, type FormValues } from "@/components/CommonDialog";
+import { CommonDialog } from "@/components/CommonDialog";
 import { cn } from "cn";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
+type FormValues = Record<string, any>;
 type Tab = "all" | "published" | "draft" | "closed";
 type Status = Exclude<Tab, "all">;
 
@@ -44,6 +47,7 @@ const TABS: { key: Tab; label: string }[] = [
 
 const CAPACITY_STEP = 10;
 
+// Full class names so Tailwind can see them
 const categoryTile: Record<EventCategory, string> = {
   Technology: "bg-cat-technology",
   Business: "bg-cat-business",
@@ -58,16 +62,21 @@ const statusBadge = {
   draft: { variant: "option", label: "Draft" },
 } as const;
 
-// Draft -> "draft", published but full -> "closed", otherwise "published"
+// Draft -> "draft"
+// closed manually, or published but sold out -> "closed"
+// otherwise -> "published"
+// NOTE: Event["status"] must be "draft" | "published" | "closed"
 const getTab = (event: Event): Status =>
   event.status === "draft"
     ? "draft"
-    : seatsLeft(event) === 0
+    : event.status === "closed" || seatsLeft(event) === 0
       ? "closed"
       : "published";
 
 const formatDate = (event: Event) => {
   const eventDate = new Date(`${event.date}T${event.start_time}`);
+  if (Number.isNaN(eventDate.getTime())) return "Date not set";
+
   const day = eventDate.toLocaleDateString("en-IN", {
     weekday: "short",
     day: "numeric",
@@ -101,6 +110,7 @@ const PRICE_TYPE_OPTIONS = [
 const STATUS_OPTIONS = [
   { label: "Draft", value: "draft" },
   { label: "Published", value: "published" },
+  { label: "Closed", value: "closed" },
 ];
 
 const NEW_EVENT_DEFAULTS: FormValues = {
@@ -117,23 +127,26 @@ const eventToFormValues = (event: Event): FormValues => ({
   agenda: agendaToList(event.agenda ?? "").join("\n"),
 });
 
+// safe string: undefined/null -> "" (so drafts never store the text "undefined")
+const text = (value: unknown) => String(value ?? "").trim();
+
 const toEventInput = (values: FormValues): CreateEventInput => {
   const isPaid = values.price_type === "paid";
 
   return {
-    title: String(values.title).trim(),
+    title: text(values.title),
     category: values.category,
-    description: String(values.description).trim(),
-    date: values.date,
-    start_time: values.start_time,
-    end_time: values.end_time,
-    venue: String(values.venue).trim(),
-    city: String(values.city).trim(),
-    speaker: String(values.speaker).trim(),
-    speaker_role: String(values.speaker_role ?? "").trim(),
+    description: text(values.description),
+    date: values.date ?? "",
+    start_time: values.start_time ?? "",
+    end_time: values.end_time ?? "",
+    venue: text(values.venue),
+    city: text(values.city),
+    speaker: text(values.speaker),
+    speaker_role: text(values.speaker_role),
     agenda: listToAgenda(String(values.agenda ?? "").split("\n")),
     price_type: values.price_type,
-    price: isPaid ? Number(values.price) : 0,
+    price: isPaid ? Number(values.price) || 0 : 0,
     capacity: Number(values.capacity),
     status: values.status,
   } as CreateEventInput;
@@ -190,7 +203,6 @@ const EventFields = ({
   registered,
 }: FormContext & { registered: number }) => (
   <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
-    <SectionTitle>Basics</SectionTitle>
 
     <FormField
       type="text"
@@ -237,8 +249,6 @@ const EventFields = ({
       required
       className="sm:col-span-2"
     />
-
-    <SectionTitle>Schedule and venue</SectionTitle>
 
     <FormField
       type="date"
@@ -329,8 +339,6 @@ const EventFields = ({
       className="sm:col-span-2"
     />
 
-    <SectionTitle>Tickets</SectionTitle>
-
     <FormField
       type="number"
       name="capacity"
@@ -381,6 +389,15 @@ export default function AddEventsPage() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
 
+  // the page owns the form state, CommonDialog only shows it
+  const [formValues, setFormValues] = useState<FormValues>(NEW_EVENT_DEFAULTS);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  const setFormValue = (name: string, value: any) => {
+    setFormValues((previousValues) => ({ ...previousValues, [name]: value }));
+    setFormErrors((previousErrors) => ({ ...previousErrors, [name]: "" }));
+  };
+
   const changeCapacity = (event: Event, delta: number) =>
     dispatch(
       eventUpdated({
@@ -390,8 +407,12 @@ export default function AddEventsPage() {
       }),
     );
 
+  const setEventStatus = (event: Event, status: Event["status"]) =>
+    dispatch(eventUpdated({ id: event.id, changes: { status } }));
+
+  // published -> closed, closed or draft -> published
   const toggleRegistration = (event: Event) =>
-    dispatch(eventStatusToggled(event.id));
+    setEventStatus(event, getTab(event) === "published" ? "closed" : "published");
 
   const counts = useMemo(
     () => ({
@@ -414,27 +435,59 @@ export default function AddEventsPage() {
         event.venue,
         event.city,
         event.speaker,
-      ].some((fieldValue) => fieldValue.toLowerCase().includes(searchText));
+      ].some((fieldValue) => (fieldValue ?? "").toLowerCase().includes(searchText));
     });
   }, [events, tab, query]);
 
   const handleNewEvent = () => {
     setEditingEvent(null);
+    setFormValues(NEW_EVENT_DEFAULTS);
+    setFormErrors({});
     setIsFormOpen(true);
   };
 
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
+    setFormValues(eventToFormValues(event));
+    setFormErrors({});
     setIsFormOpen(true);
   };
 
-  const handleSaveEvent = (values: FormValues) => {
-    const eventInput = toEventInput(values);
+  // returns false to keep the dialog open when validation fails
+  const handleSaveEvent = () => {
+    const errors = validateEvent(formValues, editingEvent?.registered ?? 0);
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) return false;
+
+    const eventInput = toEventInput(formValues);
 
     if (editingEvent) {
       dispatch(eventUpdated({ id: editingEvent.id, changes: eventInput }));
     } else {
       dispatch(eventAdded(eventInput));
+    }
+  };
+
+  // saves with status "draft"; only the title is required
+  const handleSaveDraft = () => {
+    if (!String(formValues.title ?? "").trim()) {
+      setFormErrors({ title: "Event title is required" });
+      return false;
+    }
+    setFormErrors({});
+
+    const draftInput = {
+      ...toEventInput(formValues),
+      status: "draft",
+      // keep capacity valid so the progress bar never divides by zero
+      capacity:
+        Number(formValues.capacity) || Math.max(1, editingEvent?.registered ?? 0),
+    } as CreateEventInput;
+
+    if (editingEvent) {
+      dispatch(eventUpdated({ id: editingEvent.id, changes: draftInput }));
+    } else {
+      dispatch(eventAdded(draftInput));
     }
   };
 
@@ -466,7 +519,7 @@ export default function AddEventsPage() {
         <>
           <p className="font-medium">{formatDate(event)}</p>
           <p className="text-muted-foreground">
-            {event.venue}, {event.city}
+            {[event.venue, event.city].filter(Boolean).join(", ")}
           </p>
         </>
       ),
@@ -475,7 +528,9 @@ export default function AddEventsPage() {
       key: "capacity",
       header: "Capacity",
       cell: (event) => {
-        const percentSold = Math.round((event.registered / event.capacity) * 100);
+        const percentSold = event.capacity
+          ? Math.round((event.registered / event.capacity) * 100)
+          : 0;
         return (
           <div className="flex flex-col gap-2">
             <div className="inline-flex w-fit items-center rounded-lg border border-line-strong">
@@ -531,19 +586,19 @@ export default function AddEventsPage() {
       header: "Registration",
       cell: (event) => {
         const status = getTab(event);
+        // ON only when Published. Closed and Draft are OFF.
         const registrationOn = status === "published";
         const badge = statusBadge[status];
         return (
           <div className="flex items-center gap-3">
-            <button
+            <Button
               type="button"
               role="switch"
               aria-checked={registrationOn}
               aria-label={`Registration for ${event.title}`}
-              disabled={seatsLeft(event) === 0}
               onClick={() => toggleRegistration(event)}
               className={cn(
-                "relative h-6 w-10 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+                "relative h-6 w-10 shrink-0 rounded-full transition-colors",
                 registrationOn ? "bg-button-primary" : "bg-line-strong",
               )}
             >
@@ -553,7 +608,7 @@ export default function AddEventsPage() {
                   registrationOn && "translate-x-4",
                 )}
               />
-            </button>
+            </Button>
             <Badge variant={badge.variant} className="h-6 px-3">
               {badge.label}
             </Badge>
@@ -566,9 +621,19 @@ export default function AddEventsPage() {
       header: "Actions",
       srOnlyHeader: true,
       align: "right",
-      headerClassName: "w-28",
+      headerClassName: "w-44",
       cell: (event) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex items-center justify-end gap-2">
+          {event.status === "draft" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEventStatus(event, "published")}
+            >
+              <Send />
+              Publish
+            </Button>
+          )}
           <Button
             variant="outline"
             size="icon"
@@ -660,39 +725,74 @@ export default function AddEventsPage() {
             ? "Update the details attendees see for this event."
             : "Add the details attendees will see. You can change them later."
         }
-        defaultValues={
-          editingEvent ? eventToFormValues(editingEvent) : NEW_EVENT_DEFAULTS
-        }
-        validate={(values) => validateEvent(values, editingEvent?.registered ?? 0)}
         saveLabel={editingEvent ? "Save changes" : "Create event"}
         onSubmit={handleSaveEvent}
+        // Draft button shows when creating, or when editing a non-draft event
+        onSaveDraft={editingEvent?.status === "draft" ? undefined : handleSaveDraft}
       >
-        {(context) => (
-          <EventFields {...context} registered={editingEvent?.registered ?? 0} />
-        )}
+        <EventFields
+          values={formValues}
+          setValue={setFormValue}
+          errors={formErrors}
+          registered={editingEvent?.registered ?? 0}
+        />
       </CommonDialog>
 
-      {/* Delete confirmation */}
-      <CommonDialog
-        open={deletingEvent !== null}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) setDeletingEvent(null);
-        }}
-        icon={<Trash2 />}
-        title="Delete event?"
-        description={
-          deletingEvent
-            ? `"${deletingEvent.title}" will be removed permanently.${
-                deletingEvent.registered > 0
-                  ? ` ${deletingEvent.registered} people are already registered.`
-                  : ""
-              }`
-            : undefined
-        }
-        saveLabel="Delete event"
-        saveVariant="destructive"
-        onSubmit={handleDeleteEvent}
-      />
+   {/* Delete confirmation */}
+{/* <ConfirmDialog
+  open={deletingEvent !== null}
+  onOpenChange={(isOpen) => {
+    if (!isOpen) setDeletingEvent(null);
+  }}
+  icon={Trash2}
+  variant="danger"
+  title="Delete event?"
+  description={
+    deletingEvent && (
+      <>
+        <span className="font-medium text-primary">{deletingEvent.title}</span>{" "}
+        will be removed permanently. This cannot be undone.
+        {deletingEvent.registered > 0 && (
+          <span className="mt-3 block rounded-lg bg-danger/10 px-3 py-2 text-danger">
+            {deletingEvent.registered}{" "}
+            {deletingEvent.registered === 1 ? "person is" : "people are"} already
+            registered for this event.
+          </span>
+        )}
+      </>
+    )
+  }
+  confirmLabel="Delete event"
+  onConfirm={handleDeleteEvent}
+/> */}
+
+<ConfirmDialog
+  open={deletingEvent !== null}
+  onOpenChange={(isOpen) => {
+    if (!isOpen) setDeletingEvent(null);
+  }}
+  icon={Trash2}
+  variant="danger"
+  title="Delete event?"
+  description={
+    deletingEvent && (
+      <>
+        <span className="font-medium text-foreground">{deletingEvent.title}</span>{" "}
+        will be removed permanently. This cannot be undone.
+        {deletingEvent.registered > 0 && (
+          <span className="mt-3 block rounded-lg bg-danger-soft px-3 py-2 text-danger">
+            {deletingEvent.registered}{" "}
+            {deletingEvent.registered === 1 ? "person is" : "people are"} already
+            registered for this event.
+          </span>
+        )}
+      </>
+    )
+  }
+  confirmLabel="Delete event"
+  onConfirm={handleDeleteEvent}
+/>
+
     </div>
   );
 }

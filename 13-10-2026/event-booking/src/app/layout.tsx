@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
-      <body className="min-h-screen w-fit">
+      <body className="min-h-screen ">
 
         <Providers>
 

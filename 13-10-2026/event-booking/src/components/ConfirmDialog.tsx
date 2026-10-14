@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, Trash2, type LucideIcon } from "lucide-react";
+import { Loader2, type LucideIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,7 +36,7 @@ export function ConfirmDialog({
   onOpenChange,
   title = "",
   description = "",
-  confirmLabel,
+  confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   variant = "danger",
   icon: Icon,
@@ -46,7 +46,6 @@ export function ConfirmDialog({
   const isDanger = variant === "danger";
 
   async function handleConfirm(e: React.MouseEvent) {
-    // keep dialog open until the async action finishes
     e.preventDefault();
     setLoading(true);
     try {
@@ -59,64 +58,59 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={(o) => !loading && onOpenChange(o)}>
-      <AlertDialogContent className="gap-0 overflow-hidden rounded-2xl border-line bg-primary p-0 shadow-xl sm:max-w-md">
-        <AlertDialogHeader className="gap-4 px-6 pb-5 pt-6 text-left">
+      {/* "!" forces the white card colour even if alert-dialog.tsx sets its own background */}
+      <AlertDialogContent className="gap-0 overflow-hidden rounded-2xl border border-line bg-card! p-0 shadow-xl sm:max-w-md">
+        <AlertDialogHeader className="flex-row items-start gap-4 p-6 pb-5 text-left">
           {Icon && (
             <div
+              aria-hidden="true"
               className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-full",
+                "flex size-11 shrink-0 items-center justify-center rounded-xl",
                 isDanger
-                  ? "bg-danger/10 text-danger"
-                  : "bg-brand-soft text-brand",
+                  ? "bg-danger-soft text-danger"
+                  : "bg-muted text-foreground",
               )}
             >
-              <div
-                className={cn(
-                  "flex h-11 w-11 items-center justify-center rounded-full",
-                  isDanger
-                    ? "bg-danger/10 text-danger"
-                    : "bg-brand-soft text-brand",
-                )}
-              >
-                <Icon className="h-5 w-5" />
-              </div>
+              <Icon className="size-5" />
             </div>
           )}
 
-          <div className="space-y-1">
-            <AlertDialogTitle className="text-lg font-semibold leading-6 tracking-tight text-primary">
+          <div className="min-w-0 space-y-1.5">
+            <AlertDialogTitle className="text-lg font-semibold leading-6 tracking-tight text-foreground">
               {title}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm leading-relaxed text-secondary">
+            <AlertDialogDescription className="text-sm leading-relaxed text-muted-foreground">
               {description}
             </AlertDialogDescription>
           </div>
         </AlertDialogHeader>
 
-        <AlertDialogFooter className="gap-2 border-t border-line bg-primary px-6 py-4 sm:justify-end">
-          <div className="flex gap-1.5">
-            <AlertDialogCancel
-              disabled={loading}
-              className="mt-0 cursor-pointer rounded-lg border-line bg-tertiary text-primary"
-            >
-              {cancelLabel}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              disabled={loading}
-              onClick={handleConfirm}
-              className={cn(
-                "cursor-pointer rounded-lg shadow-sm",
-                isDanger
-                  ? "bg-danger text-white hover:bg-danger/90"
-                  : "bg-button-primary text-on-brand hover:bg-success-soft",
-              )}
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {confirmLabel}
-            </AlertDialogAction>
-          </div>
+        {/* Same white surface as the body: no tinted strip, no divider */}
+        <AlertDialogFooter className="flex-col-reverse gap-2 bg-card px-6  py-3 sm:flex-row  sm:justify-end">
+          <AlertDialogCancel
+            disabled={loading}
+            className="mt-0 rounded-lg border-line-strong bg-card text-foreground shadow-none hover:bg-muted"
+          >
+            {cancelLabel}
+          </AlertDialogCancel>
+
+          <AlertDialogAction
+            disabled={loading}
+            onClick={handleConfirm}
+            className={cn(
+              "rounded-lg shadow-sm",
+              isDanger
+                ? "bg-danger text-white hover:bg-danger/90 focus-visible:outline-danger"
+                : "bg-button-primary text-primary-foreground hover:bg-button-primary-hover",
+            )}
+          >
+            {loading && <Loader2 className="size-4 animate-spin" />}
+            {confirmLabel}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
+
+
