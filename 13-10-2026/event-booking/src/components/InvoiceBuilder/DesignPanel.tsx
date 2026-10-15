@@ -389,7 +389,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
         </p>
       )}
 
-      <div className="flex flex-wrap justify-between gap-3">
+      {/* <div className="flex flex-wrap justify-between gap-3">
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
@@ -401,7 +401,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
             Save invoice
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

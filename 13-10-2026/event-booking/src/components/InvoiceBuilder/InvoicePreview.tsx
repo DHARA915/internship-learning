@@ -48,6 +48,8 @@ export  const InvoicePreview = ({ className }: InvoicePreviewProps) => {
 
   const { design, business, items } = draft;
   const accent = THEME_COLORS[design.theme];
+
+
   const soft = `color-mix(in srgb, ${accent} 12%, white)`;
   const customer = customers.find((item) => item.id === draft.customer_id);
   const term = PAYMENT_TERMS.find((option) => option.value === draft.payment_term);

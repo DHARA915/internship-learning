@@ -83,9 +83,6 @@ function InvoiceBuilder({ onReset }: { onReset: () => void }) {
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
             Create invoice
           </h1>
-          <p className="mt-1 text-muted-foreground">
-            {draft.invoice_number || "New invoice"} · {saved.length} saved
-          </p>
         </div>
 
         {/* <Button type="button" variant="outline" onClick={reset}>

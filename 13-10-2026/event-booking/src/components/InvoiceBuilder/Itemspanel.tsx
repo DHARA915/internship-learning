@@ -31,6 +31,11 @@ type ItemsPanelProps = {
   onNext: () => void;
 };
 
+const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+  <h3 className="col-span-full mt-2 whitespace-nowrap text-[14px] font-bold text-brand first:mt-0">
+    {children}
+  </h3>
+);
 
 
 export function ItemsPanel({ visibleErrors, onBack, onNext }: ItemsPanelProps) {
@@ -39,8 +44,8 @@ export function ItemsPanel({ visibleErrors, onBack, onNext }: ItemsPanelProps) {
   const totals = calcTotals(draft);
 
   return (
-    <div className="flex flex-col gap-5">
-      <h3 className="text-sm font-semibold">Line items</h3>
+    <div className="flex flex-col gap-2">
+      <SectionTitle>Line items</SectionTitle>  
 
       {visibleErrors.general && (
         <p className="text-sm text-danger" role="alert">
@@ -134,18 +139,18 @@ export function ItemsPanel({ visibleErrors, onBack, onNext }: ItemsPanelProps) {
       })}
 
       <div>
-        <Button type="button" variant="outline" onClick={() => dispatch(itemAdded())}>
+        <Button type="button" variant="primary" onClick={() => dispatch(itemAdded())}>
           <Plus />
           Add item
         </Button>
       </div>
 
       {/* Tax + totals */}
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
+        <SectionTitle>Tax rate  </SectionTitle>
         <FormField
           type="select"
           name="tax_rate"
-          label="Tax rate"
           options={TAX_OPTIONS}
           value={String(draft.tax_rate)}
           onChange={(value) => dispatch(taxRateChanged(Number(value)))}
