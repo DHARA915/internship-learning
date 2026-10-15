@@ -6,6 +6,7 @@ import {
   CalendarDays,
   LayoutGrid,
   Ticket,
+  FileText,
   type LucideIcon,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
@@ -52,6 +53,20 @@ const roles: RoleCard[] = [
     iconClass: "bg-warning-soft text-accent-foreground",
     ctaVariant: "accent",
   },
+ {
+title: "Invoice Builder",
+description: "Create and Manage Invoices",
+points: [
+"Create and customize invoices",
+"Calculate taxes, discounts, and totals",
+"Preview, save, and download invoices as PDF",
+],
+href: "/invoiceBuilder",
+cta: "Create an invoice",
+icon: FileText,
+iconClass: "bg-brand-soft text-brand",
+ctaVariant: "primary",
+},
 ];
 
 export default function Home() {
@@ -80,7 +95,7 @@ export default function Home() {
         </div>
 
         {/* Role cards */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-3">
           {roles.map(
             ({
               title,
