@@ -55,7 +55,7 @@ export function SelectField({
         <SelectTrigger
           id={name}
           aria-invalid={!!error}
-          className="w-full rounded-lg border-line bg-primary text-foreground"
+          className="w-full rounded-lg border-line text-foreground"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

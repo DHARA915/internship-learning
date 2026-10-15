@@ -150,6 +150,13 @@ export const TAX_RATES: { label: string; value: number }[] = [
   { label: "GST 28%", value: 28 },
 ];
 
+export const THEME_COLORS: Record<InvoiceTheme, string> = {
+  blue: "#2563eb",
+  purple: "#7c3aed",
+  green: "#16a34a",
+  orange: "#ea580c",
+  slate: "#475569",
+};
 
 /* ---------- date helpers (yyyy-mm-dd strings, no timezone surprises) ---------- */
 

@@ -1,4 +1,3 @@
-
 // app/page.tsx  (route: "/")
 import Link from "next/link";
 import {
@@ -27,7 +26,8 @@ type RoleCard = {
 const roles: RoleCard[] = [
   {
     title: "I'm an attendee",
-    description: "Find events, book your seat and keep your passes in one place.",
+    description:
+      "Find events, book your seat and keep your passes in one place.",
     points: [
       "Browse events by category",
       "Register in a couple of taps",
@@ -53,26 +53,26 @@ const roles: RoleCard[] = [
     iconClass: "bg-warning-soft text-accent-foreground",
     ctaVariant: "accent",
   },
- {
-title: "Invoice Builder",
-description: "Create and Manage Invoices",
-points: [
-"Create and customize invoices",
-"Calculate taxes, discounts, and totals",
-"Preview, save, and download invoices as PDF",
-],
-href: "/invoiceBuilder",
-cta: "Create an invoice",
-icon: FileText,
-iconClass: "bg-brand-soft text-brand",
-ctaVariant: "primary",
-},
+  {
+    title: "Invoice Builder",
+    description: "Create and Manage Invoices",
+    points: [
+      "Create and customize invoices",
+      "Calculate taxes, discounts, and totals",
+      "Preview, save, and download invoices as PDF",
+    ],
+    href: "/invoiceBuilder",
+    cta: "Create an invoice",
+    icon: FileText,
+    iconClass: "bg-brand-soft text-brand",
+    ctaVariant: "primary",
+  },
 ];
 
 export default function Home() {
   return (
     <main className="flex min-h-dvh w-full items-center justify-center px-4">
-  <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl">
         {/* Brand */}
         <div className="mb-8 flex items-center justify-center gap-3">
           <div className="flex size-11 items-center justify-center rounded-xl bg-button-primary text-primary-foreground">
