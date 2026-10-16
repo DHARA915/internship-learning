@@ -295,7 +295,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
               const selected = design.theme === option.value;
               const color = THEME_COLORS[option.value];
               return (
-                <button
+                <Button
                   key={option.value}
                   type="button"
                   role="radio"
@@ -312,7 +312,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
                   }}
                 >
                   {selected && <Check className="size-4 text-white" />}
-                </button>
+                </Button>
               );
             })}
           </div>

@@ -204,7 +204,7 @@ export const createEmptyDraft = (): InvoiceDraft => {
       template: "modern",
       theme: "blue",
       font: "inter",
-      logo: "",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlIidiIWaF3GitkfdZg5fGpk7_jocvLqXmuW7TrPPovw&s=10",
       show_notes: true,
       show_payment_terms: true,
       show_business_info: true,

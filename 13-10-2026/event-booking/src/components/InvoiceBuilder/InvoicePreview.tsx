@@ -260,5 +260,5 @@ export  const InvoicePreview = ({ className }: InvoicePreviewProps) => {
       </div>
     </div>
   );
-}
+} 
 
