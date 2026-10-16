@@ -4,12 +4,17 @@ import {
   LayoutGrid,
   Ticket,
   Users,
+  Package,
+  Tags,
+  Boxes,
+  Truck,
+  LayoutDashboard,
   type LucideIcon,
 } from "lucide-react";
 
 export const APP_NAME = "Admit";
 
-export type Role = "admin" | "user";
+export type Role = "admin" | "user"| "inventory";
 
 export type NavLink = {
   title: string;
@@ -29,8 +34,47 @@ export const userLinks: NavLink[] = [
   // { title: "Register", href: "/register", icon: Ticket },
 ];
 
-export const getLinks = (role: Role): NavLink[] =>
-  role === "admin" ? adminLinks : userLinks;
+export const inventoryLinks: NavLink[] = [
+  {
+    title: "Dashboard",
+    href: "/inventoryDashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Products",
+    href: "/products",
+    icon: Package,
+  },
+  {
+    title: "Category",
+    href: "/category",
+    icon: Tags,
+  },
+  {
+    title: "Stock Management",
+    href: "/stockmanagement",
+    icon: Boxes,
+  },
+  {
+    title: "Suppliers",
+    href: "/suppliers",
+    icon: Truck,
+  },
+];
+
+export const getLinks = (role: Role): NavLink[] => {
+  switch (role) {
+    case "admin":
+      return adminLinks;
+
+    case "inventory":
+      return inventoryLinks;
+
+    case "user":
+    default:
+      return userLinks;
+  }
+};
 
 const matches = (href: string, pathname: string) =>
   href === "/"

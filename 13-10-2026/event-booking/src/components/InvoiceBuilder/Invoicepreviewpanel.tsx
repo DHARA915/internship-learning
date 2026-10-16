@@ -91,6 +91,7 @@ export function InvoicePreviewPanel() {
           >
             <div
               ref={sheetRef}
+              id="invoice-sheet"
               style={{ width: SHEET_WIDTH, transform: `scale(${scale})`, transformOrigin: "top left" }}
             >
               <InvoicePreview />

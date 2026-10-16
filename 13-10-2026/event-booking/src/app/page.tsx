@@ -6,6 +6,7 @@ import {
   LayoutGrid,
   Ticket,
   FileText,
+  Boxes,
   type LucideIcon,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
@@ -64,6 +65,20 @@ const roles: RoleCard[] = [
     href: "/invoiceBuilder",
     cta: "Create an invoice",
     icon: FileText,
+    iconClass: "bg-brand-soft text-brand",
+    ctaVariant: "primary",
+  },
+    {
+    title: "Inventory Management",
+    description: "Create and Manage Inventory",
+    points: [
+      "Add and manage products with stock details",
+      "Track stock levels, quantities, and inventory movements",
+      "Monitor low-stock items and keep inventory up to date",
+    ],
+    href: "/inventory/dashboard",
+    cta: "Manage inventory",
+    icon: Boxes,
     iconClass: "bg-brand-soft text-brand",
     ctaVariant: "primary",
   },
