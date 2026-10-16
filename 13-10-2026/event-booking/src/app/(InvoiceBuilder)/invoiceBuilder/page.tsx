@@ -83,6 +83,8 @@ function InvoiceBuilder({ onReset }: { onReset: () => void }) {
   `,
   });
 
+  console.log("Cheak all validatior:",checkAll)
+
   const download = () => {
     const invalidTab = checkAll();
 
@@ -109,6 +111,8 @@ function InvoiceBuilder({ onReset }: { onReset: () => void }) {
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
             Create invoice
           </h1>
+          
+          <div className="flex flex-col items-end gap-1">
 
           <Button type="button" onClick={download}>
             <Download />
@@ -119,6 +123,9 @@ function InvoiceBuilder({ onReset }: { onReset: () => void }) {
               {downloadError}
             </p>
           )}
+
+          </div>
+
         </div>
 
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)]">

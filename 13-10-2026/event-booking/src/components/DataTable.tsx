@@ -49,7 +49,7 @@ export function DataTable<T>({
   data,
   getRowKey,
   emptyMessage = "No results found.",
-  minWidth = 880,
+  minWidth,
   caption,
   onRowClick,
   rowClassName,

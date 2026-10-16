@@ -110,7 +110,7 @@ export default function Home() {
         </div>
 
         {/* Role cards */}
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-4">
           {roles.map(
             ({
               title,
