@@ -27,7 +27,6 @@ export default function BookingsPage() {
     [events],
   );
 
-  // console.log("EventBy Id: " , eventById)
 
   // newest booking first
   const sortedBookings = useMemo(

@@ -117,10 +117,6 @@ export default function RegisterPage() {
   const [result, setResult] = useState<{ code: string; qr: string } | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  // for verifying: logs the whole registrations list on load and after each save
-  useEffect(() => {
-    console.log("All registrations in store:", registrations);
-  }, [registrations]);
 
   const setValue = <K extends RegisterField>(
     name: K,
@@ -203,8 +199,7 @@ export default function RegisterPage() {
       qr_code: qr,
     };
 
-    // for verifying: remove before shipping
-    console.log("New registration:", newRegistration);
+
 
     dispatch(registrationAdded(newRegistration));
     dispatch(seatsBooked({id:event.id,tickets}))

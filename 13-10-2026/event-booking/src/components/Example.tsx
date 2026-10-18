@@ -90,7 +90,7 @@ const Example = () => {
     }
  
     const payload = {...form ,age:form.age?Number(form.age):null}; //Convert string age to number
-    console.log("Submitted Form:",payload)
+
 
     setForm(initialValues)
     setFieldErrors({});

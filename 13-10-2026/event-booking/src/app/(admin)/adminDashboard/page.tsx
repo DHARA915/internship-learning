@@ -28,7 +28,6 @@ const DashboardPage = () => {
   const events = useSelector(selectAllEvents);
   const registrations = useSelector(selectAllRegistrations);
 
-  console.log("All Registrations:",registrations)
 
   const data = useMemo(() => {
     const categoryByEventId = new Map(events.map((event) => [event.id, event.category]));

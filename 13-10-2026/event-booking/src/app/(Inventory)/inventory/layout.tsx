@@ -15,4 +15,4 @@ export default function InventoryLayout({
       </AppShell>
     </Suspense>
   );
-}pag
+}

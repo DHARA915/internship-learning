@@ -10,7 +10,8 @@ export type FieldType =
   | "select"
   | "radio"
   | "checkbox"
-  | "multiselect";
+  | "multiselect"
+  | "file";
 
 export type InputType = "text" | "email" | "password"|"search" | "number" | "tel" | "url"| "time"|"date";
 
@@ -19,6 +20,15 @@ export interface Option {
   value: string;
   disabled?: boolean;
 }
+
+// image upload props (value = saved image URL / data URL string)
+export type ImageFieldProps = BaseFieldProps<string> & {
+  maxSizeMB?: number; // default 5
+  placeholder?: string;
+  /** called with the picked image, or null when removed */
+  onFileChange?: (file: File | null, name: string) => void;
+  onValidate?: (error: string | undefined, name: string) => void;
+};
 
 /** Props shared by every field */
 export interface BaseFieldProps<V> {
@@ -33,11 +43,6 @@ export interface BaseFieldProps<V> {
   disabled?: boolean;
   className?: string;
 }
-
-// export type InputFieldProps = BaseFieldProps<string> & {
-//   type?: "text" | "email" | "password" | "number" | "tel" | "url";
-//   placeholder?: string;
-// };
 
 export interface InputFieldProps {
   name: string;
@@ -96,4 +101,5 @@ export type FormFieldProps =
   | ({ type: "radio" } & RadioFieldProps)
   | ({ type: "checkbox" } & CheckboxFieldProps)
   | ({ type: "multiselect" } & MultiSelectFieldProps)
-  | ({ type: "mySelect" });
+  | ({ type: "mySelect" })
+  | ({ type:"file"}) & ImageFieldProps

@@ -34,7 +34,7 @@
     DropdownMenuTrigger,
   } from "./ui/dropdown-menu";
   import {
-    Pagination,
+    Pagination, 
     PaginationContent,
     PaginationItem,
     PaginationLink,

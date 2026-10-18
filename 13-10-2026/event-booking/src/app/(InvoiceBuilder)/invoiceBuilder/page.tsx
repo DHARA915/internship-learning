@@ -83,7 +83,6 @@ function InvoiceBuilder({ onReset }: { onReset: () => void }) {
   `,
   });
 
-  console.log("Cheak all validatior:",checkAll)
 
   const download = () => {
     const invalidTab = checkAll();

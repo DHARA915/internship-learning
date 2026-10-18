@@ -24,6 +24,14 @@ const AppSidebar = ({ role, open, onClose }: AppSidebarProps) => {
   const links = getLinks(role);
   const activeHref = getActiveLink(links, pathname)?.href;
 
+
+  const roleLabel = {
+    admin: "Organizer",
+    inventory: "Inventory",
+    attendee: "Attendee",
+    user: "User",
+  }[role];
+
   return (
     <>
       {/* Mobile overlay */}
@@ -53,9 +61,9 @@ const AppSidebar = ({ role, open, onClose }: AppSidebarProps) => {
               <h2 className="truncate text-base font-bold leading-tight">
                 {APP_NAME}
               </h2>
-              <p className="text-xs text-muted-foreground">
-                {role === "admin" ? "Organizer" : "Attendee"}
-              </p>
+              
+               <p className="text-xs text-muted-foreground">{roleLabel}</p>
+              
             </div>
           </div>
 
@@ -72,9 +80,7 @@ const AppSidebar = ({ role, open, onClose }: AppSidebarProps) => {
 
         {/* Links */}
         <nav className="flex-1 px-3 py-4">
-          <p className="px-3 pb-2 text-xs font-medium text-muted-foreground">
-            {role === "admin" ? "Management" : "Browse"}
-          </p>
+          <p className="text-xs text-muted-foreground">{roleLabel}</p>
 
           <ul className="flex flex-col gap-1">
             {links.map(({ href, title, icon: Icon }) => {

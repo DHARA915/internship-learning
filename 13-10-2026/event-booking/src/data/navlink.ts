@@ -37,30 +37,31 @@ export const userLinks: NavLink[] = [
 export const inventoryLinks: NavLink[] = [
   {
     title: "Dashboard",
-    href: "/inventoryDashboard",
+    href: "/inventory/dashboard",
     icon: LayoutDashboard,
+  },
+    {
+    title: "Category",
+    href: "/inventory/category",
+    icon: Tags,
+  },
+    {
+    title: "Suppliers",
+    href: "/inventory/suppliers",
+    icon: Truck,
   },
   {
     title: "Products",
-    href: "/products",
+    href: "/inventory/products",
     icon: Package,
   },
   {
-    title: "Category",
-    href: "/category",
-    icon: Tags,
-  },
-  {
     title: "Stock Management",
-    href: "/stockmanagement",
+    href: "/inventory/stockManagement",
     icon: Boxes,
   },
-  {
-    title: "Suppliers",
-    href: "/suppliers",
-    icon: Truck,
-  },
 ];
+
 
 export const getLinks = (role: Role): NavLink[] => {
   switch (role) {

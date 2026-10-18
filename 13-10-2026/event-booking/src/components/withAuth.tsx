@@ -20,14 +20,10 @@ function withAuth<P extends object>(
   return function ProtectedComponent(props: P) {
     const currentUser = useSelector(
       (state: RootState) => state.auth.currentUser
-    );
-
-  console.log("currentUser", currentUser);
-
- 
+    ); 
 
     const userEmail = localStorage.getItem("userEmail");
-    console.log("userEmail", userEmail);
+
 
     // // Not logged in
     if (!userEmail) {

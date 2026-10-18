@@ -4,6 +4,7 @@ import { SelectField } from "../form-field/fields/Selectfield";
 import { RadioField } from "../form-field/fields/Radiofield";
 import { CheckboxField } from "../form-field/fields/CheckboxField";
 import { MultiSelectField } from "../form-field/fields/Multiselectfield";
+import { ImageField } from "./fields/ImageField";
 import type { FormFieldProps } from "./fields/Types.ts";
 import MySelect from "./fields/select";
 
@@ -38,6 +39,9 @@ const FormField = (props: FormFieldProps)=> {
 
     case "multiselect":
       return <MultiSelectField {...props} />;
+
+    case "file":
+    return <ImageField {...props} />
 
     case "text":
     case "email":

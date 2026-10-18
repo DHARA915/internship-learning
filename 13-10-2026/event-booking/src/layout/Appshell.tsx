@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState , Suspense } from "react";
+import { useState } from "react";
 import AppSidebar from "../components/Sidebar/AppSidebar";
 import AppHeader from "../components/Header/AppHeader";
 import type { Role } from "../data/navlink";
