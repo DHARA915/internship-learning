@@ -94,7 +94,7 @@ export function InvoicePreviewPanel() {
               id="invoice-sheet"
               style={{ width: SHEET_WIDTH, transform: `scale(${scale})`, transformOrigin: "top left" }}
             >
-              <InvoicePreview />
+              <InvoicePreview /><Playou></Playou>
             </div>
           </div>
         </div>

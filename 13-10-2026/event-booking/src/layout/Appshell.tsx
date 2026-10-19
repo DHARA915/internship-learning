@@ -16,7 +16,7 @@ const AppShell = ({ role, children }: AppShellProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen w-full lg:pl-64">
+    <div className="min-h-screen w-full max-w-full overflow-x-clip lg:pl-64">
 
       <AppSidebar
         role={role}

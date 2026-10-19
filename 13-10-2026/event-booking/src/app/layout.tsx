@@ -25,7 +25,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={cn("h-full", "antialiased", jakarta.variable, "font-sans", geist.variable)}>
-      <body className="min-h-screen ">
+      {/* <body className="min-h-screen "> */}
+      <body className="min-h-screen w-full overflow-x-clip">
 
         <Providers>
 

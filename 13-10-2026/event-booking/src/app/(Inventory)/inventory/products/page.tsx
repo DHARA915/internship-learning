@@ -2,8 +2,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { ImagePlus, PackagePlus, PencilLine, Plus, Trash2 } from "lucide-react";
+import { ImagePlus, PackagePlus,Eye,PencilLine, Plus, Trash2 } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import FormField from "@/components/form-field/FormField";
@@ -193,7 +194,7 @@ export default function ProductsPage() {
     },
     {
       key: "quantity",
-      header: "In stock",
+      header: "Total quantity",
       isSort: true,
       cell: (product) => (
         <span className={cn(product.quantity === 0 && "font-medium text-destructive")}>
@@ -209,6 +210,11 @@ export default function ProductsPage() {
       headerClassName: "w-28",
       cell: (product) => (
         <div className="flex items-center justify-end gap-2">
+               <Button  variant="outline" size="icon" aria-label={`View ${product.name}`}>
+        <Link href={`/inventory/products/${product.id}`}>
+          <Eye />
+        </Link>
+      </Button>
           <Button
             type="button"
             variant="outline"
@@ -274,15 +280,6 @@ export default function ProductsPage() {
       >
         <div className="flex flex-col gap-5">
           {/* Image (the only part that changed) */}
-          {/* <FormField
-            key={formKey}
-            type="file"
-            name="image"
-            label="Product image"
-            maxSizeMB={2}
-            value={values.image}
-            onFileChange={handleImageFile}
-          /> */}
 
           <FormField
             type="text"
@@ -361,7 +358,7 @@ export default function ProductsPage() {
               <FormField
                 type="number"
                 name="quantity"
-                label="Available quantity"
+                label="Total quantity"
                 placeholder="0"
                 value={values.quantity}
                 onChange={(value) => setField("quantity", value)}
@@ -378,6 +375,7 @@ export default function ProductsPage() {
             maxSizeMB={2}
             value={values.image}
             onFileChange={handleImageFile}
+            required
           />
 
         </div>
