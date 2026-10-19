@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import eventReducer from '../Redux/Slices/eventslice'
-import registrationReducer from '../Redux/Slices/Registrationsslice '
+import registrationReducer from '../Redux/Slices/Registrationsslice'
 import customerReducer from '@/Redux/Slices/InvoiceBuilder/customerslice'
 import invoiceReducer from "@/Redux/Slices/InvoiceBuilder/invoiceslice"
 import categoryReducer from '@/Redux/Slices/inventory/categoryslice'

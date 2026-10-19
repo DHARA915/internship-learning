@@ -1,4 +1,6 @@
-// data/Inventory/productdata.ts
+// data/product/productdata.ts
+
+// For Products listing...........................................................................................................................................................................
 export interface Product {
   id: number;
   name: string;
@@ -6,21 +8,26 @@ export interface Product {
   categoryId: number;
   sku: string;
   unitPrice: number;
+  /** Total quantity received. Set when the product is added; grows only on a restock. */
   quantity: number;
+  /** Quantity left to sell. Changes with every stock adjustment. */
+  availableQuantity: number;
   supplierId: number;
   image: string | null;
   created_at: string;
 }
 
-/** What the "add" form produces (no id / created_at). */
-export type ProductInput = Omit<Product, "id" | "created_at">;
+/** What the "add" form produces (no id / created_at / availableQuantity). */
+export type ProductInput = Omit<Product, "id" | "created_at" | "availableQuantity">;
 
 /** What "edit" may change: SKU and quantity are locked after creation. */
 export type ProductChanges = Omit<ProductInput, "sku" | "quantity">;
 
-/** The app starts with no products. */
+/** Seed rows only list the total; availableQuantity is filled in below. */
+type SeedProduct = Omit<Product, "availableQuantity">;
+
 /** Seed data: 10 Electronics (categoryId 1) + 10 Furniture (categoryId 2). */
-export const products: Product[] = [
+const seedProducts: SeedProduct[] = [
   /* ---------- Electronics ---------- */
   {
     id: 1,
@@ -265,6 +272,13 @@ export const products: Product[] = [
     created_at: "2026-09-10T08:50:00.000Z",
   },
 ];
+
+/** Every seed product starts with all of its stock available. */
+export const products: Product[] = seedProducts.map((product) => ({
+  ...product,
+  availableQuantity: product.quantity,
+}));
+
 /* ---------- form values (FormField gives strings) ---------- */
 
 export type ProductFormValues = {
@@ -274,7 +288,7 @@ export type ProductFormValues = {
   supplierId: string;
   unitPrice: string;
   quantity: string;
-  image: string; 
+  image: string;
 };
 
 export type ProductErrors = Partial<Record<keyof ProductFormValues, string>>;
@@ -381,3 +395,145 @@ export const validateProduct = (
 
   return errors;
 };
+
+// For Products Movement ...............................................................................................................
+
+export type MovementType = "in" | "out";
+export type MovementReason = "buy" | "sale" | "adjustment" | "return";
+
+export interface StockMovement {
+  id: number;
+  product_id: number;
+  type: MovementType;
+  reason: MovementReason;
+  change: number; // signed: +10 in, -10 out
+  previous_quantity: number; // available quantity before
+  new_quantity: number; // available quantity after
+  created_at: string; // ISO
+}
+
+/** What the adjust form / slice action carries. */
+export interface StockAdjustment {
+  product_id: number;
+  type: MovementType;
+  reason: MovementReason;
+  quantity: number; // always positive
+}
+
+export const MOVEMENT_TYPE_OPTIONS = [
+  { label: "Stock in", value: "in" },
+  { label: "Stock out", value: "out" },
+];
+
+export const MOVEMENT_REASON_OPTIONS: { label: string; value: MovementReason }[] = [
+  { label: "Buy", value: "buy" },
+  { label: "Sale", value: "sale" },
+  { label: "Adjustment", value: "adjustment" },
+  { label: "Return", value: "return" },
+];
+
+export const isMovementType = (value: string): value is MovementType =>
+  value === "in" || value === "out";
+
+export const isMovementReason = (value: string): value is MovementReason =>
+  value === "buy" || value === "sale" || value === "adjustment" || value === "return";
+
+/**
+ * Which reasons make sense for each movement type.
+ * - Stock in:  Buy, Adjustment
+ * - Stock out: Sale, Adjustment, Return
+ */
+export const REASONS_BY_TYPE: Record<MovementType, MovementReason[]> = {
+  in: ["buy", "adjustment"],
+  out: ["sale", "adjustment", "return"],
+};
+
+/** Movement types worth offering: Stock out only makes sense while something is in stock. */
+export const getMovementTypeOptions = (product: Product) =>
+  product.availableQuantity > 0
+    ? MOVEMENT_TYPE_OPTIONS
+    : MOVEMENT_TYPE_OPTIONS.filter((option) => option.value === "in");
+
+/**
+ * Reasons offered for a movement type (see REASONS_BY_TYPE).
+ * `_product` is kept so existing callers don't change.
+ */
+export const getReasonOptions = (type: string, _product: Product) => {
+  if (!isMovementType(type)) return [];
+  return MOVEMENT_REASON_OPTIONS.filter((option) =>
+    REASONS_BY_TYPE[type].includes(option.value),
+  );
+};
+
+/**
+ * The most the user may enter, or null when there is no upper limit.
+ * - Stock out: never more than what's available (you can't take out more than came in).
+ * - Stock in (buy / adjustment): unlimited, it's a restock.
+ */
+export const getMaxQuantity = (
+  type: string,
+  _reason: string,
+  product: Product,
+): number | null => {
+  if (type === "out") return product.availableQuantity;
+  return null;
+};
+
+export type AdjustFormValues = { type: string; quantity: string; reason: string };
+export type AdjustErrors = Partial<Record<keyof AdjustFormValues, string>>;
+
+/** Stock in with the Buy reason is selected by default. */
+export const EMPTY_ADJUST_VALUES: AdjustFormValues = {
+  type: "in",
+  quantity: "",
+  reason: "buy",
+};
+
+/**
+ * Rules
+ * - Any number of stock in / stock out entries is allowed.
+ * - Stock out (sale / adjustment / return) lowers the available quantity and can never
+ *   exceed it, so stock out can never be greater than the stock that came in.
+ * - Stock in (buy / adjustment) is a restock: raises available AND total.
+ * - Each type only accepts its own reasons (see REASONS_BY_TYPE).
+ */
+export const validateAdjustment = (values: AdjustFormValues, product: Product): AdjustErrors => {
+  const errors: AdjustErrors = {};
+  const quantity = Number(values.quantity);
+  const max = getMaxQuantity(values.type, values.reason, product);
+
+  if (values.type === "out" && product.availableQuantity <= 0)
+    errors.type = "Nothing is in stock to take out";
+
+  if (!values.quantity.trim()) errors.quantity = "Enter a quantity";
+  else if (!Number.isInteger(quantity) || quantity <= 0)
+    errors.quantity = "Use a whole number above 0";
+  else if (max !== null && quantity > max)
+    errors.quantity = `Only ${max} available to stock out`;
+
+  if (!isMovementReason(values.reason)) errors.reason = "Select a reason";
+  else if (!getReasonOptions(values.type, product).some((option) => option.value === values.reason))
+    errors.reason = "This reason isn't available for this product right now";
+
+  return errors;
+};
+
+/* ---------- stock status badge ---------- */
+
+export type StockStatus = {
+  label: "In stock" | "Low stock" | "Sold out";
+  tone: "ok" | "warn" | "danger";
+};
+
+/** Low stock = 20% or less of the total is left. */
+export const getStockStatus = (available: number, total: number): StockStatus => {
+  if (available <= 0) return { label: "Sold out", tone: "danger" };
+  if (available <= Math.max(1, Math.ceil(total * 0.2))) return { label: "Low stock", tone: "warn" };
+  return { label: "In stock", tone: "ok" };
+};
+
+export const STOCK_TONE_CLASS = {
+  ok: "bg-brand-soft text-brand",
+  warn: "bg-tertiary text-foreground",
+  danger: "bg-danger-soft text-danger",
+} as const;
