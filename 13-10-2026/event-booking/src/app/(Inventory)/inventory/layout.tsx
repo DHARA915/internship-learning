@@ -7,7 +7,7 @@ export default function InventoryLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense
+    <Suspense 
       fallback={<div className="min-h-screen bg-background" />}
     >
       <AppShell role="inventory">

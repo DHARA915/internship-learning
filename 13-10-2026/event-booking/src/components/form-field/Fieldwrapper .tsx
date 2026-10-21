@@ -27,7 +27,7 @@ export function FieldWrapper({
       {label && (
         <Label htmlFor={name}>
           {label}
-          {required && <span className="ml-0.5 text-brand">*</span>}
+          {required && <span className="ml-0.5 text-danger">*</span>}
         </Label>
       )}
       {children}

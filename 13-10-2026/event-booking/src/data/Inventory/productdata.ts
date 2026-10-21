@@ -522,18 +522,18 @@ export const validateAdjustment = (values: AdjustFormValues, product: Product): 
 
 export type StockStatus = {
   label: "In stock" | "Low stock" | "Sold out";
-  tone: "ok" | "warn" | "danger";
+  status: "ok" | "warn" | "danger";
 };
 
 /** Low stock = 20% or less of the total is left. */
 export const getStockStatus = (available: number, total: number): StockStatus => {
-  if (available <= 0) return { label: "Sold out", tone: "danger" };
-  if (available <= Math.max(1, Math.ceil(total * 0.2))) return { label: "Low stock", tone: "warn" };
-  return { label: "In stock", tone: "ok" };
+  if (available <= 0) return { label: "Sold out", status: "danger" };
+  if (available <= Math.max(1, Math.ceil(total * 0.2))) return { label: "Low stock", status: "warn" };
+  return { label: "In stock", status: "ok" };
 };
 
-export const STOCK_TONE_CLASS = {
-  ok: "bg-brand-soft text-brand",
-  warn: "bg-tertiary text-foreground",
-  danger: "bg-danger-soft text-danger",
+export const STOCK_STATUS_VARIANT = {
+  ok: "active",
+  warn: "warning",
+  danger: "destructive",
 } as const;

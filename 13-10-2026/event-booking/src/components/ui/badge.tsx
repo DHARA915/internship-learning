@@ -32,6 +32,12 @@ const badgeVariants = cva(
         // option chip
         option:
           "rounded-md border-line bg-tertiary px-2 py-0.5 text-xs text-muted-foreground",
+
+        //For inventory management status badges
+        ok:"bg-brand-soft text-brand",
+        warn:"bg-warning-soft text-warning",
+        danger:"bg-danger-soft text-danger"
+      
       },
     },
     defaultVariants: {

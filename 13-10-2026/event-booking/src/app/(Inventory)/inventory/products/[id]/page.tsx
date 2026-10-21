@@ -25,7 +25,7 @@ import { selectAllSuppliers } from "@/Redux/Slices/inventory/supplierslice";
 import {
   EMPTY_ADJUST_VALUES,
   MOVEMENT_TYPE_OPTIONS,
-  STOCK_TONE_CLASS,
+  STOCK_STATUS_VARIANT,
   getMaxQuantity,
   getMovementTypeOptions,
   getReasonOptions,
@@ -36,6 +36,7 @@ import {
   type AdjustFormValues,
   type StockMovement,
 } from "@/data/Inventory/productdata";
+import { Badge } from "@/components/ui/badge";
 
 const money = (value: number) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(value);
@@ -137,7 +138,7 @@ export default function ProductDetailsPage() {
 
   const category = categories.find((item) => item.id === product.categoryId);
   const supplier = suppliers.find((item) => item.id === product.supplierId);
-  const status = getStockStatus(product.availableQuantity, product.quantity);
+  const Stockstatus = getStockStatus(product.availableQuantity, product.quantity);
   const sold = product.quantity - product.availableQuantity;
 
   /* ---------- adjust stock ---------- */
@@ -258,14 +259,8 @@ export default function ProductDetailsPage() {
           <section className="rounded-2xl border border-line bg-card p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-2">
               <h3 className="font-semibold">Current stock status</h3>
-              <span
-                className={cn(
-                  "rounded-full px-2.5 py-1 text-xs font-semibold",
-                  STOCK_TONE_CLASS[status.tone],
-                )}
-              >
-                {status.label}
-              </span>
+             <Badge variant={Stockstatus.status}>{Stockstatus.label}</Badge>
+             
             </div>
 
             <p className="text-4xl font-extrabold">{product.availableQuantity}</p>
@@ -286,10 +281,10 @@ export default function ProductDetailsPage() {
               </div>
             </dl>
 
-            <Button type="button" variant="outline" className="mt-4 w-full" onClick={openAdjust}>
+            {/* <Button type="button" variant="outline" className="mt-4 w-full" onClick={openAdjust}>
               <SlidersHorizontal />
               Adjust stock
-            </Button>
+            </Button> */}
           </section>
         </aside>
       </div>

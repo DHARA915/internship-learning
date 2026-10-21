@@ -11,14 +11,14 @@ import { DataTable, type DataTableColumn } from "@/components/DataTable";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ProductFormDialog } from "@/components/inventory/Productformdialog";
 import {
-  STOCK_TONE_CLASS,
+  STOCK_STATUS_VARIANT,
   getStockStatus,
   type Product,
 } from "@/data/Inventory/productdata";
 import { selectAllCategories } from "@/Redux/Slices/inventory/categoryslice";
 import { selectAllSuppliers } from "@/Redux/Slices/inventory/supplierslice";
 import { productDeleted, selectAllProducts } from "@/Redux/Slices/inventory/productslice";
-
+import { Badge } from "@/components/ui/badge";
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -99,24 +99,14 @@ export default function ProductsPage() {
     {
       // total vs remaining, with a status badge
       key: "availableQuantity",
-      header: "Available / total",
+      header: "Status",
       isSort: true,
       cell: (product) => {
-        const status = getStockStatus(product.availableQuantity, product.quantity);
+        const StockStatus = getStockStatus(product.availableQuantity, product.quantity);
         return (
-          <div className="flex flex-wrap items-center gap-2">
-            {/* <span className="font-medium">
-              {product.availableQuantity} / {product.quantity}
-            </span> */}
-            <span
-              className={cn(
-                "rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap",
-                STOCK_TONE_CLASS[status.tone],
-              )}
-            >
-              {status.label}
-            </span>
-          </div>
+      <Badge variant={StockStatus.status}>
+        {StockStatus.label}
+      </Badge>  
         );
       },
     },
