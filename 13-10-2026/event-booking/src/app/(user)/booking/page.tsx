@@ -11,7 +11,7 @@ import { seatsReleased, selectAllEvents } from "@/Redux/Slices/eventslice";
 import {
   registrationRemoved,
   selectAllRegistrations,
-} from "@/Redux/Slices/Registrationsslice ";
+} from "@/Redux/Slices/Registrationsslice";
 import BookingCard from "@/components/user/BookingCard";
 
 export default function BookingsPage() {

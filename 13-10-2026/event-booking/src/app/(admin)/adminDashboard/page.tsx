@@ -13,7 +13,7 @@ import {
   type CategoryDatum,
 } from "@/components/admin/charts";
 import { selectAllEvents } from "@/Redux/Slices/eventslice";
-import { selectAllRegistrations } from "@/Redux/Slices/Registrationsslice ";
+import { selectAllRegistrations } from "@/Redux/Slices/Registrationsslice";
 
 const initials = (name: string) =>
   name

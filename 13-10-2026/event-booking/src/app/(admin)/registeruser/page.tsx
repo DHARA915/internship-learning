@@ -7,7 +7,7 @@ import { DataTable, type DataTableColumn } from "@/components/DataTable";
 import FormField from "@/components/form-field/FormField";
 import { selectAllEvents } from "@/Redux/Slices/eventslice";
 import type { Registration } from "@/data/registration/registrationdata";
-import { selectAllRegistrations } from "@/Redux/Slices/Registrationsslice ";
+import { selectAllRegistrations } from "@/Redux/Slices/Registrationsslice";
 
 type SortKey = "newest" | "oldest" | "name" | "amount_high" | "amount_low";
 

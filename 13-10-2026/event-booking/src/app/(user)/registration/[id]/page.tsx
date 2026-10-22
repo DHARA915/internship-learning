@@ -19,7 +19,7 @@ import { selectAllEvents } from "@/Redux/Slices/eventslice";
 import {
   registrationAdded,
   selectAllRegistrations,
-} from "@/Redux/Slices/Registrationsslice ";
+} from "@/Redux/Slices/Registrationsslice";
 import { seatsBooked } from "@/Redux/Slices/eventslice";
 import type { FormErrors } from "@/components/CommonDialog";
 import Stepper from "@/components/Stepper";

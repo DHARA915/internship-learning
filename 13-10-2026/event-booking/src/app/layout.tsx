@@ -13,9 +13,16 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
+// static metaData............................................
+// export const metadata: Metadata = {
+//   title: "Admit | Event booking",
+//   description: "Discover, book and manage events.",
+// };
+
+// app/layout.tsx
+
 export const metadata: Metadata = {
-  title: "Admit | Event booking",
-  description: "Discover, book and manage events.",
+  metadataBase: new URL("http://localhost:3000"),
 };
 
 export default function RootLayout({
