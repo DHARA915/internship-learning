@@ -18,6 +18,7 @@ import invoiceReducer from "@/Redux/Slices/InvoiceBuilder/invoiceslice";
 import categoryReducer from "@/Redux/Slices/inventory/categoryslice";
 import SupplierReducer from "@/Redux/Slices/inventory/supplierslice";
 import ProductReducer from "@/Redux/Slices/inventory/productslice";
+import blogReducer from "@/Redux/Slices/blog/blogslice"
 
 const rootReducer = combineReducers({
   events: eventReducer,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   categories: categoryReducer,
   suppliers: SupplierReducer,
   products: ProductReducer,
+  blogs:blogReducer
 });
 
 const persistConfig = {

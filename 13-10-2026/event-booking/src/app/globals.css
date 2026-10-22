@@ -243,3 +243,71 @@ body {
 body {
   @apply scrollbar-none;
 }
+
+
+
+/* For RichText Editor...................................................*/
+
+.rich-content { line-height: 1.7; overflow-wrap: anywhere; }
+.rich-content > * + * { margin-top: 0.75rem; }
+.rich-content h2 { font-size: 1.5rem; font-weight: 800; line-height: 1.3; }
+.rich-content h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
+.rich-content ul { list-style: disc; padding-left: 1.5rem; }
+.rich-content ol { list-style: decimal; padding-left: 1.5rem; }
+.rich-content a { color: var(--color-brand); text-decoration: underline; }
+.rich-content mark { border-radius: 0.2rem; padding: 0 0.15rem; }
+.rich-content blockquote {
+  border-left: 4px solid var(--color-brand);
+  padding-left: 1rem;
+  color: var(--color-muted-foreground);
+}
+.rich-content pre {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: var(--color-tertiary);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+.rich-content code { font-family: ui-monospace, monospace; }
+.rich-content hr { border: 0; border-top: 1px solid var(--color-line); margin: 1.5rem 0; }
+.rich-content img { max-width: 100%; height: auto; border-radius: 0.5rem; }
+.rich-content img.ProseMirror-selectednode { outline: 2px solid var(--color-brand); }
+
+/* tables scroll sideways on small screens instead of breaking the layout */
+.rich-content .tableWrapper { overflow-x: auto; }
+.rich-content table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+.rich-content th,
+.rich-content td {
+  position: relative;
+  min-width: 5rem;
+  border: 1px solid var(--color-line);
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+}
+.rich-content th { background: var(--color-tertiary); font-weight: 600; text-align: left; }
+.rich-content .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-brand) 15%, transparent);
+  pointer-events: none;
+}
+.rich-content .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: 0;
+  width: 4px;
+  background: var(--color-brand);
+  pointer-events: none;
+}
+.resize-cursor { cursor: col-resize; }
+
+/* placeholder text */
+.rich-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+}

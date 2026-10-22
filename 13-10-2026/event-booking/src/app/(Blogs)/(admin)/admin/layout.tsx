@@ -28,7 +28,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="flex items-center gap-3 text-sm font-medium sm:gap-4">
-            <Link href="/blogs" className="hidden hover:text-brand sm:inline">
+            <Link href="/blogs" className="hidden font-semibold text-brand sm:inline">
              Blogs
             </Link>
             <Link
