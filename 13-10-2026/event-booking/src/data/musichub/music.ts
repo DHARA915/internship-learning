@@ -1,9 +1,11 @@
-export type Genre =
-  | "Pop"
-  | "Rock"
-  | "Hip-Hop"
-  | "Electronic"
-  | "Indie";
+// export type Genre =
+//   | "Pop"
+//   | "Rock"
+//   | "Hip-Hop"
+//   | "Electronic"
+//   | "Indie";
+export const GENRES = ["Pop", "Rock", "Hip-Hop", "Electronic", "Indie"] as const;
+export type Genre = (typeof GENRES)[number];
 
 export type Track = {
   id: string;
