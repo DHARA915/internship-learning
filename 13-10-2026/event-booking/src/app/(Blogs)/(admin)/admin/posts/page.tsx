@@ -3,9 +3,25 @@
 import { useSelector } from "react-redux";
 import { selectAllPosts } from "@/Redux/Slices/blog/blogslice";
 import BlogCard from "../../../components/Blogcard";
+import { useState,useEffect } from "react";
+import { Button } from "@/components/ui/button";
+
+const POSTS_PER_PAGE=9;
 
 export default function PostsPage() {
   const posts = useSelector(selectAllPosts);
+
+  const [visibleCount,setVisibleCount] = useState(POSTS_PER_PAGE)
+  const visiblePosts = posts.slice(0,POSTS_PER_PAGE)
+  const hasMorePosts = visibleCount < posts.length
+
+  const handleLoadMore = () =>{
+    setVisibleCount((prev)=>prev + POSTS_PER_PAGE)
+  }
+
+  useEffect(() => {
+  setVisibleCount(POSTS_PER_PAGE);
+}, [posts.length]);
 
   return (
     <div className="mx-auto w-full min-w-0 max-w-7xl">
@@ -52,7 +68,7 @@ export default function PostsPage() {
         )}
       </div>
 
-      {/* Empty State */}
+      
       {posts.length === 0 ? (
         <div
           className="
@@ -106,12 +122,42 @@ export default function PostsPage() {
             lg:grid-cols-3
           "
         >
-          {posts.map((post) => (
+          {visiblePosts.map((post) => (
             <BlogCard
               key={post.id}
               post={post}
             />
           ))}
+
+          {
+            hasMorePosts && (
+                   <div className="mt-10 flex justify-center">
+              <Button
+                type="button"
+                onClick={handleLoadMore}
+                className="
+                  rounded-lg
+                  border
+                  border-border
+                  bg-background
+                  px-6
+                  py-3
+                  text-sm
+                  font-semibold
+                  text-foreground
+                  transition
+                  hover:bg-muted
+                  focus:outline-none
+                  focus:ring-2
+                  focus:ring-brand
+                  focus:ring-offset-2
+                "
+              >
+                Load more
+              </Button>
+            </div>
+            )
+          }
         </div>
       )}
     </div>

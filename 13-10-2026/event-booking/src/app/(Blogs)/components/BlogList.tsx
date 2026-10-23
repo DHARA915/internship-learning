@@ -13,6 +13,7 @@ type Post = {
   tags: string[];
   views: number;
   reactions: { likes: number; dislikes: number };
+  href?:string;
 };
 
 type BlogListProps = {

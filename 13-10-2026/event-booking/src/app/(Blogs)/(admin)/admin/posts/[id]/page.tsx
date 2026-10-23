@@ -54,7 +54,7 @@ export default function BlogDetailPage() {
 
   const handleDelete = () => {
     dispatch(postDeleted(post.id));
-    router.push("/blog");
+    router.push("/admin/posts");
   };
 
   return (
