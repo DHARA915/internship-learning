@@ -311,3 +311,129 @@ body {
   color: var(--color-muted-foreground);
   pointer-events: none;
 }
+
+
+
+
+
+/* ============================================================
+   MusicHub theme: applies only inside `.music-theme`
+   Keep this at the BOTTOM of globals.css (after :root / .dark)
+   ============================================================ */
+.music-theme {
+  color-scheme: dark; /* dark native scrollbars, selects, date pickers */
+
+  /* same token names as the rest of the app, dark values */
+  --background: #0a0a0f;
+  --foreground: #f5f5f7;
+  --card: #15151c;
+  --card-foreground: #f5f5f7;
+  --tertiary: #1d1d26;
+  --line: rgba(255, 255, 255, 0.09);
+  --muted-foreground: #9b9ba8;
+  --brand: #22d96b;
+  --brand-soft: rgba(34, 217, 107, 0.14);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.14);
+
+  /* shadcn-style names (ignored if your file doesn't use them) */
+  --primary: var(--brand);
+  --primary-foreground: #04130a;
+  --secondary: var(--tertiary);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--tertiary);
+  --muted-foreground: #9b9ba8;
+  --accent: #23232e;
+  --accent-foreground: var(--foreground);
+  --popover: #1b1b24;
+  --popover-foreground: var(--foreground);
+  --border: var(--line);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: var(--brand);
+  --destructive: var(--danger);
+
+  /* MusicHub-only tokens */
+  --sidebar: #0f0f15;
+  --player: #101017;
+  --hover: rgba(255, 255, 255, 0.06);
+  --brand-foreground: #04130a; /* text on green buttons */
+  --hero: linear-gradient(135deg, #3b1d6e 0%, #7a2f8f 45%, #e8714a 100%);
+
+  /* three-zone layout sizes */
+  --sidebar-width: 16rem;
+  --player-height: 5.75rem;
+
+  /* re-point Tailwind's color tokens here too, so bg-card, border-line,
+     text-brand ... follow the values above even if your @theme is not "inline" */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-tertiary: var(--tertiary);
+  --color-line: var(--line);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+}
+
+/* new utilities for the project-only tokens: bg-sidebar, bg-player, hover:bg-hover, text-brand-foreground */
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-player: var(--player);
+  --color-hover: var(--hover);
+  --color-brand-foreground: var(--brand-foreground);
+}
+
+@layer components {
+  /* purple-to-orange banner on Home */
+  .music-theme .music-hero {
+    background: var(--hero);
+  }
+
+  /* thin dark scrollbars */
+  .music-theme,
+  .music-theme * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  /* progress + volume sliders: set --fill="40%" from React to color the played part */
+  .music-theme .music-range {
+    --fill: 0%;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 9999px;
+    cursor: pointer;
+    background: linear-gradient(to right, var(--brand) var(--fill), rgba(255, 255, 255, 0.2) var(--fill));
+  }
+  .music-theme .music-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .music-theme .music-range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: 0;
+    border-radius: 9999px;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .music-theme .music-range:hover::-webkit-slider-thumb,
+  .music-theme .music-range:focus-visible::-webkit-slider-thumb,
+  .music-theme .music-range:hover::-moz-range-thumb,
+  .music-theme .music-range:focus-visible::-moz-range-thumb {
+    opacity: 1;
+  }
+  .music-theme .music-range:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 4px;
+  }
+}

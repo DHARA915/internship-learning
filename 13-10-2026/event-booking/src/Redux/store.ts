@@ -19,6 +19,7 @@ import categoryReducer from "@/Redux/Slices/inventory/categoryslice";
 import SupplierReducer from "@/Redux/Slices/inventory/supplierslice";
 import ProductReducer from "@/Redux/Slices/inventory/productslice";
 import blogReducer from "@/Redux/Slices/blog/blogslice"
+import musicReducer from "@/Redux/Slices/musichub/musicslice"
 
 const rootReducer = combineReducers({
   events: eventReducer,
@@ -28,7 +29,8 @@ const rootReducer = combineReducers({
   categories: categoryReducer,
   suppliers: SupplierReducer,
   products: ProductReducer,
-  blogs:blogReducer
+  blogs:blogReducer,
+  music:musicReducer
 });
 
 const persistConfig = {
@@ -42,7 +44,8 @@ const persistConfig = {
     "categories",
     "suppliers",
     "products",
-    "blogs"
+    "blogs",
+    "music"
   ],
 };
 
