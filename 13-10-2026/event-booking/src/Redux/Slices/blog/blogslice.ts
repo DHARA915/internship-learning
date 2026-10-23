@@ -11,7 +11,7 @@ const postSlice = createSlice({
   reducers: {
     postAdded: {
       reducer(state, action: PayloadAction<Post>) {
-        state.items.unshift(action.payload); // newest first
+        state.items.unshift(action.payload);
       },
       prepare(input: PostInput) {
         return {
@@ -23,9 +23,18 @@ const postSlice = createSlice({
         };
       },
     },
+    postUpdated(state, action: PayloadAction<{ id: number; changes: PostInput }>) {
+      const post = state.items.find((item) => item.id === action.payload.id);
+      if (post) Object.assign(post, action.payload.changes);
+    },
+
+    postDeleted(state, action: PayloadAction<number>) {
+      state.items = state.items.filter((item) => item.id !== action.payload);
+    },
   },
 });
 
-export const { postAdded } = postSlice.actions;
+export const { postAdded,postUpdated,postDeleted } = postSlice.actions;
 export const selectAllPosts = (state: RootState) => state.blogs.items;
+export const selectPostById = (state: RootState, id: number) => state.blogs.items.find((item) => item.id === id);
 export default postSlice.reducer;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import {useEffect, useRef, useState, type ReactNode } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -227,6 +227,8 @@ export function RichTextEditor({
   error,
   placeholder = "Start writing your post...",
 }: RichTextEditorProps) {
+
+
   const editor = useEditor({
     immediatelyRender: false, // avoids a hydration mismatch in Next.js
     content: value,
@@ -250,6 +252,11 @@ export function RichTextEditor({
     },
     onUpdate: ({ editor: current }) => onChange(current.getHTML()),
   });
+
+ // keep the editor in sync when the parent replaces `value`
+useEffect(() => {
+  if (editor && value !== editor.getHTML()) editor.commands.setContent(value, false);
+}, [value, editor]);
 
   return (
     <div>
