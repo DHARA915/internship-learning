@@ -53,6 +53,9 @@ interface CommonDialogProps {
    */
   onSaveDraft?: () => SubmitResult;
   draftLabel?: string;
+
+  // For Only MusicHub
+  saveClassName?: string;
 }
 
 export function CommonDialog({
@@ -64,6 +67,7 @@ export function CommonDialog({
   children,
   onSubmit,
   saveLabel = "Save changes",
+  saveClassName,
   cancelLabel = "Cancel",
   saveVariant = "primary",
   onBack,
@@ -174,7 +178,7 @@ export function CommonDialog({
               </Button>
             )}
 
-            <Button type="submit" variant={saveVariant} disabled={isSaving}>
+            <Button type="submit" variant={saveVariant} disabled={isSaving} className={saveClassName} >
               {isSaving && <Loader2 className="animate-spin" />}
               {saveLabel}
             </Button>

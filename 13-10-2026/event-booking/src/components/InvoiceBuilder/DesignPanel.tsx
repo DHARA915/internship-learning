@@ -109,7 +109,7 @@ function ToggleRow({ icon, label, checked, onChange }: ToggleRowProps) {
         {label}
       </span>
 
-      <button
+      <Button
         type="button"
         role="switch"
         aria-checked={checked}
@@ -126,7 +126,7 @@ function ToggleRow({ icon, label, checked, onChange }: ToggleRowProps) {
             checked && "translate-x-5",
           )}
         />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -332,7 +332,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
 
         {/* ---------- Optional sections ---------- */}
         <section className="py-5">
-          <button
+          <Button
             type="button"
             aria-expanded={optionalOpen}
             onClick={() => setOptionalOpen((open) => !open)}
@@ -352,7 +352,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
                 optionalOpen && "rotate-180",
               )}
             />
-          </button>
+          </Button>
 
           {optionalOpen && (
             <div className="mt-2 divide-y divide-line">
