@@ -17,9 +17,6 @@ export default function AddToPlaylist({ track, playlists, onAdd }: Props) {
   const [query, setQuery] = useState("");
   const boxRef = useRef<HTMLDivElement>(null);
 
-  console.log("Track:",track);
-  console.log("Playlists:",playlists)
-  console.log("OnAdd:",onAdd)
 
   // close on outside click or Escape
   useEffect(() => { 

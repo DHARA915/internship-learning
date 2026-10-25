@@ -17,7 +17,6 @@ const API = "https://dummyjson.com";
 export default async function Page() {
 
   const { posts }: { posts: Post[] } = await fetch(`${API}/posts?limit=0`).then((res) => res.json());
-  console.log("POSTS:",posts)
   const { users }: { users: User[] } = await fetch(
     `${API}/users?limit=0&select=firstName,lastName`,
   ).then((res) => res.json());

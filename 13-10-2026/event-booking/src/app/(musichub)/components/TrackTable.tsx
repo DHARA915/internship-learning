@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Clock, GripVertical, Play } from "lucide-react";
+import { Clock, GripVertical, Pause, Play } from "lucide-react";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,12 @@ type TrackTableProps = {
   showGenre?: boolean;
   /** Shows a play button on each row. */
   onPlay?: (track: Track) => void;
+  /** Called when the button of the song that is already current is pressed (pause / resume). */
+  onTogglePlay?: () => void;
+  /** The song loaded in the player bar; its row is highlighted. */
+  currentId?: string | null;
+  /** Whether the current song is playing right now (shows Pause instead of Play). */
+  isPlaying?: boolean;
   /** Shows a drag handle; called with the new order of track ids. */
   onReorder?: (trackIds: string[]) => void;
   emptyMessage?: string;
@@ -37,10 +43,14 @@ export default function TrackTable({
   actionLabel = "",
   showGenre = true,
   onPlay,
+  onTogglePlay,
+  currentId = null,
+  isPlaying = false,
   onReorder,
   emptyMessage = "No tracks found.",
 }: TrackTableProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const showNumber = !!onReorder;
 
   const drop = (target: number) => {
     if (dragIndex === null || dragIndex === target || !onReorder) return;
@@ -52,7 +62,11 @@ export default function TrackTable({
   };
 
   if (tracks.length === 0) {
-    return <p className="py-12 text-center text-sm text-muted-foreground">{emptyMessage}</p>;
+    return (
+      <p className="py-12 text-center text-sm text-muted-foreground">
+        {emptyMessage}
+      </p>
+    );
   }
 
   return (
@@ -60,12 +74,21 @@ export default function TrackTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-14 text-xs font-semibold">#</TableHead>
+            {/* <TableHead className="w-14 text-xs font-semibold">#</TableHead> */}
+            {showNumber && (
+              <TableHead className="w-16 text-xs font-semibold">#</TableHead>
+            )}
             <TableHead className="text-xs font-semibold">Title</TableHead>
-            <TableHead className="hidden text-xs font-semibold sm:table-cell">Artist</TableHead>
-            <TableHead className="hidden text-xs font-semibold md:table-cell">Album</TableHead>
+            <TableHead className="hidden text-xs font-semibold sm:table-cell">
+              Artist
+            </TableHead>
+            <TableHead className="hidden text-xs font-semibold md:table-cell">
+              Album
+            </TableHead>
             {showGenre && (
-              <TableHead className="hidden text-xs font-semibold md:table-cell">Genre</TableHead>
+              <TableHead className="hidden text-xs font-semibold md:table-cell">
+                Genre
+              </TableHead>
             )}
             <TableHead className="w-16">
               <Clock className="size-4" aria-label="Duration" />
@@ -79,80 +102,117 @@ export default function TrackTable({
         </TableHeader>
 
         <TableBody>
-          {tracks.map((track, index) => (
-            <TableRow
-              key={track.id}
-              draggable={!!onReorder}
-              onDragStart={() => setDragIndex(index)}
-              onDragOver={(event) => onReorder && event.preventDefault()}
-              onDrop={() => drop(index)}
-              onDragEnd={() => setDragIndex(null)}
-              className={cn("border-line", dragIndex === index && "opacity-40")}
-            >
-              <TableCell className="text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  {onReorder && (
-                    <GripVertical className="size-4 cursor-grab" aria-hidden="true" />
-                  )}
-                  {onPlay ? (
+          {tracks.map((track, index) => {
+            const isCurrent = track.id === currentId;
+            const showPause = isCurrent && isPlaying;
+
+            return (
+              <TableRow
+                key={track.id}
+                draggable={!!onReorder}
+                onDragStart={() => setDragIndex(index)}
+                onDragOver={(event) => onReorder && event.preventDefault()}
+                onDrop={() => drop(index)}
+                onDragEnd={() => setDragIndex(null)}
+                aria-current={isCurrent ? "true" : undefined}
+                className={cn(
+                  "border-line",
+                  isCurrent && "bg-hover",
+                  dragIndex === index && "opacity-40",
+                )}
+              >
+                {showNumber && (
+                  <TableCell className="text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      {onReorder && (
+                        <GripVertical
+                          className="size-4 cursor-grab"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </div>
+                  </TableCell>
+                )}
+
+                <TableCell>
+                  <div className="flex min-w-0 items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={track.coverUrl}
+                      alt=""
+                      loading="lazy"
+                      className="size-10 shrink-0 rounded-md bg-tertiary object-cover"
+                    />
+                    <div className="min-w-0">
+                      <p
+                        className={cn(
+                          "truncate text-sm font-semibold",
+                          isCurrent && "text-brand",
+                        )}
+                      >
+                        {track.title}
+                      </p>
+                      {/* artist moves under the title on phones */}
+                      <p className="truncate text-xs text-muted-foreground sm:hidden">
+                        {track.artist}
+                      </p>
+                    </div>
+                  </div>
+                </TableCell>
+
+                <TableCell className="hidden max-w-40 truncate text-sm text-muted-foreground sm:table-cell">
+                  {track.artist}
+                </TableCell>
+                <TableCell className="hidden max-w-40 truncate text-sm text-muted-foreground md:table-cell">
+                  {track.album}
+                </TableCell>
+                {showGenre && (
+                  <TableCell className="hidden md:table-cell">
+                    <Badge variant="option">{track.genre}</Badge>
+                  </TableCell>
+                )}
+
+                <TableCell className="text-sm text-muted-foreground tabular-nums">
+                  {formatDuration(track.duration)}
+                </TableCell>
+
+                {renderAction && (
+                  <TableCell>
+                    <div className="flex justify-center">
+                      {renderAction(track)}
+                    </div>
+                  </TableCell>
+                )}
+                {onPlay ? (
+                  <TableCell>
                     <Button
                       type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-7 rounded-full"
-                      aria-label={`Play ${track.title}`}
-                      onClick={() => onPlay(track)}
+                      aria-label={`${showPause ? "Pause" : "Play"} ${track.title}`}
+                      onClick={() =>
+                        isCurrent && onTogglePlay
+                          ? onTogglePlay()
+                          : onPlay(track)
+                      }
+                      className={cn(
+                        "flex size-8 shrink-0 items-center justify-center rounded-full transition-transform hover:scale-105",
+                        isCurrent
+                          ? "bg-brand text-black"
+                          : "bg-tertiary text-foreground hover:bg-brand hover:text-black",
+                      )}
                     >
-                      <Play className="size-3.5 fill-current" />
+                      {showPause ? (
+                        <Pause className="size-4 fill-current" />
+                      ) : (
+                        <Play className="size-4 fill-current" />
+                      )}
                     </Button>
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-              </TableCell>
-
-              <TableCell>
-                <div className="flex min-w-0 items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={track.coverUrl}
-                    alt=""
-                    loading="lazy"
-                    className="size-10 shrink-0 rounded-md bg-tertiary object-cover"
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">{track.title}</p>
-                    {/* artist moves under the title on phones */}
-                    <p className="truncate text-xs text-muted-foreground sm:hidden">
-                      {track.artist}
-                    </p>
-                  </div>
-                </div>
-              </TableCell>
-
-              <TableCell className="hidden max-w-40 truncate text-sm text-muted-foreground sm:table-cell">
-                {track.artist}
-              </TableCell>
-              <TableCell className="hidden max-w-40 truncate text-sm text-muted-foreground md:table-cell">
-                {track.album}
-              </TableCell>
-              {showGenre && (
-                <TableCell className="hidden md:table-cell">
-                  <Badge variant="option">{track.genre}</Badge>
-                </TableCell>
-              )}
-
-              <TableCell className="text-sm text-muted-foreground tabular-nums">
-                {formatDuration(track.duration)}
-              </TableCell>
-
-              {renderAction && (
-                <TableCell>
-                  <div className="flex justify-center">{renderAction(track)}</div>
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
+                  </TableCell>
+                ) : (
+                  index + 1
+                )}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

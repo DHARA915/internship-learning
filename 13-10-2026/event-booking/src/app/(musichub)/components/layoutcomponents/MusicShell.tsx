@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { AudioLines, Menu } from "lucide-react";
 import { PlayerBar } from "../layoutcomponents/PlayerBar";
 import { Sidebar } from "../layoutcomponents/Sidebar";
+import { Button } from "@/components/ui/button";
 
 /**
  * Three zones: sidebar (left), main content (scrolls), player bar (bottom).
@@ -25,7 +26,7 @@ export function MusicShell({ children }: { children: ReactNode }) {
         {/* Sidebar: mobile drawer */}
         {menuOpen && (
           <>
-            <button
+            <Button
               type="button"
               aria-label="Close menu"
               className="fixed inset-0 z-30 bg-black/60 lg:hidden"
@@ -40,9 +41,9 @@ export function MusicShell({ children }: { children: ReactNode }) {
         {/* Main content */}
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-sidebar px-4 lg:hidden">
-            <button type="button" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
+            <Button type="button" aria-label="Open menu" onClick={() => setMenuOpen(true)}>
               <Menu className="size-6" />
-            </button>
+            </Button>
             <Link href="/musichub" className="flex items-center gap-2 font-bold">
               <AudioLines className="size-5 text-brand" />
               MusicHub

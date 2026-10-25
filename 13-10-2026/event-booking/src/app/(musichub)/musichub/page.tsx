@@ -84,7 +84,7 @@ export default function MusicHomePage() {
             className="group cursor-pointer"
           >
             <Link
-              href={`/music/playlists/${playlist.id}`}
+              href={`/musichub/playlist/${playlist.id}`}
               className="block"
             >
               <div className="aspect-[16/10] w-full overflow-hidden rounded-lg border border-line bg-tertiary transition group-hover:brightness-110">

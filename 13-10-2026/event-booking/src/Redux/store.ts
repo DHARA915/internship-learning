@@ -20,6 +20,7 @@ import SupplierReducer from "@/Redux/Slices/inventory/supplierslice";
 import ProductReducer from "@/Redux/Slices/inventory/productslice";
 import blogReducer from "@/Redux/Slices/blog/blogslice"
 import musicReducer from "@/Redux/Slices/musichub/musicslice"
+import playerReducer from "@/Redux/Slices/musichub/playerslice"
 
 const rootReducer = combineReducers({
   events: eventReducer,
@@ -30,7 +31,9 @@ const rootReducer = combineReducers({
   suppliers: SupplierReducer,
   products: ProductReducer,
   blogs:blogReducer,
-  music:musicReducer
+  music:musicReducer,
+  player:playerReducer,
+
 });
 
 const persistConfig = {
@@ -45,7 +48,8 @@ const persistConfig = {
     "suppliers",
     "products",
     "blogs",
-    "music"
+    "music",
+    "player",
   ],
 };
 

@@ -17,9 +17,6 @@ const page = () => {
 const handleSubmit = (event: FormEvent) => {
   event.preventDefault();
 
-  console.log("Entered password:", JSON.stringify(password));
-  console.log("Expected password:", JSON.stringify(PASSWORD));
-
   const enteredEmail = email.trim().toLowerCase();
   const expectedEmail = EMAIL.trim().toLowerCase();
 
@@ -36,7 +33,6 @@ const handleSubmit = (event: FormEvent) => {
 
   document.cookie = "admin-auth=true; path=/; max-age=28800";
 
-  console.log("Cookie set:", document.cookie);
 
   router.replace("/admin/dashboard");
   router.refresh();
