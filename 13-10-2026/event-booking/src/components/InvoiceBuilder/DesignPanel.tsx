@@ -186,7 +186,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
             {TEMPLATE_OPTIONS.map((option) => {
               const selected = design.template === option.value;
               return (
-                <button
+                <Button
                   key={option.value}
                   type="button"
                   role="radio"
@@ -215,7 +215,7 @@ export function DesignPanel({ notice, onBack, onSave }: DesignPanelProps) {
                   >
                     {option.label}
                   </span>
-                </button>
+                </Button>
               );
             })}
           </div>

@@ -13,6 +13,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Button } from "./ui/button";
 
 export type DataTableColumn<T> = {
   /** Unique key for the column (used as React key). Also the field used for sorting. */
@@ -229,7 +230,7 @@ export function DataTable<T>({
                     {column.srOnlyHeader ? (
                       <span className="sr-only">{column.header}</span>
                     ) : column.isSort ? (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleSort(column)}
                         className={cn(
@@ -245,7 +246,7 @@ export function DataTable<T>({
                         {isSorted && sortConfig.direction === "desc" && (
                           <ArrowDown className="size-3.5" />
                         )}
-                      </button>
+                      </Button>
                     ) : (
                       column.header
                     )}

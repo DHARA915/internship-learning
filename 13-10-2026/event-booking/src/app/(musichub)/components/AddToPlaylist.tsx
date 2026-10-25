@@ -10,9 +10,10 @@ type Props = {
   track: Track;
   playlists: Playlist[];
   onAdd: (playlistId: string) => void;
+  onRemove:(playlistId:string) => void;
 };
 
-export default function AddToPlaylist({ track, playlists, onAdd }: Props) {
+export default function AddToPlaylist({ track, playlists, onAdd , onRemove }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const boxRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,7 @@ export default function AddToPlaylist({ track, playlists, onAdd }: Props) {
 
       {open && (
         <div className="absolute top-full right-0 z-30 mt-2 w-64 rounded-xl border border-line bg-card p-3 text-left shadow-xl">
-          <p className="mb-2 text-xs font-semibold text-muted-foreground">Add to playlist</p>
+          <p className="mb-2 text-xs font-semibold text-muted-foreground">Add or remove from playlist</p>
 
           <FormField
             type="search"
@@ -79,8 +80,9 @@ export default function AddToPlaylist({ track, playlists, onAdd }: Props) {
                   <Button
                     type="button"
                     variant="ghost"
-                    disabled={added}
-                    onClick={() => onAdd(playlist.id)}
+                 aria-pressed={added}
+  aria-label={`${added ? "Remove from" : "Add to"} ${playlist.name}`}
+  onClick={() => (added ? onRemove(playlist.id) : onAdd(playlist.id))}
                     className="h-auto w-full justify-start gap-3 px-2 py-1.5 text-left text-sm font-normal"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}

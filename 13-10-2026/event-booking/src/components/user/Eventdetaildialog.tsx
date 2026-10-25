@@ -134,7 +134,7 @@ function DialogBody({
       {/* Tabs */}
       <div className="shrink-0 border-b border-line px-3 sm:px-6" role="tablist">
         {TABS.map(({ key, label }) => (
-          <button
+          <Button
             key={key}
             type="button"
             role="tab"
@@ -148,7 +148,7 @@ function DialogBody({
             )}
           >
             {label}
-          </button>
+          </Button>
         ))}
       </div>
 

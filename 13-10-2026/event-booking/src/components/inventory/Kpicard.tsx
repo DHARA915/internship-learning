@@ -2,6 +2,7 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "cn";
 export type Tone = "ok" | "warn" | "danger";
+import { Button } from "../ui/button";
 
 /** Colours for the card icons (global.css tokens). */
 const TONE_CLASS: Record<Tone, string> = {
@@ -32,7 +33,7 @@ export function KpiCard({
   onClick,
 }: KpiCardProps) {
   return (
-    <button
+    <Button
       type="button"
       aria-pressed={active}
       aria-controls={controls}
@@ -55,6 +56,6 @@ export function KpiCard({
       >
         <Icon className="size-5" />
       </span>
-    </button>
+    </Button>
   );
 }

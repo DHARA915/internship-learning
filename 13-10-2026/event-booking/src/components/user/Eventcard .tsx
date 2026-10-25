@@ -105,13 +105,13 @@ export function EventCard({
       <div className="flex flex-1 flex-col gap-3 p-5">
         <h3 className="text-lg font-bold leading-snug">
           {/* stretched button: the whole card opens the dialog, but Register stays separate */}
-          <button
+          <Button
             type="button"
             onClick={() => onOpen?.(event)}
             className="line-clamp-2 cursor-pointer text-left outline-none after:absolute after:inset-0 focus-visible:after:ring-2 focus-visible:after:ring-ring"
           >
             {event.title}
-          </button>
+          </Button>
         </h3>
 
         <p className="line-clamp-2 text-sm text-muted-foreground">

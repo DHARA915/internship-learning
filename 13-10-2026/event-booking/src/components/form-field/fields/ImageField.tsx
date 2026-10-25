@@ -3,6 +3,7 @@ import { ImagePlus, Pencil, Trash2 } from "lucide-react";
 import { cn } from "cn";
 import { FieldWrapper } from "../Fieldwrapper ";
 import type { ImageFieldProps } from "./Types";
+import { Button } from "@/components/ui/button";
 
 // the picker only lists these; check() enforces it again for drag & drop
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
@@ -137,7 +138,7 @@ export function ImageField({
           />
 
           <div className="flex flex-1 flex-wrap items-center gap-2">
-            <button
+            <Button
               type="button"
               disabled={disabled}
               onClick={openPicker}
@@ -145,8 +146,8 @@ export function ImageField({
             >
               <Pencil className="size-3.5" />
               Change
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               disabled={disabled}
               onClick={handleRemove}
@@ -154,11 +155,11 @@ export function ImageField({
             >
               <Trash2 className="size-3.5" />
               Remove
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <button
+        <Button
           type="button"
           disabled={disabled}
           onClick={openPicker}
@@ -174,7 +175,7 @@ export function ImageField({
           <ImagePlus className="size-5" />
           <span>{placeholder}</span>
           <span className="text-xs">PNG, JPG, WebP or SVG, up to {maxSizeMB} MB</span>
-        </button>
+        </Button>
       )}
     </FieldWrapper>
   );

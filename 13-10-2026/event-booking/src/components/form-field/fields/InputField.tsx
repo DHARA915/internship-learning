@@ -3,6 +3,7 @@ import { Eye, EyeOff, Search } from "lucide-react";
 import { Input } from "../../ui/input";
 import { FieldWrapper } from "../Fieldwrapper ";
 import type { InputFieldProps, InputType } from "./Types";
+import { Button } from "@base-ui/react";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -216,7 +217,7 @@ export function InputField({
         )}
 
         {isPassword && (
-          <button
+          <Button
             type="button"
             disabled={disabled}
             onClick={() => setIsPasswordVisible((isVisible) => !isVisible)}
@@ -228,7 +229,7 @@ export function InputField({
             ) : (
               <EyeOff className="size-4" />
             )}
-          </button>
+          </Button>
         )}
       </div>
     </FieldWrapper>
