@@ -50,7 +50,7 @@ export function MusicShell({ children }: { children: ReactNode }) {
             </Link>
           </header>
 
-          <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+          <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 scrollbar-none">{children}</main>
         </div>
       </div>
 

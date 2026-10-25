@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Clock, GripVertical, Pause, Play } from "lucide-react";
+import { Clock, GripVertical, Pause, Play, Heart } from "lucide-react";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ const formatDuration = (seconds: number) =>
 
 type TrackTableProps = {
   tracks: Track[];
-  /** Last column (Add button, Delete button...). Leave out for no action column. */
+  /** Last column  button, Delete button...). Leave out for no action column. */
   renderAction?: (track: Track) => ReactNode;
   actionLabel?: string;
   showGenre?: boolean;
@@ -32,6 +32,12 @@ type TrackTableProps = {
   currentId?: string | null;
   /** Whether the current song is playing right now (shows Pause instead of Play). */
   isPlaying?: boolean;
+
+  // Like functionality
+  showLike?: boolean;
+  likedTrackIds?: string[];
+  onToggleLike?: (track: Track) => void;
+
   /** Shows a drag handle; called with the new order of track ids. */
   onReorder?: (trackIds: string[]) => void;
   emptyMessage?: string;
@@ -46,6 +52,9 @@ export default function TrackTable({
   onTogglePlay,
   currentId = null,
   isPlaying = false,
+  showLike = false,
+  likedTrackIds = [],
+  onToggleLike,
   onReorder,
   emptyMessage = "No tracks found.",
 }: TrackTableProps) {
@@ -74,9 +83,11 @@ export default function TrackTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            {/* <TableHead className="w-14 text-xs font-semibold">#</TableHead> */}
             {showNumber && (
               <TableHead className="w-16 text-xs font-semibold">#</TableHead>
+            )}
+            {showLike && (
+            <TableHead className="text-xs font-semibold"></TableHead>
             )}
             <TableHead className="text-xs font-semibold">Title</TableHead>
             <TableHead className="hidden text-xs font-semibold sm:table-cell">
@@ -105,6 +116,7 @@ export default function TrackTable({
           {tracks.map((track, index) => {
             const isCurrent = track.id === currentId;
             const showPause = isCurrent && isPlaying;
+            const isLiked = likedTrackIds?.includes(track.id) ?? false;
 
             return (
               <TableRow
@@ -131,6 +143,28 @@ export default function TrackTable({
                         />
                       )}
                     </div>
+                  </TableCell>
+                )}
+                {showLike && (
+                  <TableCell className="w-12">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onToggleLike?.(track)}
+                      aria-label={
+                        isLiked
+                          ? `Unlike ${track.title}`
+                          : `Like ${track.title}`
+                      }
+                    >
+                      <Heart
+                        className={cn(
+                          "size-4",
+                          isLiked && "fill-current text-brand",
+                        )}
+                      />
+                    </Button>
                   </TableCell>
                 )}
 

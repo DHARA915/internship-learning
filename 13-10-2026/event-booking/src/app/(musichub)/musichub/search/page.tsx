@@ -4,7 +4,6 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import FormField from "@/components/form-field/FormField";
-import { Button } from "@/components/ui/button";
 import TrackTable from "../../components/TrackTable";
 import AddToPlaylist from "../../components/AddToPlaylist";
 import type { RootState } from "@/Redux/store";
@@ -13,12 +12,14 @@ import {
   removeTrackFromPlaylist,
   selectAllPlaylists,
   selectAllTracks,
+  selectLikedTrackIds,
+  toggleLikedTrack,
 } from "@/Redux/Slices/musichub/musicslice";
 import { playQueue, togglePlay } from "@/Redux/Slices/musichub/playerslice";
 import { GENRES, type Genre, type Track } from "@/data/musichub/music";
+import GenreFilter,{type GenreFilterValue} from "../../components/GenreFilter";
 
-type GenreFilter = "All" | Genre;
-const GENRE_FILTERS: GenreFilter[] = ["All", ...GENRES];
+
 const isGenre = (value: string): value is Genre =>
   (GENRES as readonly string[]).includes(value);
 
@@ -44,13 +45,14 @@ const SearchContent = () => {
 
   const tracks = useSelector(selectAllTracks);
   const playlists = useSelector(selectAllPlaylists);
+  const likedTrackIds = useSelector(selectLikedTrackIds);
   const { currentId, isPlaying } = useSelector(
     (state: RootState) => state.player,
   );
 
   const query = searchParams.get("q") ?? "";
   const genreParam = searchParams.get("genre") ?? "";
-  const genre: GenreFilter = isGenre(genreParam) ? genreParam : "All";
+  const genre: GenreFilterValue  = isGenre(genreParam) ? genreParam : "All";
 
   // typing stays instant in the input; the URL updates a moment later
   const [input, setInput] = useState(query);
@@ -95,45 +97,24 @@ const SearchContent = () => {
         onChange={setInput}
       />
 
-      {/* Genre chips + result count */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div
-          className="flex gap-2 overflow-x-auto pb-1"
-          role="tablist"
-          aria-label="Filter by genre"
-        >
-          {GENRE_FILTERS.map((item) => {
-            const isActive = genre === item;
-            return (
-              <Button
-                key={item}
-                type="button"
-                role="tab"
-                size="sm"
-                aria-selected={genre === item}
-                className={`shrink-0 rounded-full ${
-                  isActive
-                    ? "bg-brand text-foreground"
-                    : "bg-hover text-muted-foreground hover:bg-hover"
-                }`}
-                onClick={() => updateParams({ genre: item })}
-              >
-                {item}
-              </Button>
-            );
-          })}
-        </div>
-        <span className="text-sm text-muted-foreground">
-          {results.length} results
-        </span>
-      </div>
 
-      {/* Track table: play button + Add-to-playlist button on each row */}
+      <GenreFilter
+  genres={GENRES}
+  value={genre}
+  onChange={(item) => updateParams({ genre: item })}
+  resultCount={results.length}
+/>
+
       <TrackTable
         tracks={results}
         actionLabel="Add"
         emptyMessage="No tracks match your search."
-        // Next / Previous follow the clicked song's artist, then its genre
+        showLike
+         likedTrackIds={likedTrackIds}
+  onToggleLike={(track) => {
+    dispatch(toggleLikedTrack(track.id));
+  }}
+
         onPlay={(track) =>
           dispatch(
             playQueue({

@@ -16,6 +16,7 @@ import type {
 const initialState: MusicState = {
   tracks: initialTracks,
   playlists: initialPlaylists,
+  likedTrackIds: [],
 };
 
 const musicSlice = createSlice({
@@ -92,25 +93,23 @@ const musicSlice = createSlice({
     },
 
     // playlist tracks.........................................................................
-     addTrackToPlaylist: (
+    addTrackToPlaylist: (
       state,
       action: PayloadAction<{
         playlistId: string;
         trackId: string;
-      }>
+      }>,
     ) => {
       const { playlistId, trackId } = action.payload;
 
       const playlist = state.playlists.find(
-        (playlist) => playlist.id === playlistId
+        (playlist) => playlist.id === playlistId,
       );
 
       if (!playlist) return;
 
       // Check whether track exists
-      const trackExists = state.tracks.some(
-        (track) => track.id === trackId
-      );
+      const trackExists = state.tracks.some((track) => track.id === trackId);
 
       if (!trackExists) return;
 
@@ -127,38 +126,58 @@ const musicSlice = createSlice({
       action: PayloadAction<{
         playlistId: string;
         trackId: string;
-      }>
+      }>,
     ) => {
       const { playlistId, trackId } = action.payload;
 
       const playlist = state.playlists.find(
-        (playlist) => playlist.id === playlistId
+        (playlist) => playlist.id === playlistId,
       );
 
       if (!playlist) return;
 
-      playlist.trackIds = playlist.trackIds.filter(
-        (id) => id !== trackId
-      );
+      playlist.trackIds = playlist.trackIds.filter((id) => id !== trackId);
     },
 
+    // For Reordering...............................................
     reorderPlaylistTracks: (
       state,
       action: PayloadAction<{
         playlistId: string;
         trackIds: string[];
-      }>
+      }>,
     ) => {
       const { playlistId, trackIds } = action.payload;
 
       const playlist = state.playlists.find(
-        (playlist) => playlist.id === playlistId
+        (playlist) => playlist.id === playlistId,
       );
 
       if (!playlist) return;
 
       playlist.trackIds = trackIds;
     },
+
+    // ToggleLikedTrack
+    toggleLikedTrack: (state, action: PayloadAction<string>) => {
+      const trackId = action.payload;
+
+      if (!state.likedTrackIds) {
+        state.likedTrackIds = [];
+      }
+
+      if (state.likedTrackIds.includes(trackId)) {
+        state.likedTrackIds = state.likedTrackIds.filter(
+          (id) => id !== trackId,
+        );
+      } else {
+        state.likedTrackIds.push(trackId);
+      }
+    },
+
+    clearLikedTracks:(state)=>{
+      state.likedTrackIds = [];
+    }
 
   },
 });
@@ -175,6 +194,9 @@ export const {
   addTrackToPlaylist,
   removeTrackFromPlaylist,
   reorderPlaylistTracks,
+
+  toggleLikedTrack,
+  clearLikedTracks
 } = musicSlice.actions;
 
 export default musicSlice.reducer;
@@ -185,3 +207,12 @@ export const selectTrackById = (state: RootState, id: string) =>
   state.music.tracks.find((track) => track.id === id);
 export const selectPlaylistById = (state: RootState, id: string) =>
   state.music.playlists.find((playlist) => playlist.id === id);
+
+export const selectLikedTrackIds = (state: RootState) =>
+  state.music.likedTrackIds;
+
+export const selectLikedTracks = (state: RootState) => {
+  const likedIds = new Set(state.music.likedTrackIds);
+
+  return state.music.tracks.filter((track) => likedIds.has(track.id));
+};

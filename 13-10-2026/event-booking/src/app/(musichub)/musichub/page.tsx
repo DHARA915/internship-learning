@@ -62,7 +62,7 @@ export default function MusicHomePage() {
       <ul className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-3 lg:grid-cols-4">
         {/* Liked Songs */}
         <li className="group cursor-pointer">
-          <Link href="/music/liked" className="block">
+          <Link href="/musichub/liked" className="block">
             <div className="flex aspect-[16/10] w-full bg-gradient-to-br from-violet-500 to-fuchsia items-center justify-center rounded-lg bg-brand-soft transition group-hover:brightness-110">
               <Heart className="size-9 fill-brand text-brand" />
             </div>

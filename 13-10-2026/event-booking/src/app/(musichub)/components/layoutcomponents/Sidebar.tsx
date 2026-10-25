@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { AudioLines, Home, ListPlus, Plus, Search } from "lucide-react";
+import { AudioLines, Home, ListPlus, Plus, Search , Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FormField from "@/components/form-field/FormField";
 import { CommonDialog } from "@/components/CommonDialog";
@@ -13,6 +13,7 @@ import {
   addPlaylist,
   selectAllPlaylists,
   selectAllTracks,
+  selectLikedTrackIds
 } from "@/Redux/Slices/musichub/musicslice";
 const MUSIC_BASE = "/musichub";
 
@@ -38,8 +39,11 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   const [coverImage, setCoverImage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  // count only tracks that really exist
   const trackIds = new Set(tracks.map((track) => track.id));
+const likedIds = useSelector(selectLikedTrackIds);
+const likedCount = (likedIds ?? []).filter((id) => trackIds.has(id)).length;
+const likedHref = `${MUSIC_BASE}/liked`;
+const likedActive = pathname === likedHref;
 
   const isActive = (href: string, exact: boolean) =>
     exact
@@ -131,6 +135,25 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             <Plus />
           </Button>
         </div>
+
+        <Link
+  href={likedHref}
+  onClick={onNavigate}
+  aria-current={likedActive ? "page" : undefined}
+  className={`flex items-center gap-3 rounded-lg p-2 transition-colors ${
+    likedActive ? "bg-hover" : "hover:bg-hover"
+  }`}
+>
+  <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-400">
+    <Heart className="size-5 fill-white text-white" />
+  </div>
+  <div className="min-w-0">
+    <p className="truncate text-sm font-medium">Liked</p>
+    <p className="text-xs text-muted-foreground">
+      {likedCount} {likedCount === 1 ? "song" : "songs"}
+    </p>
+  </div>
+</Link>        
 
         <ul className="-mx-1 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-1">
           {playlists.length === 0 && (

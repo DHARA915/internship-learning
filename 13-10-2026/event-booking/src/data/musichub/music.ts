@@ -28,6 +28,7 @@ export type Playlist = {
 export type MusicState = {
   tracks: Track[];
   playlists: Playlist[];
+  likedTrackIds:string[];
 };
 
 // For omiting id while input...
