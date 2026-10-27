@@ -1,0 +1,304 @@
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public';
+
+
+-- CRAETE TABLE EMPLOYEES (EMP)
+CREATE TABLE EMP(
+EMP_ID INTEGER PRIMARY KEY ,
+EMP_NAME VARCHAR(100) NOT NULL,
+EMP_EMAIL VARCHAR(255) UNIQUE,
+EMP_AGE INTEGER CHECK(EMP_AGE>=18),
+EMP_SALARY INTEGER CHECK(EMP_SALARY>0),
+EMP_DEPARTMENT_ID INTEGER,
+EMP_MANAGER_ID INTEGER,
+EMP_IS_ACTIVE BOOLEAN DEFAULT TRUE,
+EMP_JOINING_DATE DATE,
+
+ CONSTRAINT fk_emp_dept
+        FOREIGN KEY (EMP_DEPARTMENT_ID)
+        REFERENCES DEPT(DEPT_ID),
+
+CONSTRAINT fk_emp_manager
+        FOREIGN KEY (EMP_MANAGER_ID)
+		REFERENCES EMP(EMP_ID)
+)
+
+-- CREATE TABLE DEPARTMENT (DEPT)
+CREATE TABLE DEPT(
+DEPT_ID INTEGER PRIMARY KEY,
+DEPT_NAME VARCHAR(200) NOT NULL,
+DEPT_BUDGET INTEGER NOT NULL CHECK(DEPT_BUDGET>0)
+);
+
+-- CREATE TABLE PROJECT
+
+CREATE TABLE PROJECTS (
+    PROJECT_ID INTEGER PRIMARY KEY,
+    PROJECT_NAME VARCHAR(200) NOT NULL,
+    BUDGET INTEGER CHECK (BUDGET > 0),
+    START_DATE DATE NOT NULL,
+    END_DATE DATE,
+    STATUS VARCHAR(20) DEFAULT 'PLANNED',
+
+    CONSTRAINT chk_project_status
+        CHECK (STATUS IN ('PLANNED', 'ACTIVE', 'COMPLETED', 'CANCELLED')),
+
+    CONSTRAINT chk_project_dates
+        CHECK (END_DATE IS NULL OR END_DATE >= START_DATE)
+);
+
+-- CREATE TABLE FOR SHOW EMPLOYEE WORK ON WHICH PROJECT 
+CREATE TABLE EMP_PROJECTS (
+    EMP_ID INTEGER,
+    PROJECT_ID INTEGER,
+	
+    CONSTRAINT fk_emp_project_emp
+        FOREIGN KEY (EMP_ID)
+        REFERENCES EMP(EMP_ID),
+
+    CONSTRAINT fk_emp_project_project
+        FOREIGN KEY (PROJECT_ID)
+        REFERENCES PROJECTS(PROJECT_ID)
+);
+
+-- FOR SELECTING ALL TABLES.........................................................
+
+SELECT * FROM EMP;
+SELECT * FROM DEPT;
+SELECT * FROM PROJECTS;
+SELECT * FROM EMP_PROJECTS;
+
+-- ADDING DATA.....................................................................
+INSERT INTO DEPT (DEPT_ID, DEPT_NAME, DEPT_BUDGET)
+VALUES
+(1, 'IT', 500000),
+(2, 'SALES', 400000),
+(3, 'HR', 300000),
+(4, 'FINANCE', 450000),
+(5, 'MARKETING', 350000);
+
+INSERT INTO EMP (
+    EMP_ID,
+    EMP_NAME,
+    EMP_EMAIL,
+    EMP_AGE,
+    EMP_SALARY,
+    EMP_DEPARTMENT_ID,
+    EMP_MANAGER_ID,
+    EMP_IS_ACTIVE,
+    EMP_JOINING_DATE
+)
+VALUES
+(1, 'Dhara', 'dhara@gmail.com', 28, 80000, 1, NULL, TRUE, '2022-01-10'),
+(2, 'Rahul', 'rahul@gmail.com', 35, 90000, 2, NULL, TRUE, '2021-03-15'),
+(3, 'Priya', 'priya@gmail.com', 32, 75000, 3, NULL, TRUE, '2022-06-20'),
+(4, 'Amit', 'amit@gmail.com', 40, 95000, 4, NULL, TRUE, '2020-08-01'),
+(5, 'Neha', 'neha@gmail.com', 30, 70000, 5, NULL, TRUE, '2023-02-10'),
+(6, 'Karan', 'karan@gmail.com', 25, 50000, 1, 1, TRUE, '2024-01-15'),
+(7, 'Riya', 'riya@gmail.com', 27, 55000, 2, 2, TRUE, '2023-09-05'),
+(8, 'Arjun', 'arjun@gmail.com', 29, 60000, 4, 4, TRUE, '2024-03-12'),
+(9, 'Meera', 'meera@gmail.com', 26, 48000, 5, 5, TRUE, '2024-07-01')
+RETURNING *;
+
+INSERT INTO PROJECTS (
+    PROJECT_ID,
+    PROJECT_NAME,
+    BUDGET,
+    START_DATE,
+    END_DATE,
+    STATUS
+)
+VALUES
+(1, 'Website Development', 200000, '2026-01-01', '2026-06-30', 'ACTIVE'),
+(2, 'Sales Dashboard', 150000, '2026-02-01', '2026-07-31', 'ACTIVE'),
+(3, 'HR Management System', 120000, '2026-03-01', '2026-08-31', 'PLANNED'),
+(4, 'Finance Automation', 180000, '2026-01-15', '2026-05-31', 'COMPLETED'),
+(5, 'Marketing Campaign', 100000, '2026-04-01', NULL, 'ACTIVE')
+RETURNING *;
+
+INSERT INTO EMP_PROJECTS (EMP_ID, PROJECT_ID)
+VALUES
+(1, 1),
+(1, 2),
+(2, 2),
+(2, 5),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 1),
+(6, 3),
+(7, 2),
+(8, 4),
+(9, 5)
+RETURNING *;
+
+-- WITHOUT DEPARTMENT
+INSERT INTO EMP (
+    EMP_ID,
+    EMP_NAME,
+    EMP_EMAIL,
+    EMP_AGE,
+    EMP_SALARY,
+    EMP_DEPARTMENT_ID,
+    EMP_MANAGER_ID,
+    EMP_IS_ACTIVE,
+    EMP_JOINING_DATE
+)
+VALUES
+(10, 'Vikram', 'vikram@gmail.com', 24, 45000, NULL, NULL, TRUE, '2025-01-10'),
+(11, 'Anjali', 'anjali@gmail.com', 29, 52000, NULL, NULL, TRUE, '2025-02-15'),
+(12, 'Rohit', 'rohit@gmail.com', 31, 58000, NULL, NULL, TRUE, '2025-03-20');
+
+-- ADD NEW DEPARTMENT 
+INSERT INTO DEPT (DEPT_ID, DEPT_NAME, DEPT_BUDGET)
+VALUES
+(6, 'AUDIT', 40000);
+
+
+-- QUERIES........................................................................
+
+-- INNER JOIN employees with departments to show employee name, department name, department budget
+
+SELECT EMP.EMP_NAME , DEPT.DEPT_NAME , DEPT.DEPT_BUDGET FROM EMP INNER JOIN DEPT ON EMP.EMP_DEPARTMENT_ID = DEPT.DEPT_ID;
+
+-- LEFT JOIN to show all departments even if they have no employees, with employee count
+
+SELECT  DEPT.DEPT_NAME,COUNT(EMP.EMP_ID)AS EMPLOYEE_COUNT FROM DEPT LEFT JOIN EMP ON EMP.EMP_DEPARTMENT_ID = DEPT.DEPT_ID
+        GROUP BY DEPT.DEPT_ID,DEPT.DEPT_NAME; 
+
+-- Find departments with no employees using LEFT JOIN + WHERE IS NULL
+SELECT
+    DEPT.DEPT_ID,
+	EMP.EMP_ID,
+    DEPT.DEPT_NAME
+FROM DEPT
+LEFT JOIN EMP
+    ON DEPT.DEPT_ID = EMP.EMP_DEPARTMENT_ID WHERE EMP.EMP_ID IS NULL;
+
+-- Self JOIN: create a 'manager_id' column in employees, join employees to
+SELECT E.EMP_NAME AS employee_name,
+       M.EMP_NAME AS manager_name
+	   FROM EMP E
+	   LEFT JOIN EMP M
+	     ON E.EMP_MANAGER_ID = M.EMP_ID;
+
+-- Join employees + departments + projects (add employee_projects junction table first) to show who works on what
+
+SELECT E.EMP_NAME , D.DEPT_NAME , P.PROJECT_NAME 
+       FROM EMP E
+	   INNER JOIN DEPT D
+	       ON E.EMP_DEPARTMENT_ID = D.DEPT_ID
+       INNER JOIN EMP_PROJECTS EP
+	       ON EP.EMP_ID = EP.EMP_ID
+	   INNER JOIN PROJECTS P
+	       ON EP.PROJECT_ID = P.PROJECT_ID;
+
+-- Subquery: Find employees whose salary is above the company average
+SELECT EMP_NAME,EMP_SALARY FROM EMP WHERE EMP_SALARY > (SELECT AVG(EMP_SALARY) FROM EMP);
+
+-- Subquery with IN: Find employees in departments that have budget > 100000
+
+SELECT
+    E.EMP_NAME,
+    D.DEPT_NAME,
+    D.DEPT_BUDGET
+FROM EMP E
+INNER JOIN DEPT D
+    ON E.EMP_DEPARTMENT_ID = D.DEPT_ID
+WHERE E.EMP_DEPARTMENT_ID IN (
+    SELECT DEPT_ID
+    FROM DEPT
+    WHERE DEPT_BUDGET > 100000
+);
+
+-- Correlated subquery: For each department, find the employee with the highest salary
+
+SELECT D.DEPT_NAME , E.EMP_NAME,E.EMP_SALARY FROM DEPT D INNER JOIN EMP E  ON E.EMP_DEPARTMENT_ID =
+D.DEPT_ID WHERE E.EMP_SALARY=
+(SELECT MAX(E2.EMP_SALARY)FROM EMP E2 WHERE E2.EMP_DEPARTMENT_ID = D.DEPT_ID);
+
+-- EXISTS: Find departments that have at least one employee earning > 100000
+
+SELECT
+    D.DEPT_NAME,
+    D.DEPT_BUDGET
+FROM DEPT D
+WHERE EXISTS (
+    SELECT 1
+    FROM EMP E
+    WHERE E.EMP_DEPARTMENT_ID = D.DEPT_ID
+      AND E.EMP_SALARY > 100000
+);
+
+-- Compare EXISTS vs IN: rewrite the above using IN, understand which is better
+SELECT D.DEPT_NAME,DEPT_BUDGET FROM DEPT D WHERE D.DEPT_ID IN(
+SELECT E.EMP_DEPARTMENT_ID FROM EMP E WHERE E.EMP_SALARY>100000
+);
+
+-- Subquery in FROM: Get department-wise average salary as a derived table, join it with employees to show how each employee compares to their department average
+
+-- FIND AVG SALARY FROM ALL DEPARTMENT 
+SELECT * FROM
+(
+SELECT EMP_DEPARTMENT_ID , AVG(EMP_SALARY) AS AVG_SALARY
+FROM EMP
+WHERE EMP_DEPARTMENT_ID IS NOT NULL GROUP BY EMP_dEPARTMENT_ID) A;
+
+-- COMPARE WITH EMP_SALARY
+SELECT E.EMP_NAME, E.EMP_SALARY ,A.AVG_SALARY,
+E.EMP_SALARY - A.AVG_SALARY AS DIFFERENCE
+FROM EMP E
+INNER JOIN (
+SELECT EMP_DEPARTMENT_ID , AVG(EMP_SALARY) AS AVG_SALARY
+FROM EMP
+WHERE EMP_DEPARTMENT_ID IS NOT NULL GROUP BY EMP_dEPARTMENT_ID) A
+ON E.EMP_DEPARTMENT_ID = A.EMP_DEPARTMENT_ID;
+
+-- OR CREATING TEMP TABLE
+CREATE TEMP TABLE department_avg AS
+SELECT
+    EMP_DEPARTMENT_ID,
+    AVG(EMP_SALARY) AS AVG_SALARY
+FROM EMP
+WHERE EMP_DEPARTMENT_ID IS NOT NULL
+GROUP BY EMP_DEPARTMENT_ID
+
+SELECT
+    E.EMP_NAME,
+    E.EMP_SALARY,
+    T.AVG_SALARY,
+    E.EMP_SALARY - T.AVG_SALARY AS DIFFERENCE
+FROM EMP E
+INNER JOIN department_avg T
+    ON E.EMP_DEPARTMENT_ID = T.EMP_DEPARTMENT_ID;
+
+-- ANY: Find employees whose salary > ANY (SELECT salary FROM employees WHERE department = 'Marketing')
+
+SELECT EMP_NAME , EMP_SALARY FROM EMP WHERE EMP_SALARY > ANY(
+SELECT EMP_SALARY FROM EMP WHERE EMP_DEPARTMENT_ID = ( 
+SELECT DEPT_ID FROM DEPT WHERE DEPT_NAME = 'MARKETING')
+);
+
+-- ALL: Find employees whose salary > ALL (SELECT salary FROM employees WHERE department = 'HR')
+SELECT EMP_NAME , EMP_SALARY FROM EMP WHERE EMP_SALARY > ALL(
+SELECT EMP_SALARY FROM EMP WHERE EMP_DEPARTMENT_ID = ( 
+SELECT DEPT_ID FROM DEPT WHERE DEPT_NAME = 'HR')
+);
+
+-- Multi-join: Show employee name, department name, project name, and department budget in one query
+
+SELECT E.EMP_NAME , D.DEPT_NAME, D.DEPT_BUDGET , P.PROJECT_NAME FROM EMP E 
+INNER JOIN DEPT D ON E.EMP_DEPARTMENT_ID = D.DEPT_ID
+INNER JOIN EMP_PROJECTS EP ON E.EMP_ID=EP.EMP_ID
+INNER JOIN PROJECTS P ON EP.PROJECT_ID = P.PROJECT_ID;
+
+-- CROSS JOIN departments with a list of quarters (Q1, Q2, Q3, Q4) to create a budget template
+SELECT D.DEPT_NAME , Q.QUARTER , NULL AS BUDGET FROM DEPT D CROSS JOIN ( VALUES
+('Q1'),
+('Q2'),
+('Q3'),
+('Q4')
+) AS Q(QUARTER) ORDER BY D.DEPT_ID,Q.QUARTER;
+
+
