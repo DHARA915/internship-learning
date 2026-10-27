@@ -171,9 +171,13 @@ const musicSlice = createSlice({
           (id) => id !== trackId,
         );
       } else {
-        state.likedTrackIds.push(trackId);
+        state.likedTrackIds.unshift(trackId);
       }
     },
+
+ reorderLikedTracks: (state, action: PayloadAction<string[]>) => {
+  state.likedTrackIds = action.payload; // the order after dragging
+},
 
     clearLikedTracks:(state)=>{
       state.likedTrackIds = [];
@@ -196,7 +200,8 @@ export const {
   reorderPlaylistTracks,
 
   toggleLikedTrack,
-  clearLikedTracks
+  clearLikedTracks,
+  reorderLikedTracks
 } = musicSlice.actions;
 
 export default musicSlice.reducer;

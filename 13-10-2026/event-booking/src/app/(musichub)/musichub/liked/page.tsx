@@ -14,6 +14,8 @@ import {
   selectLikedTrackIds,
   toggleLikedTrack,
   clearLikedTracks,
+  reorderPlaylistTracks,
+  reorderLikedTracks
 } from "@/Redux/Slices/musichub/musicslice";
 import { playQueue, togglePlay } from "@/Redux/Slices/musichub/playerslice";
 import type { Track } from "@/data/musichub/music";
@@ -43,20 +45,17 @@ export default function LikedSongsPage() {
   const [genre, setGenre] = useState<GenreFilterValue>("All");
   const [isClearOpen, setIsClearOpen] = useState(false);
 
-
   // newest like first; ids with no matching track are skipped
   const likedTracks = useMemo(
     () =>
-      [...(likedIds ?? [])]
-        .reverse()
+      (likedIds ?? [])
         .map((trackId) => allTracks.find((track) => track.id === trackId))
         .filter((track): track is Track => !!track),
     [likedIds, allTracks],
   );
 
-  const isListCurrent = likedTracks.some((track)=>track.id===currentId)
-  const isListPlaying = isListCurrent && isPlaying
-
+  const isListCurrent = likedTracks.some((track) => track.id === currentId);
+  const isListPlaying = isListCurrent && isPlaying;
 
   // only genres that exist among the liked songs
   const availableGenres = useMemo(
@@ -113,26 +112,33 @@ export default function LikedSongsPage() {
             {likedTracks.length > 0 && <> • {formatTotal(totalSeconds)}</>}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-        <Button
-  type="button"
-  size="sm"
-  disabled={likedTracks.length === 0}
-  onClick={() => (isListCurrent ? dispatch(togglePlay()) : playFrom(likedTracks[0]))}
->
-  {isListPlaying ? <Pause /> : <Play />}
-  {isListPlaying ? "Pause" : "Play"}
-</Button>
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={() => setIsClearOpen(true)}
-          >
-            <Trash2 />
-            Clear all
-          </Button>
-        </div>
+
+        {likedTracks.length>0 && (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              disabled={likedTracks.length === 0}
+              onClick={() =>
+                isListCurrent
+                  ? dispatch(togglePlay())
+                  : playFrom(likedTracks[0])
+              }
+            >
+              {isListPlaying ? <Pause /> : <Play />}
+              {isListPlaying ? "Pause" : "Play"}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={() => setIsClearOpen(true)}
+            >
+              <Trash2 />
+              Clear all
+            </Button>
+          </div>
+        )}
       </section>
 
       {likedTracks.length === 0 ? (

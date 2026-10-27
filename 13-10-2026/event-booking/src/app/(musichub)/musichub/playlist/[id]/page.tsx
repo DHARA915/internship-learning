@@ -252,7 +252,6 @@ const PlaylistContent = () => {
         onTogglePlay={() => dispatch(togglePlay())}
         currentId={currentId}
         isPlaying={isPlaying}
-        // dragging only makes sense on the full list, not while filtered
         onReorder={
           search.trim()
             ? undefined
