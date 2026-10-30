@@ -268,3 +268,23 @@ FROM SALARY_RECORDS S
 JOIN EMP E
     ON S.EMP_ID = E.ID
 ORDER BY S.PAY_YEAR, S.PAY_MONTH, S.EMP_ID;
+
+
+-- JOINS QUERIES...........................................................................................................
+
+-- each employee's name, email, designation, salary, and department.
+
+SELECT E.NAME , E.EMAIL,E.DESIGNATION , E.SALARY , D.NAME FROM EMP E LEFT JOIN
+       DEPT D ON E.DEPARTMENT_ID = D.ID ORDER BY E.NAME;
+
+-- HR wants to know who reports to each manager.
+
+SELECT E.ID , E.NAME AS employee_name , E.DESIGNATION AS employee_designaiton , M.NAME AS manager_name , M.DESIGNATION AS manager_designmation
+FROM EMP E
+LEFT JOIN EMP M
+ON E.MANAGER_ID = M.ID ORDER BY M.NAME NULLS FIRST , E.NAME;
+
+
+
+
+
