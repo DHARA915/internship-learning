@@ -1,0 +1,325 @@
+SELECT table_schema, table_name 
+FROM information_schema.tables 
+WHERE table_type = 'BASE TABLE' 
+  AND table_schema NOT IN ('pg_catalog', 'information_schema')
+ORDER BY table_schema, table_name;
+
+-- VIEWING SCHEMA AND CONSTRAINT
+SELECT 
+    con.conname AS constraint_name,
+    CASE con.contype
+        WHEN 'p' THEN 'Primary Key'
+        WHEN 'f' THEN 'Foreign Key'
+        WHEN 'u' THEN 'Unique'
+        WHEN 'c' THEN 'Check'
+        WHEN 'x' THEN 'Exclusion'
+    END AS constraint_type,
+    pg_get_constraintdef(con.oid) AS constraint_definition
+FROM pg_catalog.pg_constraint con
+INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = con.connamespace
+WHERE rel.relname = 'orders'  -- Replace with your table name
+  AND nsp.nspname = 'public'; -- Replace with your schema name if not public
+
+
+
+-- SELECT QUERY
+
+SELECT * FROM BOOKS ORDER BY ID;
+SELECT * FROM ORDERS ORDER BY ID;
+SELECT * FROM ORDER_ITEMS ORDER BY ID;
+SELECT * FROM AUDIT_LOG;
+SELECT * FROM CUSTOMERS ORDER BY ID;
+
+-- CARDINALITY - RETURNS THE TOTAL NUMBER OF ELEMENTS IN AN ARRAY
+
+-- Create a function calculate_order_total(p_order_id int) that sums line_total from order_items and returns the total
+CREATE OR REPLACE FUNCTION CALCULATE_ORDER_TOTAL(
+P_ORDER_ID INTEGER
+)
+RETURNS NUMERIC(12,2)
+LANGUAGE PLPGSQL
+
+AS $$
+DECLARE 
+  V_TOTAL NUMERIC(12,2);
+BEGIN
+
+SELECT COALESCE(SUM(LINE_TOTAL),0)
+INTO V_TOTAL
+FROM ORDER_ITEMS
+WHERE ORDER_ID = P_ORDER_ID;
+
+RETURN V_TOTAL;
+
+END;
+$$;
+
+SELECT CALCULATE_ORDER_TOTAL(2);
+SELECT CALCULATE_ORDER_TOTAL(3);
+SELECT CALCULATE_ORDER_TOTAL(5);
+
+-- Create a PROCEDURE process_order(p_customer_id int, p_book_ids int[], 
+-- p_quantities int[]) that inserts order, loops through arrays to insert 
+-- order_items, updates stock, calculates total - all in one transaction. 
+-- Use CALL to execute.
+
+CREATE OR REPLACE PROCEDURE PROCESS_ORDER(
+p_customer_id int, 
+p_book_ids int[], 
+p_quantities int[]
+)
+LANGUAGE PLPGSQL
+AS $$
+
+DECLARE 
+    V_ORDER_ID INTEGER;
+	V_BOOK_ID INTEGER;
+	V_QUANTITY_ID INTEGER;
+	V_UNIT_PRICE NUMERIC(10,2);
+	V_TOTAL NUMERIC(12,2);
+    I INTEGER;
+BEGIN
+
+IF P_BOOK_IDS IS NULL OR P_QUANTITIES IS NULL THEN
+    RAISE EXCEPTION 'Book IDs and quantities cannot be NULL';
+END IF;
+
+
+
+END;
+$$;
+
+---------------------------------------------  TRIGER  ----------------------------------------------------------------------
+
+
+-- Create a trigger function + trigger: AFTER INSERT on orders, 
+-- auto-insert a row into audit_log with action = ‘ORDER_CREATED’,
+-- table_name = ‘orders’, performed_at = NOW()
+
+-- AUDIT_LOG TABLE 
+CREATE TABLE AUDIT_LOG (
+    AUDIT_ID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ORDER_ID INTEGER,
+    ACTION VARCHAR(50) NOT NULL,
+    TABLE_NAME VARCHAR(50) NOT NULL,
+    PERFORMED_AT TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- TRIGGER FUNCTION
+CREATE OR REPLACE FUNCTION LOG_ORDER_INSERT()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+BEGIN
+
+ INSERT INTO AUDIT_LOG (
+        ORDER_ID,
+        ACTION,
+        TABLE_NAME,
+        PERFORMED_AT
+    )
+	VALUES (
+      NEW.ID,
+	  'ORDER CREATED',
+	  'orders',
+	  NOW()
+	);
+RETURN NEW;
+
+END; 
+$$;
+
+-- CREATING TRIGGER
+
+CREATE TRIGGER AFTER_ORDER_INSERT
+AFTER INSERT 
+ON ORDERS 
+FOR EACH ROW 
+EXECUTE FUNCTION LOG_ORDER_INSERT();
+
+-- TEST TRIGGER
+
+INSERT INTO ORDERS (CUSTOMER_ID)
+VALUES (2) RETURNING *;
+
+INSERT INTO ORDERS (CUSTOMER_ID, TOTAL_AMOUNT)
+VALUES
+    (2, 1500.00),
+    (3, 2500.50),
+    (2, 3200.00)
+RETURNING *;
+
+-- TEST : AUDIT_LOG TABLE
+
+SELECT * FROM AUDIT_LOG;
+
+-- Create a trigger: AFTER INSERT OR DELETE on order_items, auto-recalculate
+-- and UPDATE the parent order’s total_amount.
+
+
+-- TRIGGER FUNCITON
+CREATE OR REPLACE FUNCTION UPDATE_ORDER_TOTAL()
+RETURNS  TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+ DECLARE 
+  V_ORDER_ID INTEGER;
+ BEGIN
+
+ -- IDENTITY WHIH ORDER NEEDS RECALCULATION
+
+ IF TG_OP = 'INSERT' THEN
+    V_ORDER_ID := NEW.ORDER_ID;
+ ELSIF TG_OP = 'DELETE' THEN
+    V_ORDER_ID := OLD.ORDER_ID;
+ END IF ;
+
+ -- RECALCULATE THE ORDER TOTAL 
+
+ UPDATE ORDERS 
+ SET TOTAL_AMOUNT = (
+  SELECT COALESCE(SUM(LINE_TOTAL), 0)
+  FROM ORDER_ITEMS
+  WHERE ORDER_ID = V_ORDER_ID
+ )
+
+ WHERE ID = V_ORDER_ID;
+
+ RETURN NULL;
+
+END;
+$$;
+
+-- CREATE TRIGGER
+
+CREATE TRIGGER AFTER_ORDER_ITEM_CHAGE
+AFTER INSERT OR DELETE 
+ON ORDER_ITEMS
+FOR EACH ROW 
+EXECUTE FUNCTION UPDATE_ORDER_TOTAL();
+
+-- TEST INSERT 
+
+SELECT
+    ID,
+    ORDER_ID,
+    BOOK_ID,
+    QUANTITY,
+    UNITPRICE,
+    LINE_TOTAL
+FROM ORDER_ITEMS
+WHERE ORDER_ID = 2;
+
+SELECT *
+FROM ORDERS
+WHERE ID = 2;
+
+INSERT INTO ORDER_ITEMS (
+    ORDER_ID,
+    BOOK_ID,
+    QUANTITY,
+    UNITPRICE
+)
+VALUES (2, 4, 2, 500.00)
+RETURNING *;
+
+-- TEST DELETE
+
+SELECT * FROM ORDER_ITEMS WHERE ORDER_ID = 2 AND BOOK_ID = 4 ;
+
+DELETE FROM ORDER_ITEMS WHERE ORDER_ID=2 AND BOOK_ID = 4 RETURNING *;
+
+--CHECK TOTAL AGAIN AFTER DELETE
+SELECT *
+FROM ORDERS
+WHERE ID = 2
+
+-- Create a trigger: BEFORE UPDATE on books, if new stock_quantity < 0 
+-- then RAISE EXCEPTION ‘Stock cannot be negative’
+
+-- CREATE TRIGGER FUNCTION
+
+CREATE OR REPLACE FUNCTION CHECK_BOOK_STOCK()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+
+AS $$
+BEGIN 
+
+ IF NEW.STOCK_QUANTITY < 0 THEN
+    RAISE EXCEPTION 'Stock cannot be negative';
+ END IF ; 
+
+ RETURN NEW;
+
+ END;
+ $$;
+
+ -- CREATE TRIGGER 
+ CREATE TRIGGER BEFORE_BOOK_UPDATE
+ BEFORE UPDATE 
+ ON BOOKS 
+ FOR EACH ROW
+ EXECUTE FUNCTION CHECK_BOOK_STOCK();
+
+ -- TEST
+ -- ERROR:  Stock cannot be negative
+-- CONTEXT:  PL/pgSQL function check_book_stock() line 5 at RAISE 
+ UPDATE BOOKS SET STOCK_QUANTITY = -2 WHERE ID= 2;
+
+-- Create a trigger: AFTER UPDATE on orders, if status changed from anything
+-- to ‘cancelled’, restore stock_quantity for all items in that order
+
+-- CREATE TRIGGER FUNCTION
+CREATE OR REPLACE FUNCTION RESTORE_CANCELLED_ORDER_STOCK()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+BEGIN
+
+    IF OLD.STATUS <> 'CANCELLED'
+       AND NEW.STATUS = 'CANCELLED' THEN
+
+        UPDATE BOOKS B
+        SET STOCK_QUANTITY = B.STOCK_QUANTITY + OI.QUANTITY
+        FROM ORDER_ITEMS OI
+        WHERE OI.ORDER_ID = NEW.ID
+          AND OI.BOOK_ID = B.ID;
+
+    END IF;
+
+    RETURN NEW;
+
+END;
+$$;
+
+-- CREATE FUNCTION
+
+CREATE TRIGGER AFTER_ORDER_CANCELLED
+AFTER UPDATE 
+ON ORDERS
+FOR EACH ROW 
+EXECUTE FUNCTION RESTORE_CANCELLED_ORDER_STOCK();
+
+-- TEST
+
+SELECT ID, STATUS, TOTAL_AMOUNT
+FROM ORDERS
+WHERE STATUS <> 'CANCELLED'; -- ORDER ID - PENDING.
+
+SELECT
+    B.ID,
+    B.TITLE,
+    B.STOCK_QUANTITY
+FROM BOOKS B
+JOIN ORDER_ITEMS OI ON OI.BOOK_ID = B.ID
+WHERE OI.ORDER_ID = 3;
+
+UPDATE ORDERS
+SET STATUS = 'CANCELLED'
+WHERE ID = 3;
+
+SELECT pg_get_functiondef(
+    'check_book_stock()'::regprocedure
+);
