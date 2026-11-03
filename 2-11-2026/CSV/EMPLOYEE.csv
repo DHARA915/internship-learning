@@ -1,0 +1,16 @@
+id,name,email,age,salary,department_id,manager_id,is_active,joining_date,designation
+101,Aarav Patel,aarav.patel.demo@example.com,24,32000,,,True,2025-01-15,Junior Developer
+102,Diya Shah,diya.shah.demo@example.com,25,36000,,,True,2025-02-03,Software Developer
+103,Krish Mehta,krish.mehta.demo@example.com,27,45000,,,True,2024-11-18,Backend Developer
+104,Anaya Desai,anaya.desai.demo@example.com,23,28000,,,True,2025-03-10,Frontend Developer
+105,Vivaan Joshi,vivaan.joshi.demo@example.com,29,55000,,,True,2023-08-21,Senior Developer
+106,Isha Trivedi,isha.trivedi.demo@example.com,26,39000,,,False,2024-06-12,QA Engineer
+107,Reyansh Parmar,reyansh.parmar.demo@example.com,28,48000,,,True,2024-02-05,Database Developer
+108,Myra Patel,myra.patel.demo@example.com,22,26000,,,True,2025-04-01,Trainee Developer
+109,Advik Shah,advik.shah.demo@example.com,30,62000,,,True,2022-09-19,Team Lead
+110,Sara Mehta,sara.mehta.demo@example.com,25,34000,,,True,2025-05-14,UI Developer
+111,Arjun Desai,arjun.desai.demo@example.com,31,70000,,,True,2021-07-26,Project Manager
+112,Kiara Joshi,kiara.joshi.demo@example.com,24,31000,,,True,2025-06-02,Support Engineer
+113,Dhruv Trivedi,dhruv.trivedi.demo@example.com,27,43000,,,False,2024-10-07,System Analyst
+114,Aadhya Parmar,aadhya.parmar.demo@example.com,26,41000,,,True,2024-12-16,Business Analyst
+115,Kabir Patel,kabir.patel.demo@example.com,29,58000,,,True,2023-04-11,DevOps Engineer

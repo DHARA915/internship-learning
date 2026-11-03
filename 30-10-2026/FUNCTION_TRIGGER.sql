@@ -403,3 +403,12 @@ VALUES
     (34, 'Vishal Desai', 'vishal34@gmail.com', 27, 42000, 3),
     (35, 'Mira Joshi', 'mira35@gmail.com', 26, 38000, 2)
 RETURNING *;
+
+ANALYZE EMP;
+
+SELECT
+    ATTNAME,
+    N_DISTINCT,
+    MOST_COMMON_VALS
+FROM PG_STATS
+WHERE TABLENAME = 'emp';

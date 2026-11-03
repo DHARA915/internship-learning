@@ -1,0 +1,199 @@
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+  AND table_type = 'BASE TABLE';
+
+-- SELECT QUERIES
+SELECT * FROM EMP ORDER BY ID;
+SELECT * FROM LEAVE_REQUESTS;
+SELECT * FROM DEPT ORDER BY ID;
+SELECT * FROM SALARY_RECORDS;
+SELECT * FROM ATTENDANCE;
+SELECT * FROM LEAVE_BALANCES;
+SELECT * FROM LEAVE_TYPES;
+SELECT * FROM AUDIT_LOG;
+SELECT * FROM EMP_PROJECT;
+SELECT * FROM PROJECT;
+
+-- Q:1 List all employees with their department name (handle employees with no department)
+SELECT E.NAME , COALESCE(D.NAME,'NO Department') FROM EMP E LEFT JOIN DEPT D ON E.DEPARTMENT_ID = D.ID;
+
+-- Q:2 Show department-wise headcount and average salary, ordered by highest avg salary first
+SELECT
+    D.ID AS DEPARTMENT_ID,
+    D.NAME AS DEPARTMENT_NAME,
+    COUNT(E.ID) AS HEADCOUNT,
+    ROUND(AVG(E.SALARY), 2) AS AVG_SALARY
+FROM DEPT D
+INNER JOIN EMP E
+    ON D.ID = E.DEPARTMENT_ID
+GROUP BY D.ID, D.NAME
+ORDER BY AVG_SALARY DESC;
+
+-- Q:3 Find the top 3 highest paid employees in each department
+
+SELECT DEPARTMENT_ID, DEPARTMENT_NAME ,EMPLOYEE_ID, EMPLOYEE_NAME,SALARY FROM(
+SELECT
+E.DEPARTMENT_ID,
+D.NAME AS DEPARTMENT_NAME,
+E.ID AS EMPLOYEE_ID,
+E.NAME AS EMPLOYEE_NAME,
+E.SALARY,
+
+ROW_NUMBER() OVER (
+PARTITION  BY E.DEPARTMENT_ID
+ORDER BY E.SALARY DESC , E.ID
+) AS RN
+
+FROM EMP E
+INNER JOIN DEPT D 
+      ON E.DEPARTMENT_ID = D.ID
+	 WHERE E.SALARY IS NOT NULL
+) WHERE RN <=3
+ORDER BY DEPARTMENT_ID, RN;
+
+-- Q:4 Show each employee's salary as percentage of their department's total salary
+
+SELECT NAME AS EMPLOYEE_NAME , DEPARTMENT_ID , SALARY , 
+
+SUM(SALARY) OVER (
+PARTITION BY DEPARTMENT_ID
+) AS DEPARTMENT_TOTAL_SALARY,
+
+CONCAT(ROUND(
+ SALARY*100/
+ SUM(SALARY) OVER(
+PARTITION BY DEPARTMENT_ID
+ ),
+ 2
+ ),
+ '%'
+) AS SALARY_PERCENTAGE
+
+FROM EMP WHERE DEPARTMENT_ID IS NOT NULL
+ORDER BY DEPARTMENT_ID , SALARY DESC;
+
+-- Q:5 Categorize all employees as Junior/Mid/Senior based on salary,
+-- show count per category per department.
+
+SELECT 
+   D.ID AS DEPARTMENT_ID,
+   D.NAME AS DEPARTMENT_NAME,
+
+   CASE 
+   WHEN E.SALARY < 30000 THEN 'Junior'
+   WHEN E.SALARY <= 60000 THEN 'Mid'
+   ELSE 'Senior'
+   END AS SALARY_CATEGORY,
+
+   COUNT(E.ID) AS EMPLOYEE_COUNT
+
+FROM EMP E
+INNER JOIN DEPT D 
+      ON E.DEPARTMENT_ID  = D.ID
+GROUP BY D.ID,D.NAME,
+     CASE 
+	   WHEN E.SALARY < 30000 THEN 'Junior'
+	   WHEN E.SALARY <= 60000 THEN 'Mid'
+	   ELSE 'Senior'
+	 END
+ORDER BY  D.ID , SALARY_CATEGORY;
+
+-- Q:6 Find departments where average salary is higher than company average.
+
+SELECT D.ID , D.NAME , ROUND(AVG(E.SALARY),2) AS DEPARTMENT_AVG
+FROM EMP E 
+INNER JOIN DEPT D
+      ON E.DEPARTMENT_ID = D.ID
+GROUP BY D.ID, D.NAME
+HAVING AVG(E.SALARY) > (
+SELECT AVG(SALARY) FROM EMP
+) 
+
+-- Q:7 List employees who joined in the last 6 months with their tenure in days 
+
+SELECT ID , NAME , JOINING_DATE , CURRENT_DATE - JOINING_DATE AS TENURE_DAYS
+FROM EMP
+WHERE JOINING_DATE>= CURRENT_DATE - INTERVAL '6 months'
+ORDER BY JOINING_DATE;
+
+-- Q:8 Generate an employee report: name, department, salary formatted as 
+-- currency (e.g., '1,50,000'), join year, email (show 'N/A' if null)
+
+SELECT E.NAME AS EMPLOYEE_NAME , COALESCE(D.NAME,'No Department') AS DEPARTMENT ,
+TO_CHAR(E.SALARY,'FM99,99,99,999') AS FORMATTED_CURRENTCY , 
+EXTRACT(YEAR FROM E.JOINING_DATE) AS JOIN_YEAR , COALESCE(E.EMAIL,'N/A') AS EMAIL
+
+FROM EMP E 
+LEFT JOIN DEPT D
+     ON E.DEPARTMENT_ID = D.ID
+ORDER BY E.ID;
+
+-- Q:7 Find duplicate department assignments (if any employee appears twice in same department).
+SELECT
+    E.ID AS EMPLOYEE_ID,
+    E.NAME AS EMPLOYEE_NAME,
+    E.DEPARTMENT_ID,
+    D.NAME AS DEPARTMENT_NAME,
+    COUNT(*) AS ASSIGNMENT_COUNT
+
+FROM EMP E
+INNER JOIN DEPT D
+    ON E.DEPARTMENT_ID = D.ID
+
+GROUP BY
+    E.ID,
+    E.NAME,
+    E.DEPARTMENT_ID,
+    D.NAME
+
+HAVING COUNT(*) > 1;
+
+-- Q:8 Create a summary: total employees, total salary expense, average salary,
+-- earliest and latest join date, count of active vs inactive - all in one query
+
+SELECT 
+COUNT(*) AS TOTAL_EMPLOYEE , SUM(SALARY) AS TOTAL_SALARY_EXPENSE , AVG(SALARY) AS AVG_SALARY,
+MIN(JOINING_DATE) AS EARLIEST_JOIN_DATE, MAX(JOINING_DATE) AS LATEST_JOIN_DATE,
+
+COUNT(*) FILTER(
+WHERE IS_ACTIVE = TRUE
+) AS ACTIVE_EMPLOYEES,
+
+
+COUNT(*) FILTER(
+WHERE IS_ACTIVE = FALSE
+) AS INACTIVE_EMPLOYEES
+
+FROM EMP;
+
+-- Q:9 UPSERT: Write a query that inserts a new employee or updates their salary
+-- if email already exists
+
+INSERT INTO EMP (
+ID,
+NAME,
+EMAIL,
+AGE,
+SALARY,DEPARTMENT_ID,
+DESIGNATION
+)
+VALUES (
+    37,
+    'Neel Shah',
+    'neel.shah@example.com',
+    25,
+    68000,
+    1,
+    'Software Developer'
+)
+
+ON CONFLICT(EMAIL)
+DO UPDATE SET SALARY = EXCLUDED.SALARY
+RETURNING * ;
+
+-- Q:10 Write a DELETE that removes all inactive employees who joined 
+-- more than 2 years ago, RETURNING their names 
+
+DELETE FROM EMP WHERE IS_ACTIVE = FALSE 
+       AND JOINING_DATE < CURRENT_DATE - INTERVAL '2 years' RETURNING NAME;
