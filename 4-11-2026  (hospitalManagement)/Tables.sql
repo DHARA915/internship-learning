@@ -1,0 +1,76 @@
+-- CREATE ALL TABLES FOR HOSPITAL MANAGEMENT SYSTEM.
+
+-- DOCTORS
+CREATE TABLE DOCTORS (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    specialization VARCHAR(100) NOT NULL,
+    phone VARCHAR(15) UNIQUE,
+    experience_years INTEGER CHECK (experience_years >= 0),
+    status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- PATIENTS
+CREATE TABLE PATIENTS (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INTEGER NOT NULL CHECK (age > 0),
+    gender VARCHAR(10) NOT NULL,
+    phone VARCHAR(15) UNIQUE,
+    blood_group VARCHAR(5),
+    status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE'
+        CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- APPOITMENTS
+CREATE TABLE APPOINTMENTS (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    patient_id INTEGER NOT NULL,
+    doctor_id INTEGER NOT NULL,
+
+    appointment_date TIMESTAMP NOT NULL,
+
+    status VARCHAR(15) NOT NULL DEFAULT 'SCHEDULED'
+        CHECK (status IN ('SCHEDULED', 'COMPLETED', 'CANCELLED')),
+
+    notes TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_appointment_patient
+        FOREIGN KEY (patient_id)
+        REFERENCES PATIENTS(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_appointment_doctor
+        FOREIGN KEY (doctor_id)
+        REFERENCES DOCTORS(id)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT unique_appointment
+        UNIQUE (patient_id, doctor_id, appointment_date)
+);
+
+-- PRESCRIPTIONS
+CREATE TABLE PRESCRIPTIONS (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    appointment_id INTEGER NOT NULL,
+    medicine_name VARCHAR(150) NOT NULL,
+    dosage VARCHAR(100) NOT NULL,
+    duration_days INTEGER NOT NULL CHECK (duration_days > 0),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_prescription_appointment
+        FOREIGN KEY (appointment_id)
+        REFERENCES APPOINTMENTS(id)
+        ON DELETE CASCADE
+);
