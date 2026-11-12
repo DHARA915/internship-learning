@@ -1,0 +1,12 @@
+
+id,name,email,age,city,department,salary
+1,Dhara,dhara@gmail.com,21,Anand,IT,25000
+2,Riya,riya@gmail.com,22,Ahmedabad,HR,30000
+3,Meet,meet@gmail.com,24,Surat,Finance,35000
+4,Krish,krish@gmail.com,23,Vadodara,IT,28000
+5,Neha,neha@gmail.com,25,Rajkot,Marketing,32000
+6,Parth,parth@gmail.com,26,Anand,Sales,27000
+7,Priya,priya@gmail.com,22,Nadiad,IT,31000
+8,Rahul,rahul@gmail.com,27,Ahmedabad,Finance,40000
+9,Anjali,anjali@gmail.com,24,Surat,HR,29000
+10,Jay,jay@gmail.com,28,Vadodara,Sales,38000

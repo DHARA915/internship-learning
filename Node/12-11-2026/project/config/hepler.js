@@ -1,0 +1,1 @@
+console.log("This is helper .js(testing readdir module)")

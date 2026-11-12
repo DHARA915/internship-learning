@@ -1,0 +1,92 @@
+[
+{
+  "id": "1",
+  "name": "Dhara",
+  "email": "dhara@gmail.com",
+  "age": "21",
+  "city": "Anand",
+  "department": "IT",
+  "salary": "25000"
+},
+{
+  "id": "2",
+  "name": "Riya",
+  "email": "riya@gmail.com",
+  "age": "22",
+  "city": "Ahmedabad",
+  "department": "HR",
+  "salary": "30000"
+},
+{
+  "id": "3",
+  "name": "Meet",
+  "email": "meet@gmail.com",
+  "age": "24",
+  "city": "Surat",
+  "department": "Finance",
+  "salary": "35000"
+},
+{
+  "id": "4",
+  "name": "Krish",
+  "email": "krish@gmail.com",
+  "age": "23",
+  "city": "Vadodara",
+  "department": "IT",
+  "salary": "28000"
+},
+{
+  "id": "5",
+  "name": "Neha",
+  "email": "neha@gmail.com",
+  "age": "25",
+  "city": "Rajkot",
+  "department": "Marketing",
+  "salary": "32000"
+},
+{
+  "id": "6",
+  "name": "Parth",
+  "email": "parth@gmail.com",
+  "age": "26",
+  "city": "Anand",
+  "department": "Sales",
+  "salary": "27000"
+},
+{
+  "id": "7",
+  "name": "Priya",
+  "email": "priya@gmail.com",
+  "age": "22",
+  "city": "Nadiad",
+  "department": "IT",
+  "salary": "31000"
+},
+{
+  "id": "8",
+  "name": "Rahul",
+  "email": "rahul@gmail.com",
+  "age": "27",
+  "city": "Ahmedabad",
+  "department": "Finance",
+  "salary": "40000"
+},
+{
+  "id": "9",
+  "name": "Anjali",
+  "email": "anjali@gmail.com",
+  "age": "24",
+  "city": "Surat",
+  "department": "HR",
+  "salary": "29000"
+},
+{
+  "id": "10",
+  "name": "Jay",
+  "email": "jay@gmail.com",
+  "age": "28",
+  "city": "Vadodara",
+  "department": "Sales",
+  "salary": "38000"
+}
+]

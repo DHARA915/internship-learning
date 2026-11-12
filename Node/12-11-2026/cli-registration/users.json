@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Dhara",
+    "age": 21,
+    "email": "dhara.patel@gmail.com",
+    "createdAt": "2026-11-12T10:40:12.470Z"
+  },
+  {
+    "id": 2,
+    "name": "Dhara",
+    "age": 22,
+    "email": "dp915@gmail.com",
+    "createdAt": "2026-11-12T10:40:43.701Z"
+  }
+]
