@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cors from "cors";
 
 import authRoute from "./routes/auth.route.js"
+import userRoute from "./routes/user.routes.js"
 
 const app = express();
 
@@ -33,6 +34,8 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth",authRoute)
+
+app.use("/api/users", userRoute)
 
 
 export default app;
