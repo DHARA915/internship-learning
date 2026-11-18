@@ -83,3 +83,26 @@ VALUES
 
 SELECT * FROM ACCOUNTS ORDER BY ID;
 
+-- CHECK ADDED VERSION FILE 
+SELECT id, name, price, version
+FROM products
+LIMIT 10;
+
+
+
+SELECT id, name, price, stock, category_id, version
+FROM products
+LIMIT 5;
+
+-- ADDING USERS ASSOCIATED WITH PRODUCT RANDOMLY
+
+UPDATE products
+SET created_by = (
+    SELECT id
+    FROM users
+    ORDER BY RANDOM()
+    LIMIT 1
+)
+WHERE created_by IS NULL;
+
+SELECT * FROM PRODUCTS;
