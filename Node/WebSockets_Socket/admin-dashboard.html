@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Order Dashboard</title>
+</head>
+<body>
+    <h1>Live Orders Dashboard</h1>
+
+    <p id="status">Connecting...</p>
+
+    <h2>New Orders</h2>
+    <div id="orders"></div>
+
+    <script>
+        const token = prompt("Enter your admin JWT token");
+
+        async function connectOrderStream() {
+            const response = await fetch(
+                "http://localhost:3000/api/orders/stream",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`Connection failed: ${response.status}`);
+            }
+
+            document.getElementById("status").textContent = "Connected";
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            let buffer = "";
+
+            while (true) {
+                const { value, done } = await reader.read();
+
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                buffer = buffer.replace(/\r\n/g, "\n");
+
+                const events = buffer.split("\n\n");
+                buffer = events.pop();
+
+                for (const eventBlock of events) {
+                    let eventName = "message";
+                    let data = "";
+
+                    for (const line of eventBlock.split("\n")) {
+                        if (line.startsWith("event:")) {
+                            eventName = line.slice(6).trim();
+                        }
+
+                        if (line.startsWith("data:")) {
+                            data += line.slice(5).trim();
+                        }
+                    }
+
+                    if (eventName === "new-order" && data) {
+                        displayOrder(JSON.parse(data));
+                    }
+                }
+            }
+
+            document.getElementById("status").textContent =
+                "Disconnected";
+        }
+
+        function displayOrder(order) {
+            const container = document.getElementById("orders");
+            const item = document.createElement("div");
+
+            item.innerHTML = `
+                <hr>
+                <h3>Order: ${order.id}</h3>
+                <p>Product: ${order.productName}</p>
+                <p>Quantity: ${order.quantity}</p>
+                <p>Total: ₹${order.total}</p>
+                <p>Status: ${order.status}</p>
+                <p>Created: ${order.createdAt}</p>
+            `;
+
+            container.prepend(item);
+        }
+
+        connectOrderStream().catch((error) => {
+            document.getElementById("status").textContent =
+                "Connection failed";
+            console.error(error);
+        });
+    </script>
+</body>
+</html>
