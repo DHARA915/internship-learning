@@ -21,10 +21,10 @@ app.use(sessionMiddleware);
 // ratelimiter per ip
 app.use(rateLimiter)
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-});
+// // Start server
+// app.listen(PORT, () => {
+//     console.log(`Server running at http://localhost:${PORT}`);
+// });
 
 app.use("/api/products", productRoutes);
 app.use("/api/session",sessionRoute);

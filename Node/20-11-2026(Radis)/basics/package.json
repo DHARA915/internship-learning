@@ -4,7 +4,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "start": "node ExecuteCache.js",
     "dev": "nodemon server.js"
   },
@@ -19,9 +19,11 @@
     "express-session": "^1.19.0",
     "ioredis": "^6.0.0",
     "pg": "^8.23.1",
-    "redis": "^6.3.1"
+    "redis": "^6.3.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "supertest": "^7.3.2"
   }
 }

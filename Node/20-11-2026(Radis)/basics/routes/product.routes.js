@@ -1,6 +1,8 @@
 import express from "express";
 import productController from "../controller/product.controller.js";
-import cacheMiddleware from "../middleware/cache.middleware.js"
+import cacheMiddleware from "../middleware/cache.middleware.js";
+import validate from "../middleware/validate.middleware.js";
+import { productSchema } from "../validators/product.validator.js";
 
 const router = express.Router();
 
@@ -11,7 +13,7 @@ router.get("/", cacheMiddleware(60),productController.getProducts);
 router.get("/:id", cacheMiddleware(60),productController.getProductById);
 
 // Create Product
-router.post("/", productController.createProduct);
+router.post("/",validate(productSchema), productController.createProduct);
 
 // Update Product
 router.put("/:id", productController.updateProduct);

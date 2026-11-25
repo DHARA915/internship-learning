@@ -1,10 +1,10 @@
 
 import "dotenv/config";
 
-import app from "./app.js";
-import pool from "./config/db.js";
-import redis from "./config/redis.js";
-import sessionRedis from "./config/sessionRedis.js";
+import app from "./src/app.js";
+import pool from "./src/config/db.js";
+import redis from "./src/config/redis.js";
+import sessionRedis from "./src/config/sessionRedis.js";
 
 const PORT = process.env.PORT || 3000;
 

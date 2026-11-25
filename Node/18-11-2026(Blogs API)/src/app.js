@@ -6,6 +6,8 @@ import cors from "cors";
 import authRoute from "./routes/auth.route.js"
 import userRoute from "./routes/user.routes.js"
 import postRoutes from "../src/routes/post.route.js"
+import healthRoutes from "./routes/health.route.js"
+import loggerMiddleware from "./middleware/logger.middleware.js";
 
 const app = express();
 
@@ -23,8 +25,13 @@ app.use(
 // Parse incoming JSON
 app.use(express.json());
 
+// Pino HTTP middleware
+app.use(loggerMiddleware);
+
 // Parse URL-encoded data
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/", healthRoutes);
 
 // Health check API
 app.get("/api/health", (req, res) => {
