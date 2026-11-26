@@ -1,0 +1,24 @@
+{
+  "name": "26-11-2026(ecommerceapi)",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test",
+    "migrate": "node-pg-migrate",
+    "migrate:create": "node-pg-migrate create",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "node-pg-migrate": "^9.0.0",
+    "nodemon": "^3.1.14",
+    "pino-pretty": "^13.2.0"
+  }
+}
