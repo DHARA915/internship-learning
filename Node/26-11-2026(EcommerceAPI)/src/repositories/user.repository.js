@@ -147,6 +147,8 @@ async update(id, updateData) {
   return result.rows[0] || null;
 }
 
+
+
 }
 
 export default new UserRepository();
