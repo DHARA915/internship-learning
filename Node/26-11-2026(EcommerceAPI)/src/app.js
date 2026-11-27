@@ -10,6 +10,7 @@ import errorHandler from "./middleware/error.middleware.js"
 import authRoutes from "./routes/auth.routes.js"
 import userRoutes from "./routes/user.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.get("/health", async (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 
 // Basic welcome route
 app.get("/", (req, res) => {
